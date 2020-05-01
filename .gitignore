@@ -24,3 +24,4 @@ log
 *.pri
 *.code-workspace
 *.workspace
+Content/Maps/BaseLevel_BuiltData.uasset
