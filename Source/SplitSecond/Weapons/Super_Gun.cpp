@@ -11,3 +11,8 @@ ASuper_Gun::ASuper_Gun()
 
 }
 
+void ASuper_Gun::FireGun()
+{
+
+}
+
