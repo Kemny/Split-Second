@@ -7,23 +7,12 @@
 #include "PlayerCharacter.generated.h"
 
 class UInputComponent;
+class ASuper_Gun;
 
 UCLASS(config=Game)
 class APlayerCharacter : public ACharacter
 {
 	GENERATED_BODY()
-
-	/** Gun mesh: 1st person view (seen only by self) */
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	class UStaticMeshComponent* Gun;
-
-	/** Location on gun mesh where projectiles should spawn. */
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	class USceneComponent* FP_MuzzleLocation;
-
-  /* This is the mesh the gun is attached to */
-  UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-  class UStaticMeshComponent* GunAttachMesh;
 
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -31,7 +20,16 @@ class APlayerCharacter : public ACharacter
 
 public:
 	APlayerCharacter();
+
 	virtual void Tick(float DeltaTime) override;
+
+  UPROPERTY(BlueprintReadWrite, Category = "Gun Var's")
+  ASuper_Gun* CurrentGun;
+
+  /* This is the mesh the gun is attached to */
+  UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+  class UStaticMeshComponent* GunAttachMesh;
+
 protected:
 	virtual void BeginPlay() override;
 

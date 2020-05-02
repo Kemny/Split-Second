@@ -1,7 +1,7 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "PlayerCharacter.h"
-#include "../Weapons/SplitSecondProjectile.h"
+#include "../Weapons/Super_Gun.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -22,22 +22,12 @@ APlayerCharacter::APlayerCharacter()
 
 	GunAttachMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunAttachMesh"));
 	GunAttachMesh->SetupAttachment(FirstPersonCameraComponent);
-
-	Gun = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Gun"));
-	Gun->SetOnlyOwnerSee(true);
-	Gun->bCastDynamicShadow = false;
-	Gun->CastShadow = false;
-	Gun->SetupAttachment(RootComponent);
-
-	FP_MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
-	FP_MuzzleLocation->SetupAttachment(Gun, "MuzzleLocation");
 }
 
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Gun->AttachToComponent(GunAttachMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -63,7 +53,10 @@ void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 
 void APlayerCharacter::OnFire()
 {
-
+  if (CurrentGun)
+  {
+    CurrentGun->FireGun();
+  }
 }
 
 void APlayerCharacter::MoveForward(float Value)
