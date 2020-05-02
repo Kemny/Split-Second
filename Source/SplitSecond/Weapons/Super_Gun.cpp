@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "SplitSecondProjectile.h"
 #include "../Player/PlayerCharacter.h"
+#include "../AI/Super_AI_Character.h"
 #include "Engine/World.h"
 
 // Sets default values
@@ -48,6 +49,7 @@ ASuper_Gun* ASuper_Gun::EquipGun(ACharacter* Character)
   if (!ensure(Character != nullptr)) { return nullptr; }
 
   APlayerCharacter* PlayerRef = Cast<APlayerCharacter>(Character);
+  ASuper_AI_Character* AIRef = Cast<ASuper_AI_Character>(Character);
 
   if (PlayerRef)
   {
@@ -58,6 +60,17 @@ ASuper_Gun* ASuper_Gun::EquipGun(ACharacter* Character)
     GunMesh->bCastDynamicShadow = false;
     GunMesh->CastShadow = false;
     
+    return this;
+  }
+  else if (AIRef)
+  {
+    AIRef->CurrentGun = this;
+    CurrentPawn = AIRef;
+
+    this->AttachToActor(AIRef, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GunSocket"));
+    GunMesh->bCastDynamicShadow = false;
+    GunMesh->CastShadow = false;
+
     return this;
   }
   else

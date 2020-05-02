@@ -13,9 +13,6 @@ class ASplitSecondGameMode : public AGameModeBase
 
 public:
 	ASplitSecondGameMode();
-
-  UFUNCTION(BlueprintPure, Category = "ID Functions")
-
 };
 
 

@@ -17,21 +17,30 @@ public:
 	// Sets default values for this character's properties
 	ASuper_AI_Character();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 public:	
 
+  /* Gun to give AI */
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gun Settings")
+  TSubclassOf<ASuper_Gun> AIGunClass;
+
+  /* Scale of the AI's gun */
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gun Settings")
+  FVector GunScale;
+
   /* AI's current gun */
-  UPROPERTY(BlueprintReadWrite)
+  UPROPERTY(BlueprintReadWrite, Category = "Gun Vars")
   ASuper_Gun* CurrentGun;
 
-  /* Gets the AI's ID */
-  UFUNCTION(BlueprintPure, Category = "AI Functions")
-  int32 GetID();
+  /* Fires the currently equipped gun */
+  void FireGun();
+
+protected:
+
+  // Called when the game starts or when spawned
+  virtual void BeginPlay() override;
 
 private:
 
-  int32 ID;
+  void SpawnGun();
+
 };
