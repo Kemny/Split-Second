@@ -23,6 +23,7 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+  /* The player's current gun */
   UPROPERTY(BlueprintReadWrite, Category = "Gun Var's")
   ASuper_Gun* CurrentGun;
 
