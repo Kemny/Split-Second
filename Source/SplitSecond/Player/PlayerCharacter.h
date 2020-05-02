@@ -35,15 +35,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-public:
-	/** Projectile class to spawn */
-	UPROPERTY(EditDefaultsOnly, Category="Projectile")
-	TSubclassOf<class ASplitSecondProjectile> ProjectileClass;
-
-	/** Sound to play each time we fire */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile")
-	class USoundBase* FireSound;
-
 protected:
 	
 	/** Fires a projectile. */
