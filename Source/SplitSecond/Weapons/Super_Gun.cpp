@@ -67,7 +67,10 @@ ASuper_Gun* ASuper_Gun::EquipGun(ACharacter* Character)
     AIRef->CurrentGun = this;
     CurrentPawn = AIRef;
 
-    this->AttachToActor(AIRef, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GunSocket"));
+    USceneComponent* EnemyScene = Cast<USceneComponent>(AIRef->GetMesh());
+    if (!ensure(EnemyScene != nullptr)) { return nullptr; }
+
+    this->AttachToComponent(EnemyScene, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GunSocket"));
     GunMesh->bCastDynamicShadow = false;
     GunMesh->CastShadow = false;
 
