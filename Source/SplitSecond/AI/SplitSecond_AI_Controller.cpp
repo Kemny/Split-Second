@@ -5,13 +5,6 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "../AI/Super_AI_Character.h"
 
-void ASplitSecond_AI_Controller::FireGun()
-{
-  if (!ensure(CurrentControlledAI != nullptr)) { return; }
-
-  CurrentControlledAI->FireGun();
-}
-
 UBehaviorTree* ASplitSecond_AI_Controller::GetBehaviorTreeFromAI()
 {
   if (CurrentControlledAI)

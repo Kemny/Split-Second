@@ -43,6 +43,7 @@ public:
   ASuper_Gun* CurrentGun;
 
   /* Fires the currently equipped gun */
+  UFUNCTION(BlueprintCallable, Category = "Gun Functions")
   void FireGun();
 
 protected:

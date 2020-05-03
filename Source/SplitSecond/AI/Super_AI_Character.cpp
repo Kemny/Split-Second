@@ -30,10 +30,9 @@ void ASuper_AI_Character::BeginPlay()
 
 void ASuper_AI_Character::FireGun()
 {
-  if (CurrentGun)
-  {
-    CurrentGun->FireGun();
-  }
+  if (!ensure(CurrentGun != nullptr)) { return; }
+
+  CurrentGun->FireGun();
 }
 
 void ASuper_AI_Character::SpawnGun()
