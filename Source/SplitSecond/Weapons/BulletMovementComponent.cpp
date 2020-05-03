@@ -7,6 +7,8 @@
 
 UBulletMovementComponent::UBulletMovementComponent()
 {
+	bTickBeforeOwner = false;
+
 	bShouldBounce = false;
 	ProjectileGravityScale = false;
 }
@@ -17,14 +19,17 @@ void UBulletMovementComponent::BeginPlay()
 
 	GameState = GetWorld()->GetGameState<ASplitSecondGameState>();
 	if (!ensure(GameState != nullptr)) return;
+
+	DefaultInitialSpeed = InitialSpeed;
+	DefaultMaxSpeed = MaxSpeed;
 }
 
-FVector UBulletMovementComponent::ComputeVelocity(FVector InitialVelocity, float DeltaTime) const
+void UBulletMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	if (!ensure(GameState != nullptr)) { return FVector(); }
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	const FVector Acceleration = ComputeAcceleration(InitialVelocity, DeltaTime) * GameState->GetGlobalTimeMultiplier();
-	FVector NewVelocity = InitialVelocity + (Acceleration * DeltaTime);
+	if (!ensure(GameState != nullptr)) return;
+	InitialSpeed = DefaultInitialSpeed * GameState->GetGlobalTimeMultiplier();
+	MaxSpeed = DefaultMaxSpeed * GameState->GetGlobalTimeMultiplier();
 
-	return LimitVelocity(NewVelocity);
 }

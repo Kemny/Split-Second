@@ -18,13 +18,12 @@ class SPLITSECOND_API UBulletMovementComponent : public UProjectileMovementCompo
 public:
     UBulletMovementComponent();
     void BeginPlay() override;
-
-    FVector ComputeVelocity(FVector InitialVelocity, float DeltaTime) const override;
-
-protected:
-    
+    void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
     float LocalTimeMultiplier;
     class ASplitSecondGameState* GameState;
+
+    float DefaultInitialSpeed;
+    float DefaultMaxSpeed;
 };
