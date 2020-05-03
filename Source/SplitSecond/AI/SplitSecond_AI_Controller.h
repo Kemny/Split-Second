@@ -7,6 +7,7 @@
 #include "SplitSecond_AI_Controller.generated.h"
 
 class ASuper_AI_Character;
+class UBehaviorTree;
 
 /**
  * 
@@ -21,16 +22,16 @@ public:
   /* Fires the current AI's gun */
   UFUNCTION(BlueprintCallable, Category = "Gun Functions")
   void FireGun();
-
   
   UFUNCTION(BlueprintPure, Category = "Controller Functions")
   ASuper_AI_Character* GetCurrentAI();
+
+  virtual void OnPossess(APawn* InPawn) override;
 
 private:
 
   ASuper_AI_Character* CurrentControlledAI;
 
-protected:
-  // Called when the game starts or when spawned
-  virtual void BeginPlay() override;
+  UBehaviorTree* GetBehaviorTreeFromAI();
+
 };

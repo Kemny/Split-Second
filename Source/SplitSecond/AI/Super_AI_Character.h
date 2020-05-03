@@ -23,6 +23,9 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gun Settings")
   TSubclassOf<ASuper_Gun> AIGunClass;
 
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Settings")
+  class UBehaviorTree* BehaviorTreeToUse;
+
   /* Scale of the AI's gun */
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gun Settings")
   FVector GunScale;
