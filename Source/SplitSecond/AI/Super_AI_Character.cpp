@@ -17,6 +17,8 @@ ASuper_AI_Character::ASuper_AI_Character()
   AIGunClass = ASuper_Gun::StaticClass();
 
   GunScale = FVector(1);
+  MaxHP = 10.f;
+  CurrentHP = 10.f;
 }
 
 void ASuper_AI_Character::BeginPlay()

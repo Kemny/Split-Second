@@ -26,6 +26,14 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Settings")
   class UBehaviorTree* BehaviorTreeToUse;
 
+  /* Maximum HP this AI can have */
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Settings")
+  float MaxHP;
+
+  /* Current HP this AI has */
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Settings")
+  float CurrentHP;
+
   /* Scale of the AI's gun */
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gun Settings")
   FVector GunScale;
