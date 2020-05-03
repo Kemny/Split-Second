@@ -9,6 +9,8 @@
 #include "GameFramework/InputSettings.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "../SplitSecondGameState.h"
+
 APlayerCharacter::APlayerCharacter()
 {
 	// Set size for collision capsule
@@ -28,6 +30,8 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	GameState = GetWorld()->GetGameState<ASplitSecondGameState>();
+	if (!ensure(GameState != nullptr)) { return; }
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
@@ -61,19 +65,23 @@ void APlayerCharacter::OnFire()
 
 void APlayerCharacter::MoveForward(float Value)
 {
+	if (!ensure(GameState != nullptr)) { return; }
+
 	if (Value != 0.0f)
 	{
 		// add movement in that direction
-		AddMovementInput(GetActorForwardVector(), Value);
+		AddMovementInput(GetActorForwardVector(), Value * GameState->GetGlobalTimeMultiplier());
 	}
 }
 
 void APlayerCharacter::MoveRight(float Value)
 {
+	if (!ensure(GameState != nullptr)) { return; }
+
 	if (Value != 0.0f)
 	{
 		// add movement in that direction
-		AddMovementInput(GetActorRightVector(), Value);
+		AddMovementInput(GetActorRightVector(), Value * GameState->GetGlobalTimeMultiplier());
 	}
 }
 

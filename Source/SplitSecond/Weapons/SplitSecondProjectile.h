@@ -17,7 +17,7 @@ class ASplitSecondProjectile : public AActor
 
 	/** Projectile movement component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	class UProjectileMovementComponent* ProjectileMovement;
+	class UBulletMovementComponent* BulletMovement;
 
 public:
 	ASplitSecondProjectile();
@@ -29,6 +29,9 @@ public:
 	/** Returns CollisionComp subobject **/
 	FORCEINLINE class USphereComponent* GetCollisionComp() const { return CollisionComp; }
 	/** Returns ProjectileMovement subobject **/
-	FORCEINLINE class UProjectileMovementComponent* GetProjectileMovement() const { return ProjectileMovement; }
+	FORCEINLINE class UBulletMovementComponent* GetProjectileMovement() const { return BulletMovement; }
+
+protected:
+	UPROPERTY(EditAnywhere, Category = "Particles") UParticleSystem* ParticleOnDeath;
 };
 

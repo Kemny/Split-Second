@@ -1,8 +1,9 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "SplitSecondProjectile.h"
-#include "GameFramework/ProjectileMovementComponent.h"
+#include "../Weapons/BulletMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ASplitSecondProjectile::ASplitSecondProjectile() 
 {
@@ -20,15 +21,14 @@ ASplitSecondProjectile::ASplitSecondProjectile()
 	RootComponent = CollisionComp;
 
 	// Use a ProjectileMovementComponent to govern this projectile's movement
-	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
-	ProjectileMovement->UpdatedComponent = CollisionComp;
-	ProjectileMovement->InitialSpeed = 3000.f;
-	ProjectileMovement->MaxSpeed = 3000.f;
-	ProjectileMovement->bRotationFollowsVelocity = true;
-	ProjectileMovement->bShouldBounce = true;
+	BulletMovement = CreateDefaultSubobject<UBulletMovementComponent>(TEXT("BulletComp"));
+	BulletMovement->UpdatedComponent = CollisionComp;
+	BulletMovement->InitialSpeed = 3000.f;
+	BulletMovement->MaxSpeed = 3000.f;
+	BulletMovement->bRotationFollowsVelocity = true;
 
 	// Die after 3 seconds by default
-	InitialLifeSpan = 3.0f;
+	InitialLifeSpan = 0;
 }
 
 void ASplitSecondProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -37,7 +37,14 @@ void ASplitSecondProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 	{
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+	}
+	if (OtherActor != this)
+	{
+		if (!ensure(GetWorld() != nullptr)) { return; }
+		if (!ensure(ParticleOnDeath != nullptr)) { return; }
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleOnDeath, GetActorLocation());
 
 		Destroy();
 	}
+	
 }

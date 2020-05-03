@@ -16,8 +16,8 @@ class SPLITSECOND_API ASplitSecondGameState : public AGameStateBase
 	GENERATED_BODY()
 	
 protected:
-	UPROPERTY(VisibleInstanceOnly)float GlobalTimeMultiplier;
-	UPROPERTY(VisibleInstanceOnly)int32 CurrentLevel;
+	UPROPERTY(EditAnywhere)float GlobalTimeMultiplier = 1;
+	int32 CurrentLevel;
 
 public:
 	float GetGlobalTimeMultiplier() const { return GlobalTimeMultiplier; }
