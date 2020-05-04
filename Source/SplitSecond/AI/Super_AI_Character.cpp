@@ -38,17 +38,20 @@ void ASuper_AI_Character::FireGun()
 
 void ASuper_AI_Character::SpawnGun()
 {
-  UWorld* const World = GetWorld();
-
-  if (World != NULL)
+  if (AIGunClass)
   {
-    //Set Spawn Collision Handling Override
-    FActorSpawnParameters ActorSpawnParams;
-    ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-    auto SpawnTransform = FTransform(FRotator(0), FVector(0), GunScale);
+    UWorld* const World = GetWorld();
 
-    CurrentGun = GetWorld()->SpawnActor<ASuper_Gun>(AIGunClass, SpawnTransform, ActorSpawnParams);
+    if (World != NULL)
+    {
+      //Set Spawn Collision Handling Override
+      FActorSpawnParameters ActorSpawnParams;
+      ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+      auto SpawnTransform = FTransform(FRotator(0), FVector(0), GunScale);
 
-    CurrentGun->EquipGun(this);
+      CurrentGun = GetWorld()->SpawnActor<ASuper_Gun>(AIGunClass, SpawnTransform, ActorSpawnParams);
+
+      CurrentGun->EquipGun(this);
+    }
   }
 }
