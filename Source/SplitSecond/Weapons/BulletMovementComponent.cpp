@@ -20,7 +20,6 @@ void UBulletMovementComponent::BeginPlay()
 	GameState = GetWorld()->GetGameState<ASplitSecondGameState>();
 	if (!ensure(GameState != nullptr)) return;
 
-	DefaultInitialSpeed = InitialSpeed;
 	DefaultMaxSpeed = MaxSpeed;
 }
 
@@ -29,7 +28,8 @@ void UBulletMovementComponent::TickComponent(float DeltaTime, enum ELevelTick Ti
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	if (!ensure(GameState != nullptr)) return;
-	InitialSpeed = DefaultInitialSpeed * GameState->GetGlobalTimeMultiplier();
+	
+	Velocity += Velocity.GetSafeNormal() * GameState->GetGlobalTimeMultiplier() * InitialSpeed * LocalTimeMultiplier;
 	MaxSpeed = DefaultMaxSpeed * GameState->GetGlobalTimeMultiplier();
 
 }

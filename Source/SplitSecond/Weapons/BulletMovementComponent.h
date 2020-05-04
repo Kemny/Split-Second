@@ -21,9 +21,9 @@ public:
     void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
-    float LocalTimeMultiplier;
-    class ASplitSecondGameState* GameState;
-
-    float DefaultInitialSpeed;
+    //When this specific bullet gets slowed down
+    float LocalTimeMultiplier = 1;
     float DefaultMaxSpeed;
+
+    class ASplitSecondGameState* GameState;
 };

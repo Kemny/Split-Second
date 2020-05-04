@@ -14,4 +14,17 @@ class SPLITSECOND_API ASplitSecondPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 	
+public:
+
+protected:
+
+private:
+	void BeginPlay() override;
+	void SetupInputComponent() override;
+
+	UFUNCTION() void ShowDebugMenu();
+	UFUNCTION() void IncreaseSlow(float Value);
+
+	class ASplitSecondHUD* Hud;
+	class ASplitSecondGameState* GameState;
 };

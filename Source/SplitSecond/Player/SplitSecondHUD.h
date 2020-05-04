@@ -17,9 +17,12 @@ public:
 	/** Primary draw call for the HUD */
 	virtual void DrawHUD() override;
 
+	void ToggleDebugMenu();
+
 private:
 	/** Crosshair asset pointer */
 	class UTexture2D* CrosshairTex;
-
+	TSubclassOf<class UDebugMenu> DebugMenuClass;
+	class UDebugMenu* DebugMenu = nullptr;
 };
 

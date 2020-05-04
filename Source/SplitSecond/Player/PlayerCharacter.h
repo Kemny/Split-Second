@@ -19,7 +19,7 @@ class APlayerCharacter : public ACharacter
 	class UCameraComponent* FirstPersonCameraComponent;
 
 public:
-	APlayerCharacter();
+	APlayerCharacter(const FObjectInitializer& ObjectInitializer);
 
 	virtual void Tick(float DeltaTime) override;
 
@@ -33,26 +33,26 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
+	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 
 protected:
-	
 	/** Fires a projectile. */
 	void OnFire();
-
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);
-
 	/** Handles stafing movement, left and right */
 	void MoveRight(float Val);
 
-protected:
-	// APawn interface
-	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
-	// End of APawn interface
+private:
+	class UPlayerMovementComponent* PlayerMovementComponent;
 
 public:
 	/** Returns FirstPersonCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+
+	UFUNCTION(BlueprintCallable, Category = "Movement")
+	FORCEINLINE class UPlayerMovementComponent* GetMyMovementComponent() const { return PlayerMovementComponent; }
 
 private:
 	class ASplitSecondGameState* GameState;

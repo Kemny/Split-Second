@@ -10,8 +10,10 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "../SplitSecondGameState.h"
+#include "PlayerMovementComponent.h"
 
-APlayerCharacter::APlayerCharacter()
+APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
@@ -32,6 +34,12 @@ void APlayerCharacter::BeginPlay()
 
 	GameState = GetWorld()->GetGameState<ASplitSecondGameState>();
 	if (!ensure(GameState != nullptr)) { return; }
+}
+void APlayerCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	PlayerMovementComponent = Cast<UPlayerMovementComponent>(Super::GetMovementComponent());
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
