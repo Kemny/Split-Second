@@ -6,6 +6,7 @@
 #include "../Health/HealthComponent.h"
 #include "Engine/World.h"
 #include "SplitSecond_AI_Controller.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Math/UnrealMathUtility.h"
 
 // Sets default values
@@ -20,6 +21,8 @@ ASuper_AI_Character::ASuper_AI_Character()
   HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 
   GunScale = FVector(1);
+
+  GetCharacterMovement()->bUseRVOAvoidance = true;
 }
 
 void ASuper_AI_Character::BeginPlay()
