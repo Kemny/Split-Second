@@ -3,6 +3,7 @@
 
 #include "Super_AI_Character.h"
 #include "../Weapons/Super_Gun.h"
+#include "../Health/HealthComponent.h"
 #include "Engine/World.h"
 #include "SplitSecond_AI_Controller.h"
 #include "Math/UnrealMathUtility.h"
@@ -16,9 +17,9 @@ ASuper_AI_Character::ASuper_AI_Character()
   AIControllerClass = ASplitSecond_AI_Controller::StaticClass();
   AIGunClass = ASuper_Gun::StaticClass();
 
+  HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
+
   GunScale = FVector(1);
-  MaxHP = 10.f;
-  CurrentHP = 10.f;
 }
 
 void ASuper_AI_Character::BeginPlay()

@@ -17,6 +17,9 @@ public:
 	// Sets default values for this character's properties
 	ASuper_AI_Character();
 
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+  class UHealthComponent* HealthComponent;
+
 public:	
 
   /* Gun to give AI */
@@ -25,14 +28,6 @@ public:
 
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Settings")
   class UBehaviorTree* BehaviorTreeToUse;
-
-  /* Maximum HP this AI can have */
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Settings")
-  float MaxHP;
-
-  /* Current HP this AI has */
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Settings")
-  float CurrentHP;
 
   /* Scale of the AI's gun */
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gun Settings")
@@ -45,6 +40,11 @@ public:
   /* Fires the currently equipped gun */
   UFUNCTION(BlueprintCallable, Category = "Gun Functions")
   void FireGun();
+
+public:
+
+  UFUNCTION(BlueprintCallable, Category = "Health")
+  FORCEINLINE class UHealthComponent* GetHealthComponent() const { return HealthComponent; }
 
 protected:
 
