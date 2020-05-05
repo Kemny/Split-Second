@@ -8,6 +8,8 @@
 #include "DrawDebugHelpers.h"
 #include "../Weapons/SplitSecondProjectile.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "../AI/Super_AI_Character.h"
+#include "Components/SkeletalMeshComponent.h"
 
 void ASplitSecondPlayerController::BeginPlay()
 {
@@ -37,9 +39,9 @@ void ASplitSecondPlayerController::Tick(float DeltaTime)
 	TraceForActorsToSlow();
 }
 
-bool ASplitSecondPlayerController::TraceForActorsToSlow()
+void ASplitSecondPlayerController::TraceForActorsToSlow()
 {
-	if (!ensure(Hud != nullptr)) { return false; }
+	if (!ensure(Hud != nullptr)) { return; }
 
 	FVector ScreenWorldLocation;
 	FVector ScreenWorldDirection;
@@ -49,16 +51,26 @@ bool ASplitSecondPlayerController::TraceForActorsToSlow()
 	///If line trace found an actor
 	if (GetWorld()->LineTraceSingleByChannel(HitResult, ScreenWorldLocation, ScreenWorldDirection * 10000, ECollisionChannel::ECC_Visibility))
 	{
-		///UnHighlight any old projectiles
+		///UnHighlight old projectile
 		if (HoveredProjectile && HitResult.GetActor() != HoveredProjectile)
 		{
-			if (auto BulletMesh = HoveredProjectile->GetBulletMesh())
+			if (!HoveredProjectile->GetIsSlowed())
 			{
-				BulletMesh->CreateAndSetMaterialInstanceDynamic(0)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor::Red);
-				BulletMesh->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor::Red);
+				HoveredProjectile->GetBulletMesh()->CreateAndSetMaterialInstanceDynamic(0)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor::Red);
+				HoveredProjectile->GetBulletMesh()->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor::Red);
 				HoveredProjectile = nullptr;
 			}
 		}
+		///UnHighlight old NPC
+		if(HoveredEnemy && HitResult.GetActor() != HoveredEnemy)
+		{
+			if (!HoveredEnemy->GetIsSlowed())
+			{
+				HoveredEnemy->GetMesh()->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor::Red);
+				HoveredEnemy = nullptr;
+			}
+		}
+
 		///Check New Actor
 		if (HitResult.GetActor()->IsA<ASplitSecondProjectile>())
 		{
@@ -67,12 +79,28 @@ bool ASplitSecondPlayerController::TraceForActorsToSlow()
 			///Hightlight new Bullet
 			if (auto BulletMesh = HoveredProjectile->GetBulletMesh())
 			{
-				BulletMesh->CreateAndSetMaterialInstanceDynamic(0)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0, 1, 1, 1));
-				BulletMesh->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0, 1, 1, 1));
+				if (!HoveredProjectile->GetIsSlowed())
+				{
+					BulletMesh->CreateAndSetMaterialInstanceDynamic(0)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0, 1, 1, 1));
+					BulletMesh->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0, 1, 1, 1));
+				}
+			}
+		}
+		else if (HitResult.GetActor()->IsA<ASuper_AI_Character>())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Enemy"));
+			///Set Hovered Enemy
+			HoveredEnemy = Cast<ASuper_AI_Character>(HitResult.GetActor());
+			///Hightlight new Enemy
+			if (auto EnemyMesh = HoveredEnemy->GetMesh())
+			{
+				if (!HoveredEnemy->GetIsSlowed())
+				{
+					EnemyMesh->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0, 1, 1, 1));
+				}
 			}
 		}
 	}
-	return true;
 }
 
 void ASplitSecondPlayerController::ShowDebugMenu()
@@ -90,5 +118,9 @@ void ASplitSecondPlayerController::SlowTarget()
 	if (HoveredProjectile)
 	{
 		HoveredProjectile->GetSlowed(ActorSlowDuration, ActorSlowValue);
+	}
+	else if (HoveredEnemy)
+	{
+		HoveredEnemy->GetSlowed(ActorSlowDuration, ActorSlowValue);
 	}
 }

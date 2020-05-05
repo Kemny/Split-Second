@@ -24,7 +24,7 @@ private:
 	void SetupInputComponent() override;
 	void Tick(float DeltaTime) override;
 
-	bool TraceForActorsToSlow();
+	void TraceForActorsToSlow();
 
 	UFUNCTION() void ShowDebugMenu();
 	UFUNCTION() void IncreaseSlow(float Value);
@@ -32,5 +32,7 @@ private:
 	UFUNCTION() void SlowTarget();
 
 	class ASplitSecondHUD* Hud;
+
 	class ASplitSecondProjectile* HoveredProjectile;
+	class ASuper_AI_Character* HoveredEnemy;
 };

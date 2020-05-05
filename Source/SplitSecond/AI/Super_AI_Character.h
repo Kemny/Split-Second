@@ -46,13 +46,18 @@ public:
   UFUNCTION(BlueprintCallable, Category = "Health")
   FORCEINLINE class UHealthComponent* GetHealthComponent() const { return HealthComponent; }
 
+    void Highlight();
+    void GetSlowed(float SlowTime, float SlowAmmount);
+    UFUNCTION() void StopBeingSlowed();
+    bool GetIsSlowed() const { return bIsSlowed; }
+
 protected:
 
   // Called when the game starts or when spawned
   virtual void BeginPlay() override;
 
 private:
-
-  void SpawnGun();
+    bool bIsSlowed;
+    void SpawnGun();
 
 };
