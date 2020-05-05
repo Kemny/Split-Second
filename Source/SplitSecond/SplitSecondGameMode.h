@@ -11,8 +11,14 @@ class ASplitSecondGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
+protected:
+	UPROPERTY(EditAnywhere)float MinTimeDilation = 0.01;
+	UPROPERTY(EditAnywhere)float MaxTimeDilation = 1;
+
 public:
 	ASplitSecondGameMode();
+
+	void BeginPlay() override;
 };
 
 

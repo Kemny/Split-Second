@@ -4,6 +4,7 @@
 #include "Player/SplitSecondHUD.h"
 #include "Player/PlayerCharacter.h"
 #include "UObject/ConstructorHelpers.h"
+#include "GameFramework/WorldSettings.h"
 
 ASplitSecondGameMode::ASplitSecondGameMode()
 	: Super()
@@ -14,4 +15,12 @@ ASplitSecondGameMode::ASplitSecondGameMode()
 
 	// use our custom HUD class
 	HUDClass = ASplitSecondHUD::StaticClass();
+}
+
+void ASplitSecondGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GetWorldSettings()->MaxGlobalTimeDilation = MaxTimeDilation;
+	GetWorldSettings()->MinGlobalTimeDilation = MinTimeDilation;
 }

@@ -26,5 +26,4 @@ private:
 	UFUNCTION() void IncreaseSlow(float Value);
 
 	class ASplitSecondHUD* Hud;
-	class ASplitSecondGameState* GameState;
 };

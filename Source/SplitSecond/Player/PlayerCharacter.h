@@ -55,6 +55,6 @@ public:
 	FORCEINLINE class UPlayerMovementComponent* GetMyMovementComponent() const { return PlayerMovementComponent; }
 
 private:
-	class ASplitSecondGameState* GameState;
+
 };
 

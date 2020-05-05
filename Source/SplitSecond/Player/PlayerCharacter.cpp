@@ -9,7 +9,6 @@
 #include "GameFramework/InputSettings.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "../SplitSecondGameState.h"
 #include "PlayerMovementComponent.h"
 
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
@@ -32,8 +31,6 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	GameState = GetWorld()->GetGameState<ASplitSecondGameState>();
-	if (!ensure(GameState != nullptr)) { return; }
 }
 void APlayerCharacter::PostInitializeComponents()
 {
@@ -73,23 +70,19 @@ void APlayerCharacter::OnFire()
 
 void APlayerCharacter::MoveForward(float Value)
 {
-	if (!ensure(GameState != nullptr)) { return; }
-
 	if (Value != 0.0f)
 	{
 		// add movement in that direction
-		AddMovementInput(GetActorForwardVector(), Value * GameState->GetGlobalTimeMultiplier());
+		AddMovementInput(GetActorForwardVector(), Value);
 	}
 }
 
 void APlayerCharacter::MoveRight(float Value)
 {
-	if (!ensure(GameState != nullptr)) { return; }
-
 	if (Value != 0.0f)
 	{
 		// add movement in that direction
-		AddMovementInput(GetActorRightVector(), Value * GameState->GetGlobalTimeMultiplier());
+		AddMovementInput(GetActorRightVector(), Value);
 	}
 }
 

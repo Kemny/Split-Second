@@ -3,7 +3,8 @@
 #include "SplitSecondPlayerController.h"
 #include "SplitSecondHUD.h"
 #include "Engine/World.h"
-#include "../SplitSecondGameState.h"
+#include "GameFramework/WorldSettings.h"
+#include "Kismet/GameplayStatics.h"
 
 void ASplitSecondPlayerController::BeginPlay()
 {
@@ -13,9 +14,6 @@ void ASplitSecondPlayerController::BeginPlay()
 	if (!ensure(Hud != nullptr)) { return; }
 	///TODO Remove Debug Menu
 	Hud->ToggleDebugMenu();
-
-	GameState = GetWorld()->GetGameState<ASplitSecondGameState>();
-	if (!ensure(GameState != nullptr)) { return; }
 }
 
 void ASplitSecondPlayerController::SetupInputComponent()
@@ -35,6 +33,5 @@ void ASplitSecondPlayerController::ShowDebugMenu()
 }
 void ASplitSecondPlayerController::IncreaseSlow(float Value)
 {
-	if (!ensure(GameState != nullptr)) { return; }
-	GameState->AddToGlobalTimeMultiplier(Value * 0.01);
+	GetWorldSettings()->SetTimeDilation(UGameplayStatics::GetGlobalTimeDilation(GetWorld()) + Value *0.01);
 }

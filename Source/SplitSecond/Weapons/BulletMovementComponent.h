@@ -7,8 +7,8 @@
 #include "BulletMovementComponent.generated.h"
 
 /**
- * Projectile Movement Component Override
- * This one can be slowed down by time
+ * 
+ * 
  */
 UCLASS(ClassGroup = Movement, meta = (BlueprintSpawnableComponent))
 class SPLITSECOND_API UBulletMovementComponent : public UProjectileMovementComponent
@@ -21,9 +21,5 @@ public:
     void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
-    //When this specific bullet gets slowed down
-    float LocalTimeMultiplier = 1;
-    float DefaultMaxSpeed;
 
-    class ASplitSecondGameState* GameState;
 };

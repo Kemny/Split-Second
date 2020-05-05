@@ -22,5 +22,4 @@ private:
 	void NativeConstruct() override;
 	void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
-	class ASplitSecondGameState* GameState;
 };
