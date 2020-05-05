@@ -46,6 +46,8 @@ void UHealthComponent::Heal(float Amount)
     return;
   }
 
-  Health = FMath::Clamp(Health + Amount, 0.0f, DefaultHealth);
+  Health += FMath::Clamp<float>(Health + Amount, 0.0f, DefaultHealth);
+
+  UE_LOG(LogTemp, Log, TEXT("Current HP: %f Amount: %f"), Health, Amount)
 }
 
