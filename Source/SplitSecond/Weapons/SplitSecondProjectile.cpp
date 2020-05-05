@@ -4,10 +4,12 @@
 #include "../Weapons/BulletMovementComponent.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "UObject/ConstructorHelpers.h"
+#include "TimerManager.h"
+#include "Components/StaticMeshComponent.h"
 
 ASplitSecondProjectile::ASplitSecondProjectile() 
 {
-	// Use a sphere as a simple collision representation
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(5.0f);
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
@@ -16,7 +18,6 @@ ASplitSecondProjectile::ASplitSecondProjectile()
 	// Players can't walk on it
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
 	CollisionComp->CanCharacterStepUpOn = ECB_No;
-
 	// Set as root component
 	RootComponent = CollisionComp;
 
@@ -29,22 +30,35 @@ ASplitSecondProjectile::ASplitSecondProjectile()
 
 	// Die after 3 seconds by default
 	InitialLifeSpan = 0;
+
+	BulletMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	BulletMesh->SetupAttachment(CollisionComp);
+	BulletMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ASplitSecondProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	if (!OtherActor) return;
 	// Only add impulse and destroy projectile if we hit a physics
-	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
-	{
-		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
-	}
 	if (OtherActor != this)
 	{
-		if (!ensure(GetWorld() != nullptr)) { return; }
+		if (OtherActor->IsA<ASplitSecondProjectile>())
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleOnDeath, OtherActor->GetActorLocation());
+			OtherActor->Destroy();
+		}
+
 		if (!ensure(ParticleOnDeath != nullptr)) { return; }
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleOnDeath, GetActorLocation());
 
 		Destroy();
 	}
 	
+}
+
+void ASplitSecondProjectile::GetSlowed(float SlowTime, float SlowAmmount)
+{
+	FTimerHandle TimerHandle;
+	CustomTimeDilation = SlowAmmount;
+	GetWorldTimerManager().SetTimer(TimerHandle, this, &ASplitSecondProjectile::StopBeingSlowed, SlowTime, false);
 }

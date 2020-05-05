@@ -22,7 +22,12 @@ public:
 private:
 	/** Crosshair asset pointer */
 	class UTexture2D* CrosshairTex;
+	FVector2D CrosshairDrawPosition;
+
 	TSubclassOf<class UDebugMenu> DebugMenuClass;
 	class UDebugMenu* DebugMenu = nullptr;
+
+public:
+	FVector2D GetCrosshairPosition() const { return CrosshairDrawPosition; }
 };
 

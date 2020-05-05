@@ -17,13 +17,20 @@ class SPLITSECOND_API ASplitSecondPlayerController : public APlayerController
 public:
 
 protected:
-
+	UPROPERTY(EditAnywhere, Category = "Time Manipulation") float ActorSlowDuration = 3;
+	UPROPERTY(EditAnywhere, Category = "Time Manipulation") float ActorSlowValue = 0.1;
 private:
 	void BeginPlay() override;
 	void SetupInputComponent() override;
+	void Tick(float DeltaTime) override;
+
+	bool TraceForActorsToSlow();
 
 	UFUNCTION() void ShowDebugMenu();
 	UFUNCTION() void IncreaseSlow(float Value);
 
+	UFUNCTION() void SlowTarget();
+
 	class ASplitSecondHUD* Hud;
+	class ASplitSecondProjectile* HoveredProjectile;
 };

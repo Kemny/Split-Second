@@ -11,11 +11,13 @@ class ASplitSecondProjectile : public AActor
 {
 	GENERATED_BODY()
 
-	/** Sphere collision component */
 	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
 	class USphereComponent* CollisionComp;
+	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
+	class USphereComponent* LineTraceComp;
+	UPROPERTY(VisibleDefaultsOnly, Category=Projectile)
+	class UStaticMeshComponent* BulletMesh;
 
-	/** Projectile movement component */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	class UBulletMovementComponent* BulletMovement;
 
@@ -26,12 +28,17 @@ public:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	/** Returns CollisionComp subobject **/
 	FORCEINLINE class USphereComponent* GetCollisionComp() const { return CollisionComp; }
-	/** Returns ProjectileMovement subobject **/
 	FORCEINLINE class UBulletMovementComponent* GetProjectileMovement() const { return BulletMovement; }
+	FORCEINLINE class UStaticMeshComponent* GetBulletMesh() const { return BulletMesh; }
+
+	void GetSlowed(float SlowTime, float SlowAmmount);
+	UFUNCTION() void StopBeingSlowed() { CustomTimeDilation = 1; }
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Particles") UParticleSystem* ParticleOnDeath;
+
+private:
+	UCurveFloat* SlowingCurve;
 };
 
