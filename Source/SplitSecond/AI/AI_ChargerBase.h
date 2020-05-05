@@ -13,5 +13,9 @@ UCLASS()
 class SPLITSECOND_API AAI_ChargerBase : public ASuper_AI_Character
 {
 	GENERATED_BODY()
-	
+
+public:
+
+  AAI_ChargerBase();
+
 };

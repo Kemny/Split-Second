@@ -14,4 +14,12 @@ class SPLITSECOND_API AAI_HealerBase : public ASuper_AI_Character
 {
 	GENERATED_BODY()
 	
+public:
+  
+  AAI_HealerBase();
+  
+  /* Amount to heal the damaged enemy */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Healer Settings")
+  float HealAmount;
+
 };
