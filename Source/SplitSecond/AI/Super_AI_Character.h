@@ -17,8 +17,11 @@ public:
 	// Sets default values for this character's properties
 	ASuper_AI_Character();
 
-  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
   class UHealthComponent* HealthComponent;
+
+  UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+  class UBoxComponent* TraceComp;
 
 public:	
 

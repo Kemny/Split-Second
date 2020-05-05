@@ -8,6 +8,7 @@
 #include "SplitSecond_AI_Controller.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Math/UnrealMathUtility.h"
+#include "Components/BoxComponent.h"
 
 #include "TimerManager.h"
 #include "Materials/MaterialInstanceDynamic.h"
@@ -21,6 +22,15 @@ ASuper_AI_Character::ASuper_AI_Character()
 
   AIControllerClass = ASplitSecond_AI_Controller::StaticClass();
   AIGunClass = ASuper_Gun::StaticClass();
+
+  TraceComp = CreateDefaultSubobject<UBoxComponent>(TEXT("TraceComp"));
+  TraceComp->SetupAttachment(RootComponent);
+  TraceComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+  TraceComp->SetCollisionObjectType(ECC_WorldDynamic);
+  TraceComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+  TraceComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+  TraceComp->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
+  TraceComp->SetBoxExtent(FVector(32, 32, 80));
 
   HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 
