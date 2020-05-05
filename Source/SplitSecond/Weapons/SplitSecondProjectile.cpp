@@ -7,6 +7,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "TimerManager.h"
 #include "Components/StaticMeshComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 ASplitSecondProjectile::ASplitSecondProjectile() 
 {
@@ -53,12 +54,22 @@ void ASplitSecondProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 
 		Destroy();
 	}
-	
 }
 
 void ASplitSecondProjectile::GetSlowed(float SlowTime, float SlowAmmount)
 {
+	bIsSlowed = true;
+	BulletMesh->CreateAndSetMaterialInstanceDynamic(0)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0, 0, 1, 1));
+	BulletMesh->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0, 0, 1, 1));
+
 	FTimerHandle TimerHandle;
 	CustomTimeDilation = SlowAmmount;
 	GetWorldTimerManager().SetTimer(TimerHandle, this, &ASplitSecondProjectile::StopBeingSlowed, SlowTime, false);
+}
+void ASplitSecondProjectile::StopBeingSlowed()
+{ 
+	bIsSlowed = false;
+	CustomTimeDilation = 1;
+	BulletMesh->CreateAndSetMaterialInstanceDynamic(0)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor::Red);
+	BulletMesh->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor::Red);
 }

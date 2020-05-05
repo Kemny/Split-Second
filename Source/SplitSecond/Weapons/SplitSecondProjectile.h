@@ -32,13 +32,14 @@ public:
 	FORCEINLINE class UBulletMovementComponent* GetProjectileMovement() const { return BulletMovement; }
 	FORCEINLINE class UStaticMeshComponent* GetBulletMesh() const { return BulletMesh; }
 
+	bool GetIsSlowed() const { return bIsSlowed; }
 	void GetSlowed(float SlowTime, float SlowAmmount);
-	UFUNCTION() void StopBeingSlowed() { CustomTimeDilation = 1; }
+	UFUNCTION() void StopBeingSlowed();
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Particles") UParticleSystem* ParticleOnDeath;
 
 private:
-	UCurveFloat* SlowingCurve;
+	bool bIsSlowed;
 };
 

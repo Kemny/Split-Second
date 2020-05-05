@@ -9,6 +9,10 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Math/UnrealMathUtility.h"
 
+#include "TimerManager.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "Components/SkeletalMeshComponent.h"
+
 // Sets default values
 ASuper_AI_Character::ASuper_AI_Character()
 {
@@ -57,4 +61,21 @@ void ASuper_AI_Character::SpawnGun()
       CurrentGun->EquipGun(this);
     }
   }
+}
+
+void ASuper_AI_Character::GetSlowed(float SlowTime, float SlowAmmount)
+{
+    bIsSlowed = true;
+    GetMesh()->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0, 0, 1, 1));
+
+    FTimerHandle TimerHandle;
+    CustomTimeDilation = SlowAmmount;
+    GetWorldTimerManager().SetTimer(TimerHandle, this, &ASuper_AI_Character::StopBeingSlowed, SlowTime, false);
+}
+void ASuper_AI_Character::StopBeingSlowed() 
+{ 
+    bIsSlowed = false;
+
+    GetMesh()->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor::Red);
+    CustomTimeDilation = 1; 
 }
