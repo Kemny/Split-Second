@@ -29,8 +29,13 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gun Settings")
   TSubclassOf<ASuper_Gun> AIGunClass;
 
+  /* The Behavior Tree the AI will use */
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Settings")
   class UBehaviorTree* BehaviorTreeToUse;
+
+  /* the maximum amount of distance the AI can be from it's target */
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Settings")
+  float MaxTargetDistance;
 
   /* Scale of the AI's gun */
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gun Settings")

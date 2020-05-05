@@ -35,7 +35,8 @@ ASuper_AI_Character::ASuper_AI_Character()
   HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 
   GunScale = FVector(1);
-
+  MaxTargetDistance = 2000.f;
+  
   GetCharacterMovement()->bUseRVOAvoidance = true;
 }
 

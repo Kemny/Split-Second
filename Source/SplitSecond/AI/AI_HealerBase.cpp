@@ -6,4 +6,6 @@
 AAI_HealerBase::AAI_HealerBase()
 {
   HealAmount = 10.0f;
+  TargetingDelay = 2.0f;
+  HealthThreshold = 30.f;
 }

@@ -11,6 +11,7 @@ UHealthComponent::UHealthComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 
 	DefaultHealth = 100;
+  Health = DefaultHealth;
 }
 
 
@@ -24,8 +25,6 @@ void UHealthComponent::BeginPlay()
 	{
 		Owner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::TakeDamage);
 	}
-	
-  Health = DefaultHealth;
 }
 
 void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
@@ -36,18 +35,18 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDam
 	}
 
 	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
-
 }
 
-void UHealthComponent::Heal(float Amount)
+void UHealthComponent::Heal(float HealAmount)
 {
-  if (Amount <= 0)
+  if (HealAmount <= 0)
   {
     return;
   }
 
-  Health += FMath::Clamp<float>(Health + Amount, 0.0f, DefaultHealth);
+  float NewHealth = Health + HealAmount;
+  Health = FMath::Clamp(NewHealth, 0.0f, DefaultHealth);
 
-  UE_LOG(LogTemp, Log, TEXT("Current HP: %f Amount: %f"), Health, Amount)
+  UE_LOG(LogTemp, Log, TEXT("%s 's Current HP is: %f Amount: %f"), *GetOwner()->GetName(), Health, HealAmount)
 }
 

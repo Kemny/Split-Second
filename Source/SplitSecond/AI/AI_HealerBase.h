@@ -22,4 +22,11 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Healer Settings")
   float HealAmount;
 
+  /* If healer finds a NPC with health below this threshold then that NPC will become it's target to heal */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Healer Settings")
+  float HealthThreshold;
+
+  /* Delay before the healer starts looking for a new target to heal */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Healer Settings")
+  float TargetingDelay;
 };
