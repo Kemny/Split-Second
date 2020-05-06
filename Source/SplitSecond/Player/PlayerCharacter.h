@@ -79,5 +79,7 @@ private:
   FTimerHandle RightDashTimerHandle;
 
   FTimerHandle LeftDashTimerHandle;
+
+  class ASplitSecondPlayerController* PlayerController;
 };
 

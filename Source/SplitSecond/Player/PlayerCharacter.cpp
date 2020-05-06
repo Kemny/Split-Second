@@ -6,6 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "TimerManager.h"
+#include "SplitSecondPlayerController.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/InputSettings.h"
 #include "Kismet/GameplayStatics.h"
@@ -34,6 +35,8 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+  PlayerController = Cast<ASplitSecondPlayerController>(GetWorld()->GetFirstPlayerController());
+  if (!ensure(PlayerController != nullptr)) { return; }
 }
 void APlayerCharacter::PostInitializeComponents()
 {
@@ -97,9 +100,20 @@ void APlayerCharacter::MoveRight(float Value)
 
 void APlayerCharacter::DashRightPressed()
 {
-  RightKeyCount++;
+  if (!ensure(PlayerController != nullptr)) { return; }
 
-  if (RightKeyCount >= 2)
+  if (!PlayerController->bIsUsingGamepad)
+  {
+    RightKeyCount++;
+
+    if (RightKeyCount >= 2)
+    {
+      FVector LaunchVelocity = GetActorRightVector() * DashMultiplier;
+
+      LaunchCharacter(LaunchVelocity, false, false);
+    }
+  }
+  else
   {
     FVector LaunchVelocity = GetActorRightVector() * DashMultiplier;
 
@@ -119,9 +133,20 @@ void APlayerCharacter::ResetRightDash()
 
 void APlayerCharacter::DashLeftPressed()
 {
-  LeftKeyCount++;
+  if (!ensure(PlayerController != nullptr)) { return; }
 
-  if (LeftKeyCount >= 2)
+  if (!PlayerController->bIsUsingGamepad)
+  {
+    LeftKeyCount++;
+
+    if (LeftKeyCount >= 2)
+    {
+      FVector LaunchVelocity = GetActorRightVector() * DashMultiplier * -1;
+
+      LaunchCharacter(LaunchVelocity, false, false);
+    }
+  }
+  else
   {
     FVector LaunchVelocity = GetActorRightVector() * DashMultiplier * -1;
 
