@@ -30,6 +30,10 @@ public:
   /* This is the mesh the gun is attached to */
   UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
   class UStaticMeshComponent* GunAttachMesh;
+  
+  /* Multiplier used to launch the player either right or left */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
+  float DashMultiplier;
 
 protected:
 	virtual void BeginPlay() override;
@@ -56,5 +60,24 @@ public:
 
 private:
 
+  void DashRightPressed();
+
+  void DashRightReleased();
+
+  void ResetRightDash();
+
+  void DashLeftPressed();
+
+  void ResetLeftDash();
+
+  void DashLeftReleased();
+
+  int32 RightKeyCount;
+
+  int32 LeftKeyCount;
+
+  FTimerHandle RightDashTimerHandle;
+
+  FTimerHandle LeftDashTimerHandle;
 };
 

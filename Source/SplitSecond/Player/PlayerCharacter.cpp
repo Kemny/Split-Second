@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "TimerManager.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/InputSettings.h"
 #include "Kismet/GameplayStatics.h"
@@ -25,6 +26,8 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 
 	GunAttachMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunAttachMesh"));
 	GunAttachMesh->SetupAttachment(FirstPersonCameraComponent);
+
+  DashMultiplier = 400.f;
 }
 
 void APlayerCharacter::BeginPlay()
@@ -58,6 +61,12 @@ void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 	// Camera Movement
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+
+  PlayerInputComponent->BindAction("Dash Right", IE_Pressed, this, &APlayerCharacter::DashRightPressed);
+  PlayerInputComponent->BindAction("Dash Right", IE_Released, this, &APlayerCharacter::DashRightReleased);
+
+  PlayerInputComponent->BindAction("Dash Left", IE_Pressed, this, &APlayerCharacter::DashLeftPressed);
+  PlayerInputComponent->BindAction("Dash Left", IE_Released, this, &APlayerCharacter::DashLeftReleased);
 }
 
 void APlayerCharacter::OnFire()
@@ -86,9 +95,51 @@ void APlayerCharacter::MoveRight(float Value)
 	}
 }
 
+void APlayerCharacter::DashRightPressed()
+{
+  RightKeyCount++;
+
+  if (RightKeyCount >= 2)
+  {
+    FVector LaunchVelocity = GetActorRightVector() * DashMultiplier;
+
+    LaunchCharacter(LaunchVelocity, false, false);
+  }
+}
+
+void APlayerCharacter::DashRightReleased()
+{
+  GetWorldTimerManager().SetTimer(RightDashTimerHandle, this, &APlayerCharacter::ResetRightDash, 0.3f, false);
+}
+
+void APlayerCharacter::ResetRightDash()
+{
+  RightKeyCount = 0;
+}
+
+void APlayerCharacter::DashLeftPressed()
+{
+  LeftKeyCount++;
+
+  if (LeftKeyCount >= 2)
+  {
+    FVector LaunchVelocity = GetActorRightVector() * DashMultiplier * -1;
+
+    LaunchCharacter(LaunchVelocity, false, false);
+  }
+}
+
+void APlayerCharacter::ResetLeftDash()
+{
+  LeftKeyCount = 0;
+}
+
+void APlayerCharacter::DashLeftReleased()
+{
+  GetWorldTimerManager().SetTimer(LeftDashTimerHandle, this, &APlayerCharacter::ResetLeftDash, 0.3f, false);
+}
+
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-
 }
