@@ -29,6 +29,7 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	GunAttachMesh->SetupAttachment(FirstPersonCameraComponent);
 
   DashMultiplier = 400.f;
+  DashInputDelay = 0.3f;
 }
 
 void APlayerCharacter::BeginPlay()
@@ -110,20 +111,20 @@ void APlayerCharacter::DashRightPressed()
     {
       FVector LaunchVelocity = GetActorRightVector() * DashMultiplier;
 
-      LaunchCharacter(LaunchVelocity, false, false);
+      LaunchCharacter(LaunchVelocity, true, true);
     }
   }
   else
   {
     FVector LaunchVelocity = GetActorRightVector() * DashMultiplier;
 
-    LaunchCharacter(LaunchVelocity, false, false);
+    LaunchCharacter(LaunchVelocity, true, true);
   }
 }
 
 void APlayerCharacter::DashRightReleased()
 {
-  GetWorldTimerManager().SetTimer(RightDashTimerHandle, this, &APlayerCharacter::ResetRightDash, 0.3f, false);
+  GetWorldTimerManager().SetTimer(RightDashTimerHandle, this, &APlayerCharacter::ResetRightDash, DashInputDelay, false);
 }
 
 void APlayerCharacter::ResetRightDash()
@@ -143,14 +144,14 @@ void APlayerCharacter::DashLeftPressed()
     {
       FVector LaunchVelocity = GetActorRightVector() * DashMultiplier * -1;
 
-      LaunchCharacter(LaunchVelocity, false, false);
+      LaunchCharacter(LaunchVelocity, true, true);
     }
   }
   else
   {
     FVector LaunchVelocity = GetActorRightVector() * DashMultiplier * -1;
 
-    LaunchCharacter(LaunchVelocity, false, false);
+    LaunchCharacter(LaunchVelocity, true, true);
   }
 }
 
@@ -161,7 +162,7 @@ void APlayerCharacter::ResetLeftDash()
 
 void APlayerCharacter::DashLeftReleased()
 {
-  GetWorldTimerManager().SetTimer(LeftDashTimerHandle, this, &APlayerCharacter::ResetLeftDash, 0.3f, false);
+  GetWorldTimerManager().SetTimer(LeftDashTimerHandle, this, &APlayerCharacter::ResetLeftDash, DashInputDelay, false);
 }
 
 void APlayerCharacter::Tick(float DeltaTime)

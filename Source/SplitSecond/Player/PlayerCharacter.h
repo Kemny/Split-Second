@@ -30,10 +30,14 @@ public:
   /* This is the mesh the gun is attached to */
   UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
   class UStaticMeshComponent* GunAttachMesh;
-  
+
   /* Multiplier used to launch the player either right or left */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
   float DashMultiplier;
+
+  /* If dash button is hit twice within this delay it counts as a double tap  */
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dash Settings")
+  float DashInputDelay;
 
 protected:
 	virtual void BeginPlay() override;
