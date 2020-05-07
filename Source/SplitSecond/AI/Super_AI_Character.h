@@ -37,9 +37,9 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Settings")
   float MaxTargetDistance;
 
-  /* Scale of the AI's gun */
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gun Settings")
-  FVector GunScale;
+  /* Enemies gun fire delay */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Settings")
+  float GunFireDelay;
 
   /* AI's current gun */
   UPROPERTY(BlueprintReadWrite, Category = "Gun Vars")

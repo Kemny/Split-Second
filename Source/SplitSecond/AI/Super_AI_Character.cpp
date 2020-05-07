@@ -34,7 +34,7 @@ ASuper_AI_Character::ASuper_AI_Character()
 
   HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 
-  GunScale = FVector(1);
+  GunFireDelay = 2.0f;
   MaxTargetDistance = 2000.f;
   
   GetCharacterMovement()->bUseRVOAvoidance = true;
@@ -65,7 +65,7 @@ void ASuper_AI_Character::SpawnGun()
       //Set Spawn Collision Handling Override
       FActorSpawnParameters ActorSpawnParams;
       ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-      auto SpawnTransform = FTransform(FRotator(0), FVector(0), GunScale);
+      auto SpawnTransform = FTransform(FRotator(0), FVector(0), FVector(1));
 
       CurrentGun = GetWorld()->SpawnActor<ASuper_Gun>(AIGunClass, SpawnTransform, ActorSpawnParams);
 
