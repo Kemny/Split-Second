@@ -42,6 +42,8 @@ public:
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller Events")
   void ControllerDisconnected();
 
+  FHitResult LineTraceFromCamera(ECollisionChannel Collision);
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "Time Manipulation") float ActorSlowDuration = 3;
 	UPROPERTY(EditAnywhere, Category = "Time Manipulation") float ActorSlowValue = 0.1;

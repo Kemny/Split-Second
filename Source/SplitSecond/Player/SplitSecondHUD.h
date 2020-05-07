@@ -27,7 +27,5 @@ private:
 	TSubclassOf<class UDebugMenu> DebugMenuClass;
 	class UDebugMenu* DebugMenu = nullptr;
 
-public:
-	FVector2D GetCrosshairPosition() const { return CrosshairDrawPosition; }
 };
 

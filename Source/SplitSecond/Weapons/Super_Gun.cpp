@@ -7,6 +7,8 @@
 #include "../Player/PlayerCharacter.h"
 #include "../AI/Super_AI_Character.h"
 #include "Engine/World.h"
+#include "../Player/SplitSecondPlayerController.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ASuper_Gun::ASuper_Gun()
@@ -29,17 +31,36 @@ void ASuper_Gun::FireGun()
     UWorld* const World = GetWorld();
     if (World != NULL)
     {
-      const FRotator SpawnRotation = CurrentPawn->GetControlRotation();
-      // MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
-      if (!ensure(FP_MuzzleLocation != nullptr)) { return; }
-      const FVector SpawnLocation = FP_MuzzleLocation->GetComponentLocation();
+        FRotator SpawnRotation;
 
-      //Set Spawn Collision Handling Override
-      FActorSpawnParameters ActorSpawnParams;
-      ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+        // MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
+        if (!ensure(FP_MuzzleLocation != nullptr)) { return; }
 
-      // spawn the projectile at the muzzle
-      World->SpawnActor<ASplitSecondProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+        if (GetCurrentPawn()->IsA<APlayerCharacter>())
+        {
+            auto HitResult = World->GetFirstPlayerController<ASplitSecondPlayerController>()->LineTraceFromCamera(ECC_Camera);
+            if (HitResult.GetActor())
+            {
+                SpawnRotation = UKismetMathLibrary::FindLookAtRotation(FP_MuzzleLocation->GetComponentLocation(), HitResult.Location);
+            }
+            else
+            {
+                SpawnRotation = CurrentPawn->GetControlRotation();
+            }
+        }
+        else
+        {
+            SpawnRotation = CurrentPawn->GetControlRotation();
+        }
+
+        const FVector SpawnLocation = FP_MuzzleLocation->GetComponentLocation();
+
+        //Set Spawn Collision Handling Override
+        FActorSpawnParameters ActorSpawnParams;
+        ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+
+        // spawn the projectile at the muzzle
+        World->SpawnActor<ASplitSecondProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
     }
   }
 }
