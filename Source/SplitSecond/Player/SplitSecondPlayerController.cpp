@@ -10,6 +10,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "../AI/Super_AI_Character.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 ASplitSecondPlayerController::ASplitSecondPlayerController()
 {
@@ -50,13 +51,10 @@ void ASplitSecondPlayerController::TraceForActorsToSlow()
 {
 	if (!ensure(Hud != nullptr)) { return; }
 
-	FVector ScreenWorldLocation;
-	FVector ScreenWorldDirection;
-	DeprojectScreenPositionToWorld(Hud->GetCrosshairPosition().X, Hud->GetCrosshairPosition().Y, ScreenWorldLocation, ScreenWorldDirection);
+	auto HitResult = LineTraceFromCamera(ECollisionChannel::ECC_Visibility);
 
-	FHitResult HitResult;
 	///If line trace found an actor
-	if (GetWorld()->LineTraceSingleByChannel(HitResult, ScreenWorldLocation, ScreenWorldDirection * 10000, ECollisionChannel::ECC_Visibility))
+	if (HitResult.GetActor())
 	{
 		///UnHighlight old projectile
 		if (HoveredProjectile && HitResult.GetActor() != HoveredProjectile)
@@ -95,7 +93,6 @@ void ASplitSecondPlayerController::TraceForActorsToSlow()
 		}
 		else if (HitResult.GetActor()->IsA<ASuper_AI_Character>())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Enemy"));
 			///Set Hovered Enemy
 			HoveredEnemy = Cast<ASuper_AI_Character>(HitResult.GetActor());
 			///Hightlight new Enemy
@@ -108,6 +105,15 @@ void ASplitSecondPlayerController::TraceForActorsToSlow()
 			}
 		}
 	}
+}
+
+FHitResult ASplitSecondPlayerController::LineTraceFromCamera(ECollisionChannel Collision)
+{
+	FHitResult HitResult;
+	auto CameraLocation = PlayerCameraManager->GetCameraLocation();
+
+	GetWorld()->LineTraceSingleByChannel(HitResult, CameraLocation, (UKismetMathLibrary::Conv_RotatorToVector(PlayerCameraManager->GetCameraRotation()) * 50000) + CameraLocation, ECollisionChannel::ECC_Camera);
+	return HitResult;
 }
 
 void ASplitSecondPlayerController::ShowDebugMenu()
