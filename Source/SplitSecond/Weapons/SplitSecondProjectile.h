@@ -36,8 +36,8 @@ public:
 	void GetSlowed(float SlowTime, float SlowAmmount);
 	UFUNCTION() void StopBeingSlowed();
 
-protected:
-	UPROPERTY(EditAnywhere, Category = "Particles") UParticleSystem* ParticleOnDeath;
+  UFUNCTION(BlueprintImplementableEvent, Category = "Bullet Events")
+  void BulletOnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 private:
 	bool bIsSlowed;

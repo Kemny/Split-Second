@@ -43,16 +43,7 @@ void ASplitSecondProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 	// Only add impulse and destroy projectile if we hit a physics
 	if (OtherActor != this)
 	{
-		if (OtherActor->IsA<ASplitSecondProjectile>())
-		{
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleOnDeath, OtherActor->GetActorLocation());
-			OtherActor->Destroy();
-		}
-
-		if (!ensure(ParticleOnDeath != nullptr)) { return; }
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleOnDeath, GetActorLocation());
-
-		Destroy();
+		BulletOnHit(HitComp, OtherActor, OtherComp, NormalImpulse, Hit);
 	}
 }
 
