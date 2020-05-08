@@ -32,6 +32,14 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
   float FireRate;
 
+  /* The default ammo count of this gun */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+  float DefaultAmmoCount;
+
+  /* The current ammo count of this gun */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
+  float CurrentAmmoCount;
+
   /* Function called to fire the gun */
   UFUNCTION(BlueprintCallable, Category = "Gun Functions")
   void FireGun();

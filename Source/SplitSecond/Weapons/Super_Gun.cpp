@@ -21,6 +21,9 @@ ASuper_Gun::ASuper_Gun()
   RootComponent = GunMesh;
 
   FireRate = 0.5f;
+
+  DefaultAmmoCount = 10;
+  CurrentAmmoCount = DefaultAmmoCount;
 }
 
 void ASuper_Gun::OnInputPressed_Implementation()
@@ -43,23 +46,25 @@ void ASuper_Gun::FireGun()
     UWorld* const World = GetWorld();
     if (World != NULL)
     {
+      if (CurrentAmmoCount > 0)
+      {
         FRotator SpawnRotation;
 
         if (GetCurrentPawn()->IsA<APlayerCharacter>())
         {
-            auto HitResult = World->GetFirstPlayerController<ASplitSecondPlayerController>()->LineTraceFromCamera(ECC_Camera);
-            if (HitResult.GetActor())
-            {
-                SpawnRotation = UKismetMathLibrary::FindLookAtRotation(GunMesh->GetSocketLocation(FName("MuzzleLocation")), HitResult.Location);
-            }
-            else
-            {
-                SpawnRotation = CurrentPawn->GetControlRotation();
-            }
+          auto HitResult = World->GetFirstPlayerController<ASplitSecondPlayerController>()->LineTraceFromCamera(ECC_Camera);
+          if (HitResult.GetActor())
+          {
+            SpawnRotation = UKismetMathLibrary::FindLookAtRotation(GunMesh->GetSocketLocation(FName("MuzzleLocation")), HitResult.Location);
+          }
+          else
+          {
+            SpawnRotation = CurrentPawn->GetControlRotation();
+          }
         }
         else
         {
-            SpawnRotation = CurrentPawn->GetControlRotation();
+          SpawnRotation = CurrentPawn->GetControlRotation();
         }
 
         const FVector SpawnLocation = GunMesh->GetSocketLocation(FName("MuzzleLocation"));
@@ -71,7 +76,15 @@ void ASuper_Gun::FireGun()
         // spawn the projectile at the muzzle
         World->SpawnActor<ASplitSecondProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
 
+        if (GetCurrentPawn()->IsA<APlayerCharacter>())
+        {
+          CurrentAmmoCount--;
+
+          UE_LOG(LogTemp, Log, TEXT("Current Ammo Count: %f"), CurrentAmmoCount)
+        }
+
         LastTimeFired = GetWorld()->TimeSeconds;
+      }
     }
   }
 }
