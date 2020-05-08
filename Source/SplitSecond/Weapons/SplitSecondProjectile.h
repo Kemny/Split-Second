@@ -39,6 +39,10 @@ public:
   UFUNCTION(BlueprintImplementableEvent, Category = "Bullet Events")
   void BulletOnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+protected:
+	UPROPERTY(EditAnywhere)
+	float DamageValue = 10;
+
 private:
 	bool bIsSlowed;
 };

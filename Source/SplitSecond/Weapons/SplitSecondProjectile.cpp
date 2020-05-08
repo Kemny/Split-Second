@@ -7,6 +7,9 @@
 #include "UObject/ConstructorHelpers.h"
 #include "TimerManager.h"
 #include "Components/StaticMeshComponent.h"
+#include "Engine/World.h"
+#include "../Player/SplitSecondPlayerController.h" 
+#include "GameFramework/DamageType.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
 ASplitSecondProjectile::ASplitSecondProjectile() 
@@ -43,7 +46,9 @@ void ASplitSecondProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 	// Only add impulse and destroy projectile if we hit a physics
 	if (OtherActor != this)
 	{
-		BulletOnHit(HitComp, OtherActor, OtherComp, NormalImpulse, Hit);
+		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+		UGameplayStatics::ApplyDamage(OtherActor, DamageValue, PlayerController, this, UDamageType::StaticClass());
+		BulletOnHit(HitComp, OtherActor, OtherComp, NormalImpulse, Hit); // Event
 	}
 }
 
