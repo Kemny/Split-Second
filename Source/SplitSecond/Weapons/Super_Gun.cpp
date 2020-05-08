@@ -8,6 +8,7 @@
 #include "../AI/Super_AI_Character.h"
 #include "Engine/World.h"
 #include "../Player/SplitSecondPlayerController.h"
+#include "TimerManager.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -18,6 +19,20 @@ ASuper_Gun::ASuper_Gun()
 
   GunMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunMesh"));
   RootComponent = GunMesh;
+
+  FireRate = 0.5f;
+}
+
+void ASuper_Gun::OnInputPressed_Implementation()
+{
+  float FirstDelay = FMath::Max(LastTimeFired + FireRate - GetWorld()->TimeSeconds, 0.0f);
+
+  GetWorldTimerManager().SetTimer(FireRateTimer, this, &ASuper_Gun::FireGun, FireRate, true, FirstDelay);
+}
+
+void ASuper_Gun::OnInputReleased_Implementation()
+{
+  GetWorldTimerManager().ClearTimer(FireRateTimer);
 }
 
 void ASuper_Gun::FireGun()
@@ -55,6 +70,8 @@ void ASuper_Gun::FireGun()
 
         // spawn the projectile at the muzzle
         World->SpawnActor<ASplitSecondProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+
+        LastTimeFired = GetWorld()->TimeSeconds;
     }
   }
 }

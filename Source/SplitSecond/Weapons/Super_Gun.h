@@ -28,12 +28,23 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
   class USoundBase* FireSound;
 
+  /* Fire rate of player's gun not enemies */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
   float FireRate;
 
   /* Function called to fire the gun */
   UFUNCTION(BlueprintCallable, Category = "Gun Functions")
   void FireGun();
+
+  /* Called when player fire key is pressed */
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Gun Events")
+  void OnInputPressed();
+  virtual void OnInputPressed_Implementation();
+
+  /* Called when player fire key is released */
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Gun Events")
+  void OnInputReleased();
+  virtual void OnInputReleased_Implementation();
 
   /* Returns the pawn that currently has the gun */
   UFUNCTION(BlueprintPure, Category = "Gun Functions")
@@ -47,4 +58,9 @@ private:
 
   ACharacter* CurrentPawn;
 
+  bool bCanFire;
+
+  FTimerHandle FireRateTimer;
+
+  float LastTimeFired;
 };

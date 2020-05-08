@@ -45,8 +45,11 @@ protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 
 protected:
-	/** Fires a projectile. */
-	void OnFire();
+
+	/* If player has a gun this calls the gun's input pressed function */
+	void OnFirePressed();
+  /* If player has a gun this calls the gun's input released function */
+  void OnFireReleased();
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);
 	/** Handles stafing movement, left and right */
