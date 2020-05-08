@@ -18,9 +18,6 @@ ASuper_Gun::ASuper_Gun()
 
   GunMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunMesh"));
   RootComponent = GunMesh;
-
-  FP_MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
-  FP_MuzzleLocation->SetupAttachment(RootComponent, "MuzzleLocation");
 }
 
 void ASuper_Gun::FireGun()
@@ -33,15 +30,12 @@ void ASuper_Gun::FireGun()
     {
         FRotator SpawnRotation;
 
-        // MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
-        if (!ensure(FP_MuzzleLocation != nullptr)) { return; }
-
         if (GetCurrentPawn()->IsA<APlayerCharacter>())
         {
             auto HitResult = World->GetFirstPlayerController<ASplitSecondPlayerController>()->LineTraceFromCamera(ECC_Camera);
             if (HitResult.GetActor())
             {
-                SpawnRotation = UKismetMathLibrary::FindLookAtRotation(FP_MuzzleLocation->GetComponentLocation(), HitResult.Location);
+                SpawnRotation = UKismetMathLibrary::FindLookAtRotation(GunMesh->GetSocketLocation(FName("MuzzleLocation")), HitResult.Location);
             }
             else
             {
@@ -53,7 +47,7 @@ void ASuper_Gun::FireGun()
             SpawnRotation = CurrentPawn->GetControlRotation();
         }
 
-        const FVector SpawnLocation = FP_MuzzleLocation->GetComponentLocation();
+        const FVector SpawnLocation = GunMesh->GetSocketLocation(FName("MuzzleLocation"));
 
         //Set Spawn Collision Handling Override
         FActorSpawnParameters ActorSpawnParams;

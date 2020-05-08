@@ -31,10 +31,6 @@ public:
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
   float FireRate;
 
-  /** Location on gun mesh where projectiles should spawn. */
-  UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-  class USceneComponent* FP_MuzzleLocation;
-
   /* Function called to fire the gun */
   UFUNCTION(BlueprintCallable, Category = "Gun Functions")
   void FireGun();
