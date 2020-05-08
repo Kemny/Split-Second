@@ -37,7 +37,11 @@ public:
 	UFUNCTION() void StopBeingSlowed();
 
   UFUNCTION(BlueprintImplementableEvent, Category = "Bullet Events")
-  void BulletOnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+  void SpawnParticles(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Bullet Events")
+  void OnBulletHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+  virtual void OnBulletHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 protected:
 	UPROPERTY(EditAnywhere)

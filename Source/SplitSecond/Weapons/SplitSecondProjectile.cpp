@@ -46,9 +46,11 @@ void ASplitSecondProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 	// Only add impulse and destroy projectile if we hit a physics
 	if (OtherActor != this)
 	{
-		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-		UGameplayStatics::ApplyDamage(OtherActor, DamageValue, PlayerController, this, UDamageType::StaticClass());
-		BulletOnHit(HitComp, OtherActor, OtherComp, NormalImpulse, Hit); // Event
+    // Called to apply damage to hit actor
+    OnBulletHit(HitComp, OtherActor, OtherComp, NormalImpulse, Hit);
+
+    // Spawns bullet particles in blueprint
+		SpawnParticles(HitComp, OtherActor, OtherComp, NormalImpulse, Hit); // Event
 	}
 }
 
@@ -68,4 +70,12 @@ void ASplitSecondProjectile::StopBeingSlowed()
 	CustomTimeDilation = 1;
 	BulletMesh->CreateAndSetMaterialInstanceDynamic(0)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor::Red);
 	BulletMesh->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor::Red);
+}
+
+void ASplitSecondProjectile::OnBulletHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+  APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+  if (!ensure(PlayerController != nullptr)) { return; }
+
+  UGameplayStatics::ApplyDamage(OtherActor, DamageValue, PlayerController, this, UDamageType::StaticClass());
 }
