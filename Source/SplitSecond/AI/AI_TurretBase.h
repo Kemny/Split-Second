@@ -24,5 +24,9 @@ public:
   /* When the turret trace stops hitting the player this the amount time it takes to stop shooting the player  */
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Turret Settings")
   float DeaggroDelay = 4;
+
+  /* Time it takes for the turret to rotate to player */
+  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Turret Settings")
+  float RotationTime = 1;
 	
 };

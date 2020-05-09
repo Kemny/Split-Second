@@ -38,6 +38,8 @@ void UAI_TraceComponent::Trace(FVector StartLocation)
   FVector End = ((ForwardVector * TraceMultipler) + StartLocation);
   FCollisionObjectQueryParams ObjectCollisionParams;
   ObjectCollisionParams.AddObjectTypesToQuery(ECC_Pawn);
+  ObjectCollisionParams.AddObjectTypesToQuery(ECC_WorldStatic);
+  ObjectCollisionParams.AddObjectTypesToQuery(ECC_WorldDynamic);
   FCollisionQueryParams CollisionParams;
   CollisionParams.AddIgnoredActor(Owner);
   
@@ -48,35 +50,56 @@ void UAI_TraceComponent::Trace(FVector StartLocation)
 
   if (GetWorld()->LineTraceSingleByObjectType(OutHit, StartLocation, End, ObjectCollisionParams, CollisionParams))
   {
-    if (OutHit.Actor != NULL)
+    if (OutHit.bBlockingHit)
     {
-      if (OutHit.Actor->IsA<APlayerCharacter>())
+      if (OutHit.Actor != NULL)
       {
-        bPlayerWasHit = true;
-        
-        if (bDrawDebug)
+        if (OutHit.Actor->IsA<APlayerCharacter>())
         {
-          UE_LOG(LogAISystem, Log, TEXT("Hit player"))
+          bPlayerWasHit = true;
+
+          if (bDrawDebug)
+          {
+            UE_LOG(LogAISystem, Log, TEXT("Hit player"))
+          }
+        }
+        else
+        {
+          bPlayerWasHit = false;
+
+          if (bDrawDebug)
+          {
+            UE_LOG(LogAISystem, Log, TEXT("Hit : %s"), *OutHit.Actor->GetName())
+          }
         }
       }
       else
       {
         bPlayerWasHit = false;
-        
+
         if (bDrawDebug)
         {
-          UE_LOG(LogAISystem, Log, TEXT("Hit : %s"), *OutHit.Actor->GetName())
+          UE_LOG(LogAISystem, Log, TEXT("No Hit"))
         }
       }
     }
     else
     {
       bPlayerWasHit = false;
-      
+
       if (bDrawDebug)
       {
         UE_LOG(LogAISystem, Log, TEXT("No Hit"))
       }
+    }
+  }
+  else
+  {
+    bPlayerWasHit = false;
+
+    if (bDrawDebug)
+    {
+      UE_LOG(LogAISystem, Log, TEXT("No Hit"))
     }
   }
 }
