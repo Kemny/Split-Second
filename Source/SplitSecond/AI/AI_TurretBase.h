@@ -19,7 +19,11 @@ public:
   AAI_TurretBase();
 
   UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-  class UAI_TraceComponent* AITraceComp;
+  class URotatingMovementComponent* RotatingMovement;
+
+  /* The bullet the AI will shoot */
+  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Turret Settings")
+  TSubclassOf<class ASplitSecondProjectile> ProjectileClass;
 
   /* When the turret trace stops hitting the player this the amount time it takes to stop shooting the player  */
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Turret Settings")
@@ -28,5 +32,22 @@ public:
   /* Time it takes for the turret to rotate to player */
   UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Turret Settings")
   float RotationTime = 1;
-	
+
+  /* Called to shoot turret */
+  UFUNCTION(BlueprintCallable, Category = "Turret Functions")
+  void ShootTurret();
+
+  /* Disable / Enable rotating movement component */
+  UFUNCTION(BlueprintCallable, Category = "Turret Functions")
+  void EnableRotationMovement(bool bEnable);
+
+  /* Whether or not the turret is currently rotating */
+  UPROPERTY(BlueprintReadOnly, Category = "Turret Settings")
+  bool bCurrentlyRotating;
+
+
+protected:
+  
+  virtual void BeginPlay() override;
+  
 };
