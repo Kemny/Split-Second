@@ -39,6 +39,9 @@ public:
   /* The current ammo count of this gun */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
   float CurrentAmmoCount;
+  /* Current Maximum Ammo*/
+  UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "Projectile")
+  float CurrentAmmoMax;
 
   /* Function called to fire the gun */
   UFUNCTION(BlueprintCallable, Category = "Gun Functions")

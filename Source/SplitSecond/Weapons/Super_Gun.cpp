@@ -10,6 +10,7 @@
 #include "../Player/SplitSecondPlayerController.h"
 #include "TimerManager.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 // Sets default values
 ASuper_Gun::ASuper_Gun()
@@ -17,13 +18,14 @@ ASuper_Gun::ASuper_Gun()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-  GunMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunMesh"));
-  RootComponent = GunMesh;
+    GunMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunMesh"));
+    RootComponent = GunMesh;
 
-  FireRate = 0.5f;
+    FireRate = 0.5f;
 
-  DefaultAmmoCount = 10;
-  CurrentAmmoCount = DefaultAmmoCount;
+    DefaultAmmoCount = 10;
+    CurrentAmmoCount = DefaultAmmoCount;
+    CurrentAmmoMax = DefaultAmmoCount;
 }
 
 void ASuper_Gun::OnInputPressed_Implementation()
@@ -78,9 +80,11 @@ void ASuper_Gun::FireGun()
 
         if (GetCurrentPawn()->IsA<APlayerCharacter>())
         {
-          CurrentAmmoCount--;
+            CurrentAmmoCount--;
+            UE_LOG(LogTemp, Log, TEXT("Current Ammo Count: %f"), CurrentAmmoCount)
 
-          UE_LOG(LogTemp, Log, TEXT("Current Ammo Count: %f"), CurrentAmmoCount)
+            if (!ensure(GunMesh != nullptr)) { return; }
+            GunMesh->CreateAndSetMaterialInstanceDynamic(1)->SetScalarParameterValue(TEXT("Emission Multiplier"), CurrentAmmoCount / CurrentAmmoMax);
         }
 
         LastTimeFired = GetWorld()->TimeSeconds;
