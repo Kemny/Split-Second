@@ -8,6 +8,7 @@
 #include "../AI/Super_AI_Character.h"
 #include "Engine/World.h"
 #include "../Player/SplitSecondPlayerController.h"
+#include "TimerManager.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
@@ -19,8 +20,22 @@ ASuper_Gun::ASuper_Gun()
   GunMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunMesh"));
   RootComponent = GunMesh;
 
-  FP_MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
-  FP_MuzzleLocation->SetupAttachment(RootComponent, "MuzzleLocation");
+  FireRate = 0.5f;
+
+  DefaultAmmoCount = 10;
+  CurrentAmmoCount = DefaultAmmoCount;
+}
+
+void ASuper_Gun::OnInputPressed_Implementation()
+{
+  float FirstDelay = FMath::Max(LastTimeFired + FireRate - GetWorld()->TimeSeconds, 0.0f);
+
+  GetWorldTimerManager().SetTimer(FireRateTimer, this, &ASuper_Gun::FireGun, FireRate, true, FirstDelay);
+}
+
+void ASuper_Gun::OnInputReleased_Implementation()
+{
+  GetWorldTimerManager().ClearTimer(FireRateTimer);
 }
 
 void ASuper_Gun::FireGun()
@@ -31,29 +46,28 @@ void ASuper_Gun::FireGun()
     UWorld* const World = GetWorld();
     if (World != NULL)
     {
+      if (CurrentAmmoCount > 0)
+      {
         FRotator SpawnRotation;
-
-        // MuzzleOffset is in camera space, so transform it to world space before offsetting from the character location to find the final muzzle position
-        if (!ensure(FP_MuzzleLocation != nullptr)) { return; }
 
         if (GetCurrentPawn()->IsA<APlayerCharacter>())
         {
-            auto HitResult = World->GetFirstPlayerController<ASplitSecondPlayerController>()->LineTraceFromCamera(ECC_Camera);
-            if (HitResult.GetActor())
-            {
-                SpawnRotation = UKismetMathLibrary::FindLookAtRotation(FP_MuzzleLocation->GetComponentLocation(), HitResult.Location);
-            }
-            else
-            {
-                SpawnRotation = CurrentPawn->GetControlRotation();
-            }
+          auto HitResult = World->GetFirstPlayerController<ASplitSecondPlayerController>()->LineTraceFromCamera(ECC_Camera);
+          if (HitResult.GetActor())
+          {
+            SpawnRotation = UKismetMathLibrary::FindLookAtRotation(GunMesh->GetSocketLocation(FName("MuzzleLocation")), HitResult.Location);
+          }
+          else
+          {
+            SpawnRotation = CurrentPawn->GetControlRotation();
+          }
         }
         else
         {
-            SpawnRotation = CurrentPawn->GetControlRotation();
+          SpawnRotation = CurrentPawn->GetControlRotation();
         }
 
-        const FVector SpawnLocation = FP_MuzzleLocation->GetComponentLocation();
+        const FVector SpawnLocation = GunMesh->GetSocketLocation(FName("MuzzleLocation"));
 
         //Set Spawn Collision Handling Override
         FActorSpawnParameters ActorSpawnParams;
@@ -61,6 +75,16 @@ void ASuper_Gun::FireGun()
 
         // spawn the projectile at the muzzle
         World->SpawnActor<ASplitSecondProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+
+        if (GetCurrentPawn()->IsA<APlayerCharacter>())
+        {
+          CurrentAmmoCount--;
+
+          UE_LOG(LogTemp, Log, TEXT("Current Ammo Count: %f"), CurrentAmmoCount)
+        }
+
+        LastTimeFired = GetWorld()->TimeSeconds;
+      }
     }
   }
 }

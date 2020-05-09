@@ -56,7 +56,8 @@ void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 
 	// Bind fire event
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::OnFire);
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &APlayerCharacter::OnFirePressed);
+  PlayerInputComponent->BindAction("Fire", IE_Released, this, &APlayerCharacter::OnFireReleased);
 
 	// Bind movement events
 	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::MoveForward);
@@ -73,11 +74,19 @@ void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
   PlayerInputComponent->BindAction("Dash Left", IE_Released, this, &APlayerCharacter::DashLeftReleased);
 }
 
-void APlayerCharacter::OnFire()
+void APlayerCharacter::OnFirePressed()
 {
   if (CurrentGun)
   {
-    CurrentGun->FireGun();
+    CurrentGun->OnInputPressed();
+  }
+}
+
+void APlayerCharacter::OnFireReleased()
+{
+  if (CurrentGun)
+  {
+    CurrentGun->OnInputReleased();
   }
 }
 
