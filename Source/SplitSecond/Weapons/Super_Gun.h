@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "SplitSecondProjectile.h" ///Compilation fail when forward declaring for some reason
 #include "Super_Gun.generated.h"
 
 class ACharacter;
@@ -22,7 +23,7 @@ public:
 
   /** Projectile class to spawn */
   UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-  TSubclassOf<class ASplitSecondProjectile> ProjectileClass;
+  TSubclassOf<ASplitSecondProjectile> ProjectileClass;
 
   /** Sound to play each time we fire */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
@@ -45,7 +46,7 @@ public:
 
   /* Function called to fire the gun */
   UFUNCTION(BlueprintCallable, Category = "Gun Functions")
-  void FireGun();
+  virtual void FireGun() PURE_VIRTUAL(&ASuper_Gun::FireGun, );
 
   /* Called when player fire key is pressed */
   UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Gun Events")
@@ -65,8 +66,7 @@ public:
   UFUNCTION(BlueprintCallable, Category = "Gun Functions")
   ASuper_Gun* EquipGun(ACharacter* Character);
 
-private:
-
+protected:
   ACharacter* CurrentPawn;
 
   bool bCanFire;
@@ -74,4 +74,5 @@ private:
   FTimerHandle FireRateTimer;
 
   float LastTimeFired;
+
 };

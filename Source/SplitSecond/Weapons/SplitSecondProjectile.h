@@ -26,28 +26,25 @@ public:
 
 	/** called when projectile hits something */
 	UFUNCTION()
-	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) PURE_VIRTUAL(&ASplitSecondProjectile::OnHit, );
 
 	FORCEINLINE class USphereComponent* GetCollisionComp() const { return CollisionComp; }
 	FORCEINLINE class UBulletMovementComponent* GetProjectileMovement() const { return BulletMovement; }
 	FORCEINLINE class UStaticMeshComponent* GetBulletMesh() const { return BulletMesh; }
 
-	bool GetIsSlowed() const { return bIsSlowed; }
 	void GetSlowed(float SlowTime, float SlowAmmount);
 	UFUNCTION() void StopBeingSlowed();
 
-  UFUNCTION(BlueprintImplementableEvent, Category = "Bullet Events")
-  void SpawnParticles(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
-  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Bullet Events")
-  void OnBulletHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-  virtual void OnBulletHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Bullet Events")
+	void OnBulletHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	virtual void OnBulletHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 protected:
 	UPROPERTY(EditAnywhere)
 	float DamageValue = 10;
 
-private:
-	bool bIsSlowed;
+	class UNiagaraSystem* NiagaraSystem;
+	FTimerHandle SlowTimerHandle;
+
 };
 

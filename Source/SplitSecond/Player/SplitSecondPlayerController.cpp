@@ -56,16 +56,6 @@ void ASplitSecondPlayerController::TraceForActorsToSlow()
 	///If line trace found an actor
 	if (HitResult.GetActor())
 	{
-		///UnHighlight old projectile
-		if (HoveredProjectile && HitResult.GetActor() != HoveredProjectile)
-		{
-			if (!HoveredProjectile->GetIsSlowed())
-			{
-				HoveredProjectile->GetBulletMesh()->CreateAndSetMaterialInstanceDynamic(0)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor::Red);
-				HoveredProjectile->GetBulletMesh()->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor::Red);
-				HoveredProjectile = nullptr;
-			}
-		}
 		///UnHighlight old NPC
 		if(HoveredEnemy && HitResult.GetActor() != HoveredEnemy)
 		{
@@ -76,21 +66,6 @@ void ASplitSecondPlayerController::TraceForActorsToSlow()
 			}
 		}
 
-		///Check New Actor
-		if (HitResult.GetActor()->IsA<ASplitSecondProjectile>())
-		{
-			///Set Hovered Bullet
-			HoveredProjectile = Cast<ASplitSecondProjectile>(HitResult.GetActor());
-			///Hightlight new Bullet
-			if (auto BulletMesh = HoveredProjectile->GetBulletMesh())
-			{
-				if (!HoveredProjectile->GetIsSlowed())
-				{
-					BulletMesh->CreateAndSetMaterialInstanceDynamic(0)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0, 1, 1, 1));
-					BulletMesh->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0, 1, 1, 1));
-				}
-			}
-		}
 		else if (HitResult.GetActor()->IsA<ASuper_AI_Character>())
 		{
 			///Set Hovered Enemy
@@ -115,7 +90,15 @@ FHitResult ASplitSecondPlayerController::LineTraceFromCamera(ECollisionChannel C
 	GetWorld()->LineTraceSingleByChannel(HitResult, CameraLocation, (UKismetMathLibrary::Conv_RotatorToVector(PlayerCameraManager->GetCameraRotation()) * 50000) + CameraLocation, ECollisionChannel::ECC_Camera);
 	return HitResult;
 }
+FHitResult ASplitSecondPlayerController::LineTraceFromCamera(ECollisionChannel Collision, FVector EndOffset)
+{
+	FHitResult HitResult;
+	auto CameraLocation = PlayerCameraManager->GetCameraLocation();
 
+	GetWorld()->LineTraceSingleByChannel(HitResult, CameraLocation, (UKismetMathLibrary::Conv_RotatorToVector(PlayerCameraManager->GetCameraRotation()) * 50000) + CameraLocation + EndOffset, ECollisionChannel::ECC_Camera);
+
+	return HitResult;
+}
 void ASplitSecondPlayerController::ShowDebugMenu()
 {
 	if (!ensure(Hud != nullptr)) { return; }
