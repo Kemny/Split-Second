@@ -5,3 +5,4 @@
 
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, SplitSecond, "SplitSecond" );
  
+DEFINE_LOG_CATEGORY(LogAISystem);
