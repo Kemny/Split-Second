@@ -43,6 +43,7 @@ public:
   void ControllerDisconnected();
 
   FHitResult LineTraceFromCamera(ECollisionChannel Collision);
+  FHitResult LineTraceFromCamera(ECollisionChannel Collision, FVector EndOffset);
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Time Manipulation") float ActorSlowDuration = 3;

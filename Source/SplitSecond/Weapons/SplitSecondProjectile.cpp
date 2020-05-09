@@ -11,9 +11,15 @@
 #include "../Player/SplitSecondPlayerController.h" 
 #include "GameFramework/DamageType.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "../Player/PlayerCharacter.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 
 ASplitSecondProjectile::ASplitSecondProjectile() 
 {
+	ConstructorHelpers::FObjectFinder<UNiagaraSystem> NiagaraSystem_BP(TEXT("/Game/Particles/NS_BulletHit.NS_BulletHit"));
+	if (NiagaraSystem_BP.Object) NiagaraSystem = NiagaraSystem_BP.Object;
+
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(5.0f);
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
@@ -40,33 +46,18 @@ ASplitSecondProjectile::ASplitSecondProjectile()
 	BulletMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-void ASplitSecondProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
-{
-	if (!OtherActor) return;
-	// Only add impulse and destroy projectile if we hit a physics
-	if (OtherActor != this)
-	{
-    // Called to apply damage to hit actor
-    OnBulletHit(HitComp, OtherActor, OtherComp, NormalImpulse, Hit);
-
-    // Spawns bullet particles in blueprint
-		SpawnParticles(HitComp, OtherActor, OtherComp, NormalImpulse, Hit); // Event
-	}
-}
-
 void ASplitSecondProjectile::GetSlowed(float SlowTime, float SlowAmmount)
 {
-	bIsSlowed = true;
+	if (GetWorldTimerManager().IsTimerActive(SlowTimerHandle)) return;
+
 	BulletMesh->CreateAndSetMaterialInstanceDynamic(0)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0, 0, 1, 1));
 	BulletMesh->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0, 0, 1, 1));
 
-	FTimerHandle TimerHandle;
 	CustomTimeDilation = SlowAmmount;
-	GetWorldTimerManager().SetTimer(TimerHandle, this, &ASplitSecondProjectile::StopBeingSlowed, SlowTime, false);
+	GetWorldTimerManager().SetTimer(SlowTimerHandle, this, &ASplitSecondProjectile::StopBeingSlowed, SlowTime, false);
 }
 void ASplitSecondProjectile::StopBeingSlowed()
 { 
-	bIsSlowed = false;
 	CustomTimeDilation = 1;
 	BulletMesh->CreateAndSetMaterialInstanceDynamic(0)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor::Red);
 	BulletMesh->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor::Red);

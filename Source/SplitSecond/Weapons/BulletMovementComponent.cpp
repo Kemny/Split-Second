@@ -3,7 +3,7 @@
 #include "BulletMovementComponent.h"
 #include "../SplitSecondGameState.h"
 #include "Engine/World.h"
-
+#include "SplitSecondProjectile.h"
 
 UBulletMovementComponent::UBulletMovementComponent()
 {
@@ -22,6 +22,5 @@ void UBulletMovementComponent::BeginPlay()
 void UBulletMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
 
 }
