@@ -63,6 +63,8 @@ public:
   ACharacter* GetCurrentPawn() const ;
   void SetCurrentPawn(ACharacter* NewPawn) { CurrentPawn = NewPawn; }
 
+  virtual class UStaticMeshComponent* GetGunMesh() const { return GunMesh; }
+
 protected:
   ACharacter* CurrentPawn;
 
