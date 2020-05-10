@@ -22,6 +22,9 @@ ASuper_Gun::ASuper_Gun()
     DefaultAmmoCount = 10;
     CurrentAmmoCount = DefaultAmmoCount;
     CurrentAmmoMax = DefaultAmmoCount;
+
+    GunMesh->bCastDynamicShadow = false;
+    GunMesh->CastShadow = false;
 }
 
 void ASuper_Gun::OnInputPressed_Implementation()
@@ -36,45 +39,7 @@ void ASuper_Gun::OnInputReleased_Implementation()
   GetWorldTimerManager().ClearTimer(FireRateTimer);
 }
 
-ASuper_Gun* ASuper_Gun::EquipGun(ACharacter* Character)
-{
-  if (!ensure(Character != nullptr)) { return nullptr; }
-
-  APlayerCharacter* PlayerRef = Cast<APlayerCharacter>(Character);
-  ASuper_AI_Character* AIRef = Cast<ASuper_AI_Character>(Character);
-
-  if (PlayerRef)
-  {
-    PlayerRef->CurrentGun = this;
-    CurrentPawn = PlayerRef;
-
-    this->AttachToComponent(PlayerRef->GunAttachMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
-    GunMesh->bCastDynamicShadow = false;
-    GunMesh->CastShadow = false;
-    
-    return this;
-  }
-  else if (AIRef)
-  {
-    AIRef->CurrentGun = this;
-    CurrentPawn = AIRef;
-
-    USceneComponent* EnemyScene = Cast<USceneComponent>(AIRef->GetMesh());
-    if (!ensure(EnemyScene != nullptr)) { return nullptr; }
-
-    this->AttachToComponent(EnemyScene, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GunSocket"));
-    GunMesh->bCastDynamicShadow = false;
-    GunMesh->CastShadow = false;
-
-    return this;
-  }
-  else
-  {
-    return nullptr;
-  }
-}
-
-ACharacter* ASuper_Gun::GetCurrentPawn()
+ACharacter* ASuper_Gun::GetCurrentPawn() const
 {
   return CurrentPawn;
 }

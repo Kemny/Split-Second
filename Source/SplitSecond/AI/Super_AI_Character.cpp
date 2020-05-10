@@ -56,22 +56,23 @@ void ASuper_AI_Character::FireGun()
 
 void ASuper_AI_Character::SpawnGun()
 {
-  if (AIGunClass)
-  {
-    UWorld* const World = GetWorld();
-
-    if (World != NULL)
+    if (AIGunClass)
     {
-      //Set Spawn Collision Handling Override
-      FActorSpawnParameters ActorSpawnParams;
-      ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-      auto SpawnTransform = FTransform(FRotator(0), FVector(0), FVector(1));
+        UWorld* const World = GetWorld();
 
-      CurrentGun = GetWorld()->SpawnActor<ASuper_Gun>(AIGunClass, SpawnTransform, ActorSpawnParams);
+        if (World != NULL)
+        {
+            //Set Spawn Collision Handling Override
+            FActorSpawnParameters ActorSpawnParams;
+            ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+            auto SpawnTransform = FTransform(FRotator(0), FVector(0), FVector(1));
 
-      CurrentGun->EquipGun(this);
+            CurrentGun = GetWorld()->SpawnActor<ASuper_Gun>(AIGunClass, SpawnTransform, ActorSpawnParams);
+
+            CurrentGun->SetCurrentPawn(this);
+            CurrentGun->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GunSocket"));
+        }
     }
-  }
 }
 
 void ASuper_AI_Character::GetSlowed(float SlowTime, float SlowAmmount)
