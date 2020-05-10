@@ -3,6 +3,7 @@
 
 #include "Super_Gun.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/SceneComponent.h"
 #include "../Player/PlayerCharacter.h"
 #include "../AI/Super_AI_Character.h"
 #include "../Player/SplitSecondPlayerController.h"
@@ -14,8 +15,11 @@ ASuper_Gun::ASuper_Gun()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+    auto Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+    SetRootComponent(Root);
+
     GunMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunMesh"));
-    RootComponent = GunMesh;
+    GunMesh->SetupAttachment(GetRootComponent());
 
     FireRate = 0.5f;
 
