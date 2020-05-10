@@ -38,6 +38,15 @@ void APlayerCharacter::BeginPlay()
 
     PlayerController = Cast<ASplitSecondPlayerController>(GetWorld()->GetFirstPlayerController());
     if (!ensure(PlayerController != nullptr)) { return; }
+
+    if (GunClass)
+    {
+        CurrentGun = GetWorld()->SpawnActor<ASuper_Gun>(GunClass);
+        if (!ensure(CurrentGun != nullptr)) { return; }
+
+        CurrentGun->SetCurrentPawn(this);
+        CurrentGun->AttachToComponent(GunAttachMesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
+    }
 }
 void APlayerCharacter::PostInitializeComponents()
 {

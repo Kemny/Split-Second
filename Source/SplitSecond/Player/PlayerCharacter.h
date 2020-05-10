@@ -23,9 +23,7 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-  /* The player's current gun */
-  UPROPERTY(BlueprintReadWrite, Category = "Gun Var's")
-  ASuper_Gun* CurrentGun;
+  
 
   /* This is the mesh the gun is attached to */
   UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
@@ -45,11 +43,16 @@ protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 
 protected:
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gun Settings")
+    TSubclassOf<ASuper_Gun> GunClass;
+    /* The player's current gun */
+    UPROPERTY(BlueprintReadWrite, Category = "Gun Var's")
+    ASuper_Gun* CurrentGun;
 
 	/* If player has a gun this calls the gun's input pressed function */
 	void OnFirePressed();
-  /* If player has a gun this calls the gun's input released function */
-  void OnFireReleased();
+    /* If player has a gun this calls the gun's input released function */
+    void OnFireReleased();
 	/** Handles moving forward/backward */
 	void MoveForward(float Val);
 	/** Handles stafing movement, left and right */

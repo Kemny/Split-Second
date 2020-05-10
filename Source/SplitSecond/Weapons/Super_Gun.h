@@ -60,11 +60,8 @@ public:
 
   /* Returns the pawn that currently has the gun */
   UFUNCTION(BlueprintPure, Category = "Gun Functions")
-  ACharacter* GetCurrentPawn();
-
-  /* Equip the gun to the given character returns the equipped gun */
-  UFUNCTION(BlueprintCallable, Category = "Gun Functions")
-  ASuper_Gun* EquipGun(ACharacter* Character);
+  ACharacter* GetCurrentPawn() const ;
+  void SetCurrentPawn(ACharacter* NewPawn) { CurrentPawn = NewPawn; }
 
 protected:
   ACharacter* CurrentPawn;
