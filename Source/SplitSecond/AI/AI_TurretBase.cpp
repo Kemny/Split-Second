@@ -22,15 +22,23 @@ void AAI_TurretBase::ShootTurret()
     UWorld* const World = GetWorld();
     if (World != NULL)
     {
-      const FRotator SpawnRotation = GetControlRotation();
-      const FVector SpawnLocation = GetMesh()->GetSocketLocation(FName("TraceSocket"));
+      // Shoot bullet out of right turret barrel
+      const FRotator RightSpawnRotation = GetControlRotation();
+      const FVector RightSpawnLocation = GetMesh()->GetSocketLocation(FName("Right Turret"));
 
       //Set Spawn Collision Handling Override
       FActorSpawnParameters ActorSpawnParams;
-      ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+      ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
       // spawn the projectile at the muzzle
-      World->SpawnActor<ASplitSecondProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+      World->SpawnActor<ASplitSecondProjectile>(ProjectileClass, RightSpawnLocation, RightSpawnRotation, ActorSpawnParams);
+
+      // Shoot bullet out of left turret barrel
+      const FRotator LeftSpawnRotation = GetControlRotation();
+      const FVector LeftSpawnLocation = GetMesh()->GetSocketLocation(FName("Left Turret"));
+
+      // spawn the projectile at the muzzle
+      World->SpawnActor<ASplitSecondProjectile>(ProjectileClass, LeftSpawnLocation, LeftSpawnRotation, ActorSpawnParams);
     }
   }
 }
