@@ -9,6 +9,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "PlayerProjectile.h"
+#include "Kismet/GameplayStatics.h"
+#include "../../BulletMovementComponent.h"
 
 APlayerBow::APlayerBow()
 {
@@ -23,14 +25,14 @@ void APlayerBow::OnInputPressed_Implementation()
 
 void APlayerBow::OnInputReleased_Implementation()
 {
-	bIsDrawingBow = false;
-	bIsHeld = false;
-	BowDrawPrecentage = 0;
-    
-    if (CurrentAmmoCount > 0)
+    if (CurrentAmmoCount > 0 && BowDrawPrecentage > MinimalDrawValue)
     {
         FireGun();
     }
+
+    bIsHeld = false;
+    bIsDrawingBow = false;
+    BowDrawPrecentage = 0;
 }
 
 void APlayerBow::Tick(float DeltaTime)
@@ -42,6 +44,8 @@ void APlayerBow::Tick(float DeltaTime)
 		if (BowDrawPrecentage >= 1)
 		{
             UE_LOG(LogTemp, Log, TEXT("Bow Loaded"));
+            BowDrawPrecentage = 1;
+            bIsDrawingBow = false;
 			bIsHeld = true;
 		}
 		BowDrawPrecentage += BowDrawSpeed;
@@ -74,13 +78,16 @@ void APlayerBow::FireGun()
             ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
             // spawn the projectile at the muzzle
-            World->SpawnActor<APlayerProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-            
-            CurrentAmmoCount--;
-            UE_LOG(LogTemp, Log, TEXT("Current Ammo Count: %f"), CurrentAmmoCount);
+            if (auto Spawned = World->SpawnActor<APlayerProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams))
+            {
+                Spawned->GetProjectileMovement()->ProjectileGravityScale = FMath::Abs(BowDrawPrecentage - 1);
 
-            BowMesh->CreateAndSetMaterialInstanceDynamic(1)->SetScalarParameterValue(TEXT("Emission Multiplier"), CurrentAmmoCount / CurrentAmmoMax);
-            LastTimeFired = World->TimeSeconds;
+                CurrentAmmoCount--;
+                UE_LOG(LogTemp, Log, TEXT("Current Ammo Count: %f"), CurrentAmmoCount);
+
+                BowMesh->CreateAndSetMaterialInstanceDynamic(1)->SetScalarParameterValue(TEXT("Emission Multiplier"), CurrentAmmoCount / CurrentAmmoMax);
+                LastTimeFired = World->TimeSeconds;
+            }
         }
     }
 }

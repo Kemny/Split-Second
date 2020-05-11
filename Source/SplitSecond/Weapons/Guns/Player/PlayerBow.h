@@ -27,12 +27,16 @@ public:
 	bool bIsHeld = false;
 	UPROPERTY(BlueprintReadWrite)
 	bool bIsDrawingBow = false;
+	UPROPERTY(BlueprintReadWrite)
+	float BowDrawPrecentage = 0;
 
 	/* Bow is fully charged when it reaches 1 */
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Projectile")
 	float BowDrawSpeed = 0.1;
+	/* A projectile will spawn if BowDrawSpeed > MinimalDrawValue*/
+	UPROPERTY(EditAnywhere, Category = "Projectile")
+	float MinimalDrawValue = 0.3;
 
-	float BowDrawPrecentage = 0;
 
 	void OnInputPressed_Implementation() override;
 	void OnInputReleased_Implementation() override;
