@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+
+#include "../Libraries/SplitSecondWeapons.h" ///Structs cannot be forward declared
+
 #include "SplitSecondPlayerController.generated.h"
 
 /**
@@ -45,6 +48,8 @@ public:
   FHitResult LineTraceFromCamera(ECollisionChannel Collision);
   FHitResult LineTraceFromCamera(ECollisionChannel Collision, FVector EndOffset);
 
+  void SetDefaultWeapon(EWeapons NewWeapon);
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "Time Manipulation") float ActorSlowDuration = 3;
 	UPROPERTY(EditAnywhere, Category = "Time Manipulation") float ActorSlowValue = 0.1;
@@ -78,7 +83,6 @@ private:
 
 	class ASplitSecondHUD* Hud;
 
-	class ASplitSecondProjectile* HoveredProjectile;
 	class ASuper_AI_Character* HoveredEnemy;
 };
 

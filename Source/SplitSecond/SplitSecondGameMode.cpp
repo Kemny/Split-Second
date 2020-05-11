@@ -5,6 +5,7 @@
 #include "Player/PlayerCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 #include "GameFramework/WorldSettings.h"
+#include "Player/SplitSecondPlayerController.h"
 
 ASplitSecondGameMode::ASplitSecondGameMode()
 	: Super()
@@ -23,4 +24,11 @@ void ASplitSecondGameMode::BeginPlay()
 
 	GetWorldSettings()->MaxGlobalTimeDilation = MaxTimeDilation;
 	GetWorldSettings()->MinGlobalTimeDilation = MinTimeDilation;
+}
+
+void ASplitSecondGameMode::SetDefaultWeapon(EWeapons NewWeapon)
+{
+	auto PC = GetWorld()->GetFirstPlayerController<ASplitSecondPlayerController>();
+	if (!ensure(PC != nullptr)) { return; }
+	PC->SetDefaultWeapon(NewWeapon);
 }

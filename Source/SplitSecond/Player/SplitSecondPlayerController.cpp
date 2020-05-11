@@ -11,6 +11,7 @@
 #include "../AI/Super_AI_Character.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "../SplitSecondPlayerState.h"
 
 ASplitSecondPlayerController::ASplitSecondPlayerController()
 {
@@ -111,11 +112,7 @@ void ASplitSecondPlayerController::IncreaseSlow(float Value)
 
 void ASplitSecondPlayerController::SlowTarget()
 {
-	if (HoveredProjectile)
-	{
-		HoveredProjectile->GetSlowed(ActorSlowDuration, ActorSlowValue);
-	}
-	else if (HoveredEnemy)
+	if (HoveredEnemy)
 	{
 		HoveredEnemy->GetSlowed(ActorSlowDuration, ActorSlowValue);
 	}
@@ -138,6 +135,7 @@ bool ASplitSecondPlayerController::InputKey(FKey Key, EInputEvent EventType, flo
 void ASplitSecondPlayerController::PlayerTick(float DeltaTime)
 {
   Super::PlayerTick(DeltaTime);
+
   if (IsLocalController() && bResetGamepadDetectionAfterNoInput && bIsUsingGamepad)
   {
     float now = GetWorld()->TimeSeconds;
@@ -151,4 +149,12 @@ void ASplitSecondPlayerController::PlayerTick(float DeltaTime)
       bIsUsingGamepad = true;
     }
   }
+}
+
+void ASplitSecondPlayerController::SetDefaultWeapon(EWeapons NewWeapon)
+{
+	auto PS = GetPlayerState<ASplitSecondPlayerState>();
+	if (!ensure(PS != nullptr)) { return; }
+
+	PS->SetDefaultWeapon(NewWeapon);
 }
