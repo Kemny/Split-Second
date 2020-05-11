@@ -7,13 +7,13 @@ void ASplitSecondPlayerState::SetDefaultWeapon(EWeapons NewWeapon)
 	switch (NewWeapon)
 	{
 	case Pistol:
-		CurrentUpgrades = FPistolDefault();
+		CurrentStats = FPistolDefault();
 		break;
 	case Shotgun:
-		CurrentUpgrades = FShotgunDefault();
+		CurrentStats = FShotgunDefault();
 		break;
 	case Bow:
-		CurrentUpgrades = FBowDefault();
+		CurrentStats = FBowDefault();
 		break;
 	default:
 		break;

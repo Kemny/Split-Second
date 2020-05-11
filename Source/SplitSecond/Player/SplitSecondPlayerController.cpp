@@ -7,11 +7,13 @@
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
 #include "../Weapons/SplitSecondProjectile.h"
+#include "../Weapons/Super_Gun.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "../AI/Super_AI_Character.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "../SplitSecondPlayerState.h"
+#include "PlayerCharacter.h"
 
 ASplitSecondPlayerController::ASplitSecondPlayerController()
 {
@@ -151,10 +153,12 @@ void ASplitSecondPlayerController::PlayerTick(float DeltaTime)
   }
 }
 
-void ASplitSecondPlayerController::SetDefaultWeapon(EWeapons NewWeapon)
+void ASplitSecondPlayerController::SetDefaultWeapon(EWeapons NewWeapon, TSubclassOf<class ASuper_Gun> NewGunClass)
 {
-	auto PS = GetPlayerState<ASplitSecondPlayerState>();
-	if (!ensure(PS != nullptr)) { return; }
+	auto PC = GetPawn<APlayerCharacter>();
+	if (!ensure(PC != nullptr)) { return; }
+	PC->EquipGun(NewGunClass);
 
+	auto PS = PC->GetPlayerStateChecked<ASplitSecondPlayerState>();
 	PS->SetDefaultWeapon(NewWeapon);
 }

@@ -39,10 +39,10 @@ public:
 	void OnBulletHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	virtual void OnBulletHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-protected:
 	UPROPERTY(EditAnywhere)
 	float DamageValue = 10;
 
+protected:
 	class UNiagaraSystem* NiagaraSystem;
 	FTimerHandle SlowTimerHandle;
 

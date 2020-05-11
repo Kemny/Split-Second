@@ -1,14 +1,14 @@
 // This project falls under CC-BY-SA lisence
 
 #include "PlayerBow.h"
-#include "Components/SkeletalMeshComponent.h"
-#include "../../../Player/PlayerCharacter.h"
+#include "PlayerProjectile.h"
+#include "GameFramework/Character.h"
 #include "../../../Player/SplitSecondPlayerController.h"
-#include "../../../AI/Super_AI_Character.h"
 #include "Engine/World.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "../../../SplitSecondPlayerState.h"
 #include "PlayerProjectile.h"
-#include "Kismet/GameplayStatics.h"
 #include "../../BulletMovementComponent.h"
 
 APlayerBow::APlayerBow()
@@ -24,7 +24,9 @@ void APlayerBow::OnInputPressed_Implementation()
 
 void APlayerBow::OnInputReleased_Implementation()
 {
-    if (CurrentAmmoCount > 0 && BowDrawPrecentage > MinimalDrawValue)
+    if (!ensure(PlayerState != nullptr)) { return; }
+
+    if (PlayerState->CurrentStats.Ammo > 0 && BowDrawPrecentage > PlayerState->CurrentStats.MinimalDrawValue)
     {
         FireGun();
     }
@@ -38,6 +40,8 @@ void APlayerBow::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+    if (!ensure(PlayerState != nullptr)) { return; }
+
 	if (bIsDrawingBow && !bIsHeld)
 	{
 		if (BowDrawPrecentage >= 1)
@@ -47,7 +51,7 @@ void APlayerBow::Tick(float DeltaTime)
             bIsDrawingBow = false;
 			bIsHeld = true;
 		}
-		BowDrawPrecentage += BowDrawSpeed;
+		BowDrawPrecentage += PlayerState->CurrentStats.BowDrawSpeed;
 	}
 }
 
@@ -58,7 +62,6 @@ void APlayerBow::FireGun()
         UWorld* const World = GetWorld();
         if (World != NULL)
         {
-
             FRotator SpawnRotation;
 
             const auto HitResult = World->GetFirstPlayerController<ASplitSecondPlayerController>()->LineTraceFromCamera(ECC_Camera);
@@ -77,7 +80,7 @@ void APlayerBow::FireGun()
             ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
             // spawn the projectile at the muzzle
-            if (auto Spawned = World->SpawnActor<APlayerProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams))
+            if (auto Spawned = Player_SpawnProjectile(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams))
             {
                 Spawned->GetProjectileMovement()->ProjectileGravityScale = FMath::Abs(BowDrawPrecentage - 1);
                 AfterPlayerFireGun(BowMesh);

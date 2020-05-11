@@ -1,35 +1,29 @@
 // This project falls under CC-BY-SA lisence
 
 #include "PlayerShotgun.h"
-#include "../../../Player/PlayerCharacter.h"
+#include "GameFramework/Character.h"
 #include "../../../Player/SplitSecondPlayerController.h"
-#include "../../../AI/Super_AI_Character.h"
 #include "Engine/World.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/StaticMeshComponent.h"
-#include "Materials/MaterialInstanceDynamic.h"
-#include "PlayerProjectile.h"
+#include "../../../SplitSecondPlayerState.h"
 
-void APlayerShotgun::BeginPlay()
-{
-    Super::BeginPlay();
-    CurrentBulletNum = DefaultBulletNum;
-    CurrentBulletSpread = DefaultBulletSpread;
-}
 void APlayerShotgun::FireGun()
 {
+    if (!ensure(PlayerState != nullptr)) { return; }
+
     if (ProjectileClass != NULL)
     {
         UWorld* const World = GetWorld();
         if (World != NULL)
         {
-            if (CurrentAmmoCount > 0)
+            if (PlayerState->CurrentStats.Ammo > 0)
             {
-                for (size_t i = 0; i < CurrentBulletNum; i++)
+                for (size_t i = 0; i < PlayerState->CurrentStats.BulletNum; i++)
                 {
                     FRotator SpawnRotation;
 
-                    const auto Spread = CurrentBulletSpread;
+                    const auto Spread = PlayerState->CurrentStats.BulletSpread;
                     const auto Offset = FVector(FMath::RandRange(-Spread, Spread), FMath::RandRange(-Spread, Spread), FMath::RandRange(-Spread, Spread));
                     const auto HitResult = World->GetFirstPlayerController<ASplitSecondPlayerController>()->LineTraceFromCamera(ECC_Camera, Offset);
                     if (HitResult.GetActor())
@@ -47,10 +41,10 @@ void APlayerShotgun::FireGun()
                     FActorSpawnParameters ActorSpawnParams;
                     ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-                    // spawn the projectile at the muzzle
-                    World->SpawnActor<APlayerProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-
-                    AfterPlayerFireGun(GunMesh);
+                    if (auto Spawned = Player_SpawnProjectile(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams))
+                    {
+                        AfterPlayerFireGun(GunMesh);
+                    }
                 }
             }
         }

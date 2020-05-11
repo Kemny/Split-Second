@@ -21,7 +21,7 @@ protected:
 	virtual void BeginPlay() override;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
-	float DefaultHealth;
+	float MaxHealth = 100;
 	
 	UPROPERTY(BlueprintReadOnly)
 	float Health;
@@ -31,4 +31,11 @@ protected:
 
   UFUNCTION(BlueprintCallable, Category = "Health Functions")
   void Heal(float HealAmount);
+
+public:
+	void ChangeMaxHealth(float MaxHealthToAdd) 
+	{ 
+		MaxHealth += MaxHealthToAdd;
+		Health += MaxHealthToAdd;
+	}
 };

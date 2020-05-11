@@ -16,7 +16,7 @@ class SPLITSECOND_API ASplitSecondPlayerState : public APlayerState
 	
 public:
     UPROPERTY(VisibleInstanceOnly)
-    FUpgrades CurrentUpgrades; 
+    FUpgrades CurrentStats; 
     
     void SetDefaultWeapon(EWeapons NewWeapon);
 

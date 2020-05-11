@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "SplitSecondProjectile.h" ///Compilation fail when forward declaring for some reason
+
+///Cannot be forward declared
+#include "SplitSecondProjectile.h"
+#include "Engine/World.h"
+
 #include "Super_Gun.generated.h"
 
 class ACharacter;
@@ -18,6 +22,8 @@ public:
 	// Sets default values for this actor's properties
 	ASuper_Gun();
 
+    void BeginPlay() override;
+
   UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
   class UStaticMeshComponent* GunMesh;
 
@@ -28,21 +34,6 @@ public:
   /** Sound to play each time we fire */
   UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
   class USoundBase* FireSound;
-
-  /* Fire rate of player's gun not enemies */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
-  float FireRate;
-
-  /* The default ammo count of this gun */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
-  float DefaultAmmoCount;
-
-  /* The current ammo count of this gun */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
-  float CurrentAmmoCount;
-  /* Current Maximum Ammo*/
-  UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "Projectile")
-  float CurrentAmmoMax;
 
   /* Function called to fire the gun */
   UFUNCTION(BlueprintCallable, Category = "Gun Functions")
@@ -66,7 +57,8 @@ public:
   virtual class UStaticMeshComponent* GetGunMesh() const { return GunMesh; }
 
 protected:
-  ACharacter* CurrentPawn;
+    ACharacter* CurrentPawn;
+    class ASplitSecondPlayerState* PlayerState;
 
   bool bCanFire;
 
@@ -74,6 +66,9 @@ protected:
 
   float LastTimeFired;
 
+  class APlayerProjectile* Player_SpawnProjectile(UClass* Class, FVector const& Location, FRotator const& Rotation, const FActorSpawnParameters& SpawnParameters);
   void AfterPlayerFireGun(class UMeshComponent* GunMeshToEdit);
 
+
 };
+

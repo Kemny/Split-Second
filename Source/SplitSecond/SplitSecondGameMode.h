@@ -22,12 +22,23 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Defaults")FPistolDefault DefaultStatsForPistol;
 	UPROPERTY(EditDefaultsOnly, Category = "Defaults")FShotgunDefault DefaultStatsForShotgun;
 	UPROPERTY(EditDefaultsOnly, Category = "Defaults")FBowDefault DefaultStatsForBow;
+	
+	///TODO Remove debug Weapon calss
+
+	/*Final game will let the player pick from a menu of weapons*/
+    UPROPERTY(EditDefaultsOnly, Category = "Defaults")
+    TEnumAsByte<EWeapons> Temp_StartingGun;
 
 public:
 	ASplitSecondGameMode();
 	void BeginPlay() override;
 
-    void SetDefaultWeapon(EWeapons NewWeapon);
+    void SetDefaultWeapon(EWeapons NewWeapon, TSubclassOf<class ASuper_Gun> Pistol);
+
+private:
+	TSubclassOf<class ASuper_Gun> PistolClass;
+	TSubclassOf<class ASuper_Gun> ShotgunClass;
+	TSubclassOf<class ASuper_Gun> BowClass;
 };
 
 

@@ -11,6 +11,10 @@
 #include "TimerManager.h"
 #include "Materials/MaterialInstanceDynamic.h"
 
+#include "Guns/Player/PlayerProjectile.h"
+#include "BulletMovementComponent.h"
+#include "../SplitSecondPlayerState.h"
+
 // Sets default values
 ASuper_Gun::ASuper_Gun()
 {
@@ -23,21 +27,25 @@ ASuper_Gun::ASuper_Gun()
     GunMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunMesh"));
     GunMesh->SetupAttachment(GetRootComponent());
 
-    FireRate = 0.5f;
-
-    DefaultAmmoCount = 10;
-    CurrentAmmoCount = DefaultAmmoCount;
-    CurrentAmmoMax = DefaultAmmoCount;
-
     GunMesh->bCastDynamicShadow = false;
     GunMesh->CastShadow = false;
 }
 
+void ASuper_Gun::BeginPlay()
+{
+    Super::BeginPlay();
+
+    auto PlayerController = GetWorld()->GetFirstPlayerController<ASplitSecondPlayerController>();
+    if (!ensure(PlayerController != nullptr)) { return; }
+    PlayerState = PlayerController->GetPlayerState<ASplitSecondPlayerState>();
+}
+
 void ASuper_Gun::OnInputPressed_Implementation()
 {
-  float FirstDelay = FMath::Max(LastTimeFired + FireRate - GetWorld()->TimeSeconds, 0.0f);
+    if (!ensure(PlayerState != nullptr)) { return; }
+    float FirstDelay = FMath::Max(LastTimeFired + (PlayerState->CurrentStats.FireRate * PlayerState->CurrentStats.FireRateMultiplier) - GetWorld()->TimeSeconds, 0.0f);
 
-  GetWorldTimerManager().SetTimer(FireRateTimer, this, &ASuper_Gun::FireGun, FireRate, true, FirstDelay);
+    GetWorldTimerManager().SetTimer(FireRateTimer, this, &ASuper_Gun::FireGun, PlayerState->CurrentStats.FireRate, true, FirstDelay);
 }
 
 void ASuper_Gun::OnInputReleased_Implementation()
@@ -50,14 +58,52 @@ ACharacter* ASuper_Gun::GetCurrentPawn() const
   return CurrentPawn;
 }
 
+APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector const& Location, FRotator const& Rotation, const FActorSpawnParameters& SpawnParameters)
+{
+    if (auto Spawned = GetWorld()->SpawnActor<APlayerProjectile>(ProjectileClass, Location, Rotation, SpawnParameters))
+    {
+        if (auto PlayerCharacter = Cast<APlayerCharacter>(GetCurrentPawn()))
+        {
+            auto Upgrades = PlayerCharacter->GetPlayerStateChecked<ASplitSecondPlayerState>()->CurrentStats;
+
+            Spawned->DamageValue = Upgrades.Damage;
+            Spawned->DamageValue *= Upgrades.DamageMultiplier;
+            Spawned->GetProjectileMovement()->InitialSpeed = Upgrades.ProjectileSpeed;
+            Spawned->GetProjectileMovement()->InitialSpeed *= Upgrades.ProjectileSpeedMultiplier;
+
+            if (Upgrades.bIsBouncing)
+            {
+                Spawned->GetProjectileMovement()->bShouldBounce = true;
+            }
+            if (Upgrades.bBiggerBullets)
+            {
+                Spawned->SetActorScale3D(FVector(3));
+                Spawned->DamageValue *= 2;
+            }
+            if (Upgrades.bExplodingBullets)
+            {
+
+            }
+            if (Upgrades.bIsHoming)
+            {
+                Spawned->GetProjectileMovement()->bIsHomingProjectile = true;
+            }
+        }
+        return Spawned;
+    }
+
+    return nullptr;
+}
+
 void ASuper_Gun::AfterPlayerFireGun(UMeshComponent* GunMeshToEdit)
 {
     if (!ensure(GunMeshToEdit != nullptr)) { return; }
+    if (!ensure(PlayerState != nullptr)) { return; }
 
-    CurrentAmmoCount--;
-    UE_LOG(LogTemp, Log, TEXT("Current Ammo Count: %f"), CurrentAmmoCount);
+    PlayerState->CurrentStats.Ammo--;
+    UE_LOG(LogTemp, Log, TEXT("Current Ammo Count: %f"), PlayerState->CurrentStats.Ammo);
 
-    auto AmmoPercentage = CurrentAmmoCount / CurrentAmmoMax;
+    auto AmmoPercentage = PlayerState->CurrentStats.Ammo / PlayerState->CurrentStats.MaxAmmo;
     GunMeshToEdit->CreateAndSetMaterialInstanceDynamic(1)->SetScalarParameterValue(TEXT("Emission Multiplier"), AmmoPercentage);
     GunMeshToEdit->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(TEXT("Color"), FLinearColor(AmmoPercentage, 0, 0, 1));
 

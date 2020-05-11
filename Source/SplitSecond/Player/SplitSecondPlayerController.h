@@ -48,7 +48,7 @@ public:
   FHitResult LineTraceFromCamera(ECollisionChannel Collision);
   FHitResult LineTraceFromCamera(ECollisionChannel Collision, FVector EndOffset);
 
-  void SetDefaultWeapon(EWeapons NewWeapon);
+  void SetDefaultWeapon(EWeapons NewWeapon, TSubclassOf<class ASuper_Gun> NewGunClass);
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Time Manipulation") float ActorSlowDuration = 3;
@@ -84,5 +84,6 @@ private:
 	class ASplitSecondHUD* Hud;
 
 	class ASuper_AI_Character* HoveredEnemy;
+
 };
 

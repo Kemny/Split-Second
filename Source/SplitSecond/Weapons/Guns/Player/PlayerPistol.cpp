@@ -1,23 +1,23 @@
 // This project falls under CC-BY-SA lisence
 
 #include "PlayerPistol.h"
-#include "../../../Player/PlayerCharacter.h"
+#include "GameFramework/Character.h"
 #include "../../../Player/SplitSecondPlayerController.h"
-#include "../../../AI/Super_AI_Character.h"
 #include "Engine/World.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/StaticMeshComponent.h"
-#include "Materials/MaterialInstanceDynamic.h"
-#include "PlayerProjectile.h"
+#include "../../../SplitSecondPlayerState.h"
 
 void APlayerPistol::FireGun()
 {
+    if (!ensure(PlayerState != nullptr)) { return; }
+
     if (ProjectileClass != NULL)
     {
         UWorld* const World = GetWorld();
         if (World != NULL)
         {
-            if (CurrentAmmoCount > 0)
+            if (PlayerState->CurrentStats.Ammo > 0)
             {
                 FRotator SpawnRotation;
 
@@ -37,9 +37,10 @@ void APlayerPistol::FireGun()
                 ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
                 // spawn the projectile at the muzzle
-                World->SpawnActor<APlayerProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-
-                AfterPlayerFireGun(GunMesh);
+                if (auto Spawned = Player_SpawnProjectile(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams))
+                {
+                    AfterPlayerFireGun(GunMesh);
+                }
             }
         }
     }

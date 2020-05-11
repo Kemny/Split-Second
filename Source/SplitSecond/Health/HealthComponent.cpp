@@ -1,7 +1,7 @@
 // This project falls under CC-BY-SA lisence
 
-
 #include "HealthComponent.h"
+#include "GameFramework/Actor.h"
 
 // Sets default values for this component's properties
 UHealthComponent::UHealthComponent()
@@ -10,8 +10,7 @@ UHealthComponent::UHealthComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	DefaultHealth = 100;
-  Health = DefaultHealth;
+	Health = MaxHealth;
 }
 
 
@@ -34,7 +33,7 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDam
 		return;
 	}
 
-	Health = FMath::Clamp(Health - Damage, 0.0f, DefaultHealth);
+	Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
 }
 
 void UHealthComponent::Heal(float HealAmount)
@@ -45,7 +44,7 @@ void UHealthComponent::Heal(float HealAmount)
   }
 
   float NewHealth = Health + HealAmount;
-  Health = FMath::Clamp(NewHealth, 0.0f, DefaultHealth);
+  Health = FMath::Clamp(NewHealth, 0.0f, MaxHealth);
 
   UE_LOG(LogTemp, Log, TEXT("%s 's Current HP is: %f Amount: %f"), *GetOwner()->GetName(), Health, HealAmount)
 }

@@ -30,14 +30,6 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	float BowDrawPrecentage = 0;
 
-	/* Bow is fully charged when it reaches 1 */
-	UPROPERTY(EditAnywhere, Category = "Projectile")
-	float BowDrawSpeed = 0.1;
-	/* A projectile will spawn if BowDrawSpeed > MinimalDrawValue*/
-	UPROPERTY(EditAnywhere, Category = "Projectile")
-	float MinimalDrawValue = 0.3;
-
-
 	void OnInputPressed_Implementation() override;
 	void OnInputReleased_Implementation() override;
 };

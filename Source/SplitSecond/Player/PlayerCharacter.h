@@ -23,19 +23,19 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-  
+    /* This is the mesh the gun is attached to */
+    UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+    class UStaticMeshComponent* GunAttachMesh;
 
-  /* This is the mesh the gun is attached to */
-  UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-  class UStaticMeshComponent* GunAttachMesh;
+    /* Multiplier used to launch the player either right or left */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
+    float DashMultiplier;
 
-  /* Multiplier used to launch the player either right or left */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dash Settings")
-  float DashMultiplier;
+    /* If dash button is hit twice within this delay it counts as a double tap  */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dash Settings")
+    float DashInputDelay;
 
-  /* If dash button is hit twice within this delay it counts as a double tap  */
-  UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dash Settings")
-  float DashInputDelay;
+    void EquipGun(TSubclassOf<class ASuper_Gun> GunClass);
 
 protected:
 	virtual void BeginPlay() override;
@@ -43,8 +43,6 @@ protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 
 protected:
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gun Settings")
-    TSubclassOf<ASuper_Gun> GunClass;
     /* The player's current gun */
     UPROPERTY(BlueprintReadWrite, Category = "Gun Var's")
     ASuper_Gun* CurrentGun;

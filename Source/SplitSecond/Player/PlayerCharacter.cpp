@@ -37,7 +37,9 @@ void APlayerCharacter::BeginPlay()
 
     PlayerController = Cast<ASplitSecondPlayerController>(GetWorld()->GetFirstPlayerController());
     if (!ensure(PlayerController != nullptr)) { return; }
-
+}
+void APlayerCharacter::EquipGun(TSubclassOf<class ASuper_Gun> GunClass)
+{
     if (GunClass)
     {
         CurrentGun = GetWorld()->SpawnActor<ASuper_Gun>(GunClass);
