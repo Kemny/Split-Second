@@ -74,4 +74,6 @@ protected:
 
   float LastTimeFired;
 
+  void AfterPlayerFireGun(class UMeshComponent* GunMeshToEdit);
+
 };

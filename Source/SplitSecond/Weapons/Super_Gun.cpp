@@ -4,10 +4,12 @@
 #include "Super_Gun.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SceneComponent.h"
+#include "Components/MeshComponent.h"
 #include "../Player/PlayerCharacter.h"
 #include "../AI/Super_AI_Character.h"
 #include "../Player/SplitSecondPlayerController.h"
 #include "TimerManager.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 // Sets default values
 ASuper_Gun::ASuper_Gun()
@@ -46,4 +48,18 @@ void ASuper_Gun::OnInputReleased_Implementation()
 ACharacter* ASuper_Gun::GetCurrentPawn() const
 {
   return CurrentPawn;
+}
+
+void ASuper_Gun::AfterPlayerFireGun(UMeshComponent* GunMeshToEdit)
+{
+    if (!ensure(GunMeshToEdit != nullptr)) { return; }
+
+    CurrentAmmoCount--;
+    UE_LOG(LogTemp, Log, TEXT("Current Ammo Count: %f"), CurrentAmmoCount);
+
+    auto AmmoPercentage = CurrentAmmoCount / CurrentAmmoMax;
+    GunMeshToEdit->CreateAndSetMaterialInstanceDynamic(1)->SetScalarParameterValue(TEXT("Emission Multiplier"), AmmoPercentage);
+    GunMeshToEdit->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(TEXT("Color"), FLinearColor(AmmoPercentage, 0, 0, 1));
+
+    LastTimeFired = GetWorld()->TimeSeconds;
 }

@@ -7,7 +7,6 @@
 #include "../../../AI/Super_AI_Character.h"
 #include "Engine/World.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Materials/MaterialInstanceDynamic.h"
 #include "PlayerProjectile.h"
 #include "Kismet/GameplayStatics.h"
 #include "../../BulletMovementComponent.h"
@@ -81,12 +80,7 @@ void APlayerBow::FireGun()
             if (auto Spawned = World->SpawnActor<APlayerProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams))
             {
                 Spawned->GetProjectileMovement()->ProjectileGravityScale = FMath::Abs(BowDrawPrecentage - 1);
-
-                CurrentAmmoCount--;
-                UE_LOG(LogTemp, Log, TEXT("Current Ammo Count: %f"), CurrentAmmoCount);
-
-                BowMesh->CreateAndSetMaterialInstanceDynamic(1)->SetScalarParameterValue(TEXT("Emission Multiplier"), CurrentAmmoCount / CurrentAmmoMax);
-                LastTimeFired = World->TimeSeconds;
+                AfterPlayerFireGun(BowMesh);
             }
         }
     }

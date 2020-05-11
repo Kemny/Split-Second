@@ -49,12 +49,9 @@ void APlayerShotgun::FireGun()
 
                     // spawn the projectile at the muzzle
                     World->SpawnActor<APlayerProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-                }
-                CurrentAmmoCount--;
-                UE_LOG(LogTemp, Log, TEXT("Current Ammo Count: %f"), CurrentAmmoCount);
 
-                GunMesh->CreateAndSetMaterialInstanceDynamic(1)->SetScalarParameterValue(TEXT("Emission Multiplier"), CurrentAmmoCount / CurrentAmmoMax);
-                LastTimeFired = World->TimeSeconds;
+                    AfterPlayerFireGun(GunMesh);
+                }
             }
         }
     }
