@@ -111,13 +111,14 @@ void ASuper_Gun::AfterPlayerFireGun(UMeshComponent* GunMeshToEdit)
 
     LastTimeFired = GetWorld()->TimeSeconds;
 
+    // if gun is current regenerating ammo stop regeneration
     if (bReloadActive)
     {
       GetWorldTimerManager().ClearTimer(ReloadTimer);
       bReloadActive = false;
     }
 
-    if (PlayerState->CurrentStats.Ammo <= 0)
+    if (IsOutOfAmmo())
     {
       if (!ensure(LocalGunMeshToEdit != nullptr)) { return; }
 
@@ -127,9 +128,16 @@ void ASuper_Gun::AfterPlayerFireGun(UMeshComponent* GunMeshToEdit)
 
 void ASuper_Gun::StartRegen()
 {
-    ReloadSpeed = PlayerState->CurrentStats.ReloadSpeed * PlayerState->CurrentStats.ReloadSpeedMultiplier;
+    if (PlayerState->CurrentStats.bReloadConstant)
+    {
+      ReloadSpeed = PlayerState->CurrentStats.ReloadSpeed * PlayerState->CurrentStats.ReloadSpeedMultiplier;
 
-    GetWorldTimerManager().SetTimer(ReloadTimer, this, &ASuper_Gun::RegenAmmo, ReloadSpeed, true, ReloadSpeed);
+      GetWorldTimerManager().SetTimer(ReloadTimer, this, &ASuper_Gun::RegenAmmo, ReloadSpeed, true, ReloadSpeed);
+    }
+    else
+    {
+      // TODO Make delay affected by time dilation
+    }
 }
 
 void ASuper_Gun::RegenAmmo()
@@ -148,4 +156,9 @@ void ASuper_Gun::RegenAmmo()
 
       bReloadActive = false;
     }
+}
+
+bool ASuper_Gun::IsOutOfAmmo()
+{
+  return PlayerState->CurrentStats.Ammo <= 0;
 }
