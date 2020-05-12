@@ -41,10 +41,8 @@ void APlayerShotgun::FireGun()
                     FActorSpawnParameters ActorSpawnParams;
                     ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
-                    if (auto Spawned = Player_SpawnProjectile(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams))
-                    {
-                        AfterPlayerFireGun(GunMesh);
-                    }
+                    Player_SpawnProjectile(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+                    AfterPlayerFireGun(GunMesh);
                 }
             }
         }

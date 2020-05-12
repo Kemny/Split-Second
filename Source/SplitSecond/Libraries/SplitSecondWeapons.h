@@ -31,8 +31,7 @@ public:
     UPROPERTY(EditAnywhere)bool bHasShield;
     UPROPERTY(EditAnywhere)bool bCanThrowGun;
     UPROPERTY(EditAnywhere)bool bConstantDashSpeed;
-    UPROPERTY(EditAnywhere)float Ammo;
-    UPROPERTY(EditAnywhere)float MaxAmmo;
+    UPROPERTY(EditAnywhere)int32 MaxAmmo;
     UPROPERTY(EditAnywhere)float Damage;
     UPROPERTY(EditAnywhere)float ProjectileSpeed;
     UPROPERTY(EditAnywhere)float ReloadSpeed;
@@ -55,15 +54,14 @@ public:
     UPROPERTY(EditAnywhere)bool bHasShield;
     UPROPERTY(EditAnywhere)bool bCanThrowGun;
     UPROPERTY(EditAnywhere)bool bConstantDashSpeed;
-    UPROPERTY(EditAnywhere)float Ammo;
-    UPROPERTY(EditAnywhere)float MaxAmmo;
+    UPROPERTY(EditAnywhere)int32 MaxAmmo;
     UPROPERTY(EditAnywhere)float Damage;
     UPROPERTY(EditAnywhere)float ProjectileSpeed;
     UPROPERTY(EditAnywhere)float ReloadSpeed;
     UPROPERTY(EditAnywhere)float FireRate;
 
-    UPROPERTY(VisibleInstanceOnly)int32 BulletNum = 5;
-    UPROPERTY(VisibleInstanceOnly)float BulletSpread = 200;
+    UPROPERTY(EditAnywhere)int32 BulletNum = 5;
+    UPROPERTY(EditAnywhere)float BulletSpread = 200;
 };
 USTRUCT(BlueprintType)
 struct FBowDefault
@@ -82,8 +80,7 @@ public:
     UPROPERTY(EditAnywhere)bool bHasShield;
     UPROPERTY(EditAnywhere)bool bCanThrowGun;
     UPROPERTY(EditAnywhere)bool bConstantDashSpeed;
-    UPROPERTY(EditAnywhere)float Ammo;
-    UPROPERTY(EditAnywhere)float MaxAmmo;
+    UPROPERTY(EditAnywhere)int32 MaxAmmo;
     UPROPERTY(EditAnywhere)float Damage;
     UPROPERTY(EditAnywhere)float ProjectileSpeed;
     UPROPERTY(EditAnywhere)float ReloadSpeed;
@@ -100,30 +97,30 @@ struct FUpgrades
 
 public:
     ///Bullets
-    UPROPERTY(EditAnywhere)bool bIsPiercing;
-    UPROPERTY(EditAnywhere)bool bIsHoming;
-    UPROPERTY(EditAnywhere)bool bIsBouncing;
-    UPROPERTY(EditAnywhere)bool bExplodingBullets;
-    UPROPERTY(EditAnywhere)bool bBiggerBullets;
+    UPROPERTY(EditAnywhere)bool bIsPiercing = false;
+    UPROPERTY(EditAnywhere)bool bIsHoming = false;
+    UPROPERTY(EditAnywhere)bool bIsBouncing = false;
+    UPROPERTY(EditAnywhere)bool bExplodingBullets = false;
+    UPROPERTY(EditAnywhere)bool bBiggerBullets = false;
 
     ///Guns
-    UPROPERTY(EditAnywhere)bool bBossOneHat;
-    UPROPERTY(EditAnywhere)bool bBossTwoHat;
-    UPROPERTY(EditAnywhere)bool bBoosThreeHat;
+    UPROPERTY(EditAnywhere)bool bBossOneHat = false;
+    UPROPERTY(EditAnywhere)bool bBossTwoHat = false;
+    UPROPERTY(EditAnywhere)bool bBoosThreeHat = false;
 
     ///Player
-    UPROPERTY(EditAnywhere)bool bHasExtraLife;
-    UPROPERTY(EditAnywhere)bool bReverseCubeSlowing;
-    UPROPERTY(EditAnywhere)bool bHasShield;
-    UPROPERTY(EditAnywhere)bool bCanThrowGun;
-    UPROPERTY(EditAnywhere)bool bConstantDashSpeed;
+    UPROPERTY(EditAnywhere)bool bHasExtraLife = false;
+    UPROPERTY(EditAnywhere)bool bReverseCubeSlowing = false;
+    UPROPERTY(EditAnywhere)bool bHasShield = false;
+    UPROPERTY(EditAnywhere)bool bCanThrowGun = false;
+    UPROPERTY(EditAnywhere)bool bConstantDashSpeed = false;
 
-    UPROPERTY(EditAnywhere)float Ammo;
-    UPROPERTY(EditAnywhere)float MaxAmmo;
-    UPROPERTY(EditAnywhere)float Damage;
-    UPROPERTY(EditAnywhere)float ProjectileSpeed;
-    UPROPERTY(EditAnywhere)float ReloadSpeed;
-    UPROPERTY(EditAnywhere)float FireRate;
+    UPROPERTY(EditAnywhere)int32 Ammo = 999;
+    UPROPERTY(EditAnywhere)int32 MaxAmmo = 999;
+    UPROPERTY(EditAnywhere)float Damage = 999;
+    UPROPERTY(EditAnywhere)float ProjectileSpeed = 999;
+    UPROPERTY(EditAnywhere)float ReloadSpeed = 999;
+    UPROPERTY(EditAnywhere)float FireRate = 999;
 
     UPROPERTY(EditAnywhere)float ProjectileSpeedMultiplier = 1;
     UPROPERTY(EditAnywhere)float DamageMultiplier = 1;
@@ -131,8 +128,10 @@ public:
     UPROPERTY(EditAnywhere)float FireRateMultiplier = 1;
 
     ///Shotgun Specific
-    UPROPERTY(VisibleInstanceOnly)int32 BulletNum = 5;
-    UPROPERTY(VisibleInstanceOnly)float BulletSpread = 200;
+    UPROPERTY(EditAnywhere)int32 BulletNum = 5;
+    UPROPERTY(EditAnywhere)float BulletSpread = 200;
+
+    ///Bow Specific
 
     /*Will fire at 1 and add this value every tick*/
     UPROPERTY(EditAnywhere)float BowDrawSpeed = 0.01;
@@ -155,10 +154,12 @@ public:
         bCanThrowGun = Defaults.bCanThrowGun;
         bConstantDashSpeed = Defaults.bConstantDashSpeed;
 
-        Ammo = Defaults.Ammo;
+        MaxAmmo = Defaults.MaxAmmo;
+        Ammo = MaxAmmo;
         Damage = Defaults.Damage;
         ProjectileSpeed = Defaults.ProjectileSpeed;
         ReloadSpeed = Defaults.ReloadSpeed;
+        FireRate = Defaults.FireRate;
     }
     FUpgrades(FShotgunDefault Defaults)
     {
@@ -172,10 +173,12 @@ public:
         bCanThrowGun = Defaults.bCanThrowGun;
         bConstantDashSpeed = Defaults.bConstantDashSpeed;
 
-        Ammo = Defaults.Ammo;
+        MaxAmmo = Defaults.MaxAmmo;
+        Ammo = MaxAmmo;
         Damage = Defaults.Damage;
         ProjectileSpeed = Defaults.ProjectileSpeed;
         ReloadSpeed = Defaults.ReloadSpeed;
+        FireRate = Defaults.FireRate;
 
         BulletNum = Defaults.BulletNum;
         BulletSpread = Defaults.BulletSpread;
@@ -192,14 +195,17 @@ public:
         bCanThrowGun = Defaults.bCanThrowGun;
         bConstantDashSpeed = Defaults.bConstantDashSpeed;
 
-        Ammo = Defaults.Ammo;
+        MaxAmmo = Defaults.MaxAmmo;
+        Ammo = MaxAmmo;
         Damage = Defaults.Damage;
         ProjectileSpeed = Defaults.ProjectileSpeed;
         ReloadSpeed = Defaults.ReloadSpeed;
+        FireRate = Defaults.FireRate;
 
         BowDrawSpeed = Defaults.BowDrawSpeed;
         MinimalDrawValue = Defaults.MinimalDrawValue;
     }
+
 };
 
 UCLASS()

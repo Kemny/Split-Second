@@ -7,6 +7,7 @@
 #include "GameFramework/WorldSettings.h"
 #include "Player/SplitSecondPlayerController.h"
 #include "Weapons/Super_Gun.h"
+#include "SplitSecondPlayerState.h"
 
 ASplitSecondGameMode::ASplitSecondGameMode()
 	: Super()
@@ -51,9 +52,29 @@ void ASplitSecondGameMode::BeginPlay()
 
 }
 
-void ASplitSecondGameMode::SetDefaultWeapon(EWeapons NewWeapon, TSubclassOf<ASuper_Gun> Pistol)
+void ASplitSecondGameMode::SetDefaultWeapon(EWeapons NewWeapon, TSubclassOf<ASuper_Gun> WeaponClass)
 {
 	auto PC = GetWorld()->GetFirstPlayerController<ASplitSecondPlayerController>();
 	if (!ensure(PC != nullptr)) { return; }
-	PC->SetDefaultWeapon(NewWeapon, Pistol);
+	auto Pawn = Cast<APlayerCharacter>(PC->K2_GetPawn());
+	if (!ensure(Pawn != nullptr)) { return; }
+	Pawn->EquipGun(WeaponClass);
+	auto PS = Pawn->GetPlayerState<ASplitSecondPlayerState>();
+	if (!ensure(PC != nullptr)) { return; }
+
+	switch (NewWeapon)
+	{
+	case Pistol:
+		PS->CurrentStats = FUpgrades(DefaultStatsForPistol);
+		break;
+	case Shotgun:
+		PS->CurrentStats = FUpgrades(DefaultStatsForShotgun);
+		break;
+	case Bow:
+		PS->CurrentStats = FUpgrades(DefaultStatsForBow);
+		break;
+	default:
+		break;
+	}
+	
 }

@@ -38,6 +38,7 @@ void ASuper_Gun::BeginPlay()
     auto PlayerController = GetWorld()->GetFirstPlayerController<ASplitSecondPlayerController>();
     if (!ensure(PlayerController != nullptr)) { return; }
     PlayerState = PlayerController->GetPlayerState<ASplitSecondPlayerState>();
+    if (!ensure(PlayerState != nullptr)) { return; }
 }
 
 void ASuper_Gun::OnInputPressed_Implementation()
@@ -101,9 +102,9 @@ void ASuper_Gun::AfterPlayerFireGun(UMeshComponent* GunMeshToEdit)
     if (!ensure(PlayerState != nullptr)) { return; }
 
     PlayerState->CurrentStats.Ammo--;
-    UE_LOG(LogTemp, Log, TEXT("Current Ammo Count: %f"), PlayerState->CurrentStats.Ammo);
+    UE_LOG(LogTemp, Log, TEXT("Current Ammo Count: %i"), PlayerState->CurrentStats.Ammo);
 
-    auto AmmoPercentage = PlayerState->CurrentStats.Ammo / PlayerState->CurrentStats.MaxAmmo;
+    float AmmoPercentage = (float)PlayerState->CurrentStats.Ammo / (float)PlayerState->CurrentStats.MaxAmmo;
     GunMeshToEdit->CreateAndSetMaterialInstanceDynamic(1)->SetScalarParameterValue(TEXT("Emission Multiplier"), AmmoPercentage);
     GunMeshToEdit->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(TEXT("Color"), FLinearColor(AmmoPercentage, 0, 0, 1));
 

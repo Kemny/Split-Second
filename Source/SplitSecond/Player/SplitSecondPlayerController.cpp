@@ -13,7 +13,6 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "../SplitSecondPlayerState.h"
-#include "PlayerCharacter.h"
 
 ASplitSecondPlayerController::ASplitSecondPlayerController()
 {
@@ -151,14 +150,4 @@ void ASplitSecondPlayerController::PlayerTick(float DeltaTime)
       bIsUsingGamepad = true;
     }
   }
-}
-
-void ASplitSecondPlayerController::SetDefaultWeapon(EWeapons NewWeapon, TSubclassOf<class ASuper_Gun> NewGunClass)
-{
-	auto PC = GetPawn<APlayerCharacter>();
-	if (!ensure(PC != nullptr)) { return; }
-	PC->EquipGun(NewGunClass);
-
-	auto PS = PC->GetPlayerStateChecked<ASplitSecondPlayerState>();
-	PS->SetDefaultWeapon(NewWeapon);
 }

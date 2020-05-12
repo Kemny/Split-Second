@@ -37,7 +37,7 @@ public:
 
   /* Function called to fire the gun */
   UFUNCTION(BlueprintCallable, Category = "Gun Functions")
-  virtual void FireGun() PURE_VIRTUAL(&ASuper_Gun::FireGun, );
+  virtual void FireGun() { return; }
 
   /* Called when player fire key is pressed */
   UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Gun Events")
