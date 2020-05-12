@@ -36,6 +36,7 @@ public:
     UPROPERTY(EditAnywhere)float ProjectileSpeed;
     UPROPERTY(EditAnywhere)float ReloadSpeed;
     UPROPERTY(EditAnywhere)float FireRate;
+    UPROPERTY(EditAnywhere)bool bReloadConstant;
 };
 USTRUCT(BlueprintType)
 struct FShotgunDefault
@@ -59,6 +60,7 @@ public:
     UPROPERTY(EditAnywhere)float ProjectileSpeed;
     UPROPERTY(EditAnywhere)float ReloadSpeed;
     UPROPERTY(EditAnywhere)float FireRate;
+    UPROPERTY(EditAnywhere)bool bReloadConstant;
 
     UPROPERTY(EditAnywhere)int32 BulletNum = 5;
     UPROPERTY(EditAnywhere)float BulletSpread = 200;
@@ -85,6 +87,7 @@ public:
     UPROPERTY(EditAnywhere)float ProjectileSpeed;
     UPROPERTY(EditAnywhere)float ReloadSpeed;
     UPROPERTY(EditAnywhere)float FireRate;
+    UPROPERTY(EditAnywhere)bool bReloadConstant;
 
     UPROPERTY(EditAnywhere)float BowDrawSpeed = 0.1;
     UPROPERTY(EditAnywhere)float MinimalDrawValue = 0.3;
@@ -107,6 +110,7 @@ public:
     UPROPERTY(EditAnywhere)bool bBossOneHat = false;
     UPROPERTY(EditAnywhere)bool bBossTwoHat = false;
     UPROPERTY(EditAnywhere)bool bBoosThreeHat = false;
+    UPROPERTY(EditAnywhere)bool bReloadConstant = true;
 
     ///Player
     UPROPERTY(EditAnywhere)bool bHasExtraLife = false;
@@ -153,6 +157,7 @@ public:
         bBiggerBullets = Defaults.bBiggerBullets;
         bCanThrowGun = Defaults.bCanThrowGun;
         bConstantDashSpeed = Defaults.bConstantDashSpeed;
+        bReloadConstant = Defaults.bReloadConstant;
 
         MaxAmmo = Defaults.MaxAmmo;
         Ammo = MaxAmmo;
@@ -172,6 +177,7 @@ public:
         bBiggerBullets = Defaults.bBiggerBullets;
         bCanThrowGun = Defaults.bCanThrowGun;
         bConstantDashSpeed = Defaults.bConstantDashSpeed;
+        bReloadConstant = Defaults.bReloadConstant;
 
         MaxAmmo = Defaults.MaxAmmo;
         Ammo = MaxAmmo;
@@ -189,6 +195,7 @@ public:
         bIsHoming = Defaults.bIsHoming;
         bIsBouncing = Defaults.bIsBouncing;
         bExplodingBullets = Defaults.bExplodingBullets;
+        bReloadConstant = Defaults.bReloadConstant;
 
         bHasShield = Defaults.bHasShield;
         bBiggerBullets = Defaults.bBiggerBullets;
