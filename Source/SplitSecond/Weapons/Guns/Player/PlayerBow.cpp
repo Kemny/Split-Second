@@ -19,7 +19,11 @@ APlayerBow::APlayerBow()
 
 void APlayerBow::OnInputPressed_Implementation()
 {
-	bIsDrawingBow = true;
+    if (!ensure(PlayerState != nullptr)) { return; }
+    if (PlayerState->CurrentStats.Ammo > 0)
+    {
+        bIsDrawingBow = true;
+    }
 }
 
 void APlayerBow::OnInputReleased_Implementation()
