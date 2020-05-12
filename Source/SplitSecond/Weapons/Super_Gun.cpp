@@ -116,6 +116,13 @@ void ASuper_Gun::AfterPlayerFireGun(UMeshComponent* GunMeshToEdit)
     {
       GetWorldTimerManager().ClearTimer(ReloadTimer);
       bReloadActive = false;
+
+      if (IsOutOfAmmo())
+      {
+        if (!ensure(LocalGunMeshToEdit != nullptr)) { return; }
+
+        StartRegen();
+      }
     }
 
     if (IsOutOfAmmo())
@@ -128,7 +135,7 @@ void ASuper_Gun::AfterPlayerFireGun(UMeshComponent* GunMeshToEdit)
 
 void ASuper_Gun::StartRegen()
 {
-    if (PlayerState->CurrentStats.bReloadConstant)
+    if (!PlayerState->CurrentStats.bReloadConstant)
     {
       ReloadSpeed = PlayerState->CurrentStats.ReloadSpeed * PlayerState->CurrentStats.ReloadSpeedMultiplier;
 
@@ -137,6 +144,7 @@ void ASuper_Gun::StartRegen()
     else
     {
       // TODO Make delay affected by time dilation
+      
     }
 }
 
