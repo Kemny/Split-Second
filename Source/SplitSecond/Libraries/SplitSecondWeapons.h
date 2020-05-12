@@ -109,7 +109,7 @@ public:
     ///Guns
     UPROPERTY(EditAnywhere)bool bBossOneHat = false;
     UPROPERTY(EditAnywhere)bool bBossTwoHat = false;
-    UPROPERTY(EditAnywhere)bool bBoosThreeHat = false;
+    UPROPERTY(EditAnywhere)bool bBossThreeHat = false;
     UPROPERTY(EditAnywhere)bool bReloadConstant = true;
 
     ///Player
