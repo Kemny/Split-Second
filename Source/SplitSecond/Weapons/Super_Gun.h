@@ -64,11 +64,21 @@ protected:
 
   FTimerHandle FireRateTimer;
 
+  FTimerHandle ReloadTimer;
+
   float LastTimeFired;
+
+  float ReloadSpeed;
+
+  class UMeshComponent* LocalGunMeshToEdit;
 
   class APlayerProjectile* Player_SpawnProjectile(UClass* Class, FVector const& Location, FRotator const& Rotation, const FActorSpawnParameters& SpawnParameters);
   void AfterPlayerFireGun(class UMeshComponent* GunMeshToEdit);
 
+  void StartRegen();
 
+  void RegenAmmo();
+
+  bool bReloadActive;
 };
 

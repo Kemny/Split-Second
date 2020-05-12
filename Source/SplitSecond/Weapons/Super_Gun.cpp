@@ -107,6 +107,45 @@ void ASuper_Gun::AfterPlayerFireGun(UMeshComponent* GunMeshToEdit)
     float AmmoPercentage = (float)PlayerState->CurrentStats.Ammo / (float)PlayerState->CurrentStats.MaxAmmo;
     GunMeshToEdit->CreateAndSetMaterialInstanceDynamic(1)->SetScalarParameterValue(TEXT("Emission Multiplier"), AmmoPercentage);
     GunMeshToEdit->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(TEXT("Color"), FLinearColor(AmmoPercentage, 0, 0, 1));
+    LocalGunMeshToEdit = GunMeshToEdit;
 
     LastTimeFired = GetWorld()->TimeSeconds;
+
+    if (bReloadActive)
+    {
+      GetWorldTimerManager().ClearTimer(ReloadTimer);
+      bReloadActive = false;
+    }
+
+    if (PlayerState->CurrentStats.Ammo <= 0)
+    {
+      if (!ensure(LocalGunMeshToEdit != nullptr)) { return; }
+
+      StartRegen();
+    }
+}
+
+void ASuper_Gun::StartRegen()
+{
+    ReloadSpeed = PlayerState->CurrentStats.ReloadSpeed * PlayerState->CurrentStats.ReloadSpeedMultiplier;
+
+    GetWorldTimerManager().SetTimer(ReloadTimer, this, &ASuper_Gun::RegenAmmo, ReloadSpeed, true, ReloadSpeed);
+}
+
+void ASuper_Gun::RegenAmmo()
+{
+    PlayerState->CurrentStats.Ammo = FMath::Clamp(PlayerState->CurrentStats.Ammo + 1, 0, PlayerState->CurrentStats.MaxAmmo);
+    bReloadActive = true;
+
+    UE_LOG(LogTemp, Log, TEXT("Current Ammo Count: %i"), PlayerState->CurrentStats.Ammo);
+    float AmmoPercentage = (float)PlayerState->CurrentStats.Ammo / (float)PlayerState->CurrentStats.MaxAmmo;
+    LocalGunMeshToEdit->CreateAndSetMaterialInstanceDynamic(1)->SetScalarParameterValue(TEXT("Emission Multiplier"), AmmoPercentage);
+    LocalGunMeshToEdit->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(TEXT("Color"), FLinearColor(AmmoPercentage, 0, 0, 1));
+
+    if (PlayerState->CurrentStats.Ammo >= PlayerState->CurrentStats.MaxAmmo)
+    {
+      GetWorldTimerManager().ClearTimer(ReloadTimer);
+
+      bReloadActive = false;
+    }
 }
