@@ -160,5 +160,5 @@ void ASuper_Gun::RegenAmmo()
 
 bool ASuper_Gun::IsOutOfAmmo()
 {
-  return PlayerState->CurrentStats.Ammo <= 0;
+    return PlayerState->CurrentStats.Ammo <= 0;
 }

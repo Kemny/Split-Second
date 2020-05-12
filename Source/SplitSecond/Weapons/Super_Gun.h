@@ -79,6 +79,9 @@ protected:
 
   void RegenAmmo();
 
+  // Returns true if player is out of ammo 
+  bool IsOutOfAmmo();
+
   bool bReloadActive;
 };
 
