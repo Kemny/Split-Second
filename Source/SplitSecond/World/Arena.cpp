@@ -1,7 +1,9 @@
 // This project falls under CC-BY-SA lisence
 
-
 #include "Arena.h"
+#include "ActorSpawnLocationComponent.h"
+#include "Engine/World.h"
+#include "GameFramework/PlayerController.h"
 
 // Sets default values
 AArena::AArena()
@@ -18,10 +20,39 @@ void AArena::BeginPlay()
 	
 }
 
-// Called every frame
-void AArena::Tick(float DeltaTime)
+void AArena::SpawnActors()
 {
-	Super::Tick(DeltaTime);
+	auto SpawnLocations = GetComponentsByClass(UActorSpawnLocationComponent::StaticClass());
+	for (auto ActorToSpawn : SpawnLocations)
+	{
+		if (auto ActorSpawnLocationComponent = Cast<UActorSpawnLocationComponent>(ActorToSpawn))
+		{
+			if (ActorSpawnLocationComponent->SpawnType == Player_Location)
+			{
+				GetWorld()->GetFirstPlayerController()->GetPawn()->SetActorLocation(ActorSpawnLocationComponent->GetComponentLocation());
+			}
+			else
+			{
+				TSubclassOf<AActor> ActorClassToSpawn = ActorSpawnLocationComponent->GetCurrentTypeClass();
+				if (auto Spawned = GetWorld()->SpawnActor<AActor>(ActorClassToSpawn))
+				{
+					Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+					Spawned->SetActorLocation(ActorSpawnLocationComponent->GetComponentLocation());
+				}
+			}
+		}
+	}
+}
 
+void AArena::FinishObjective()
+{
+	//TODO Spawn a button or something to let the player progress
+}
+
+void AArena::FinishArena()
+{
+	///TODO after the condition created from finish objective is fufulled, we call finished arena to tell the gamemode to spawn the next one
+	OnArenaFinished.ExecuteIfBound();
+	Destroy();
 }
 

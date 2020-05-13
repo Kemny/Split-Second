@@ -17,7 +17,7 @@ class SPLITSECOND_API ASplitSecondGameState : public AGameStateBase
 	
 protected:
 	UPROPERTY(EditAnywhere)float GlobalTimeMultiplier = 1;
-	int32 CurrentLevel;
+	int32 CurrentLevel = 1;
 
 public:
 	int32 GetCurrentLevel() const { return CurrentLevel; }

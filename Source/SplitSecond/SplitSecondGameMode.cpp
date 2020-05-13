@@ -8,6 +8,9 @@
 #include "Player/SplitSecondPlayerController.h"
 #include "Weapons/Super_Gun.h"
 #include "SplitSecondPlayerState.h"
+#include "World/Arena.h"
+#include "SplitSecondGameState.h"
+#include "NavigationSystem.h"
 
 ASplitSecondGameMode::ASplitSecondGameMode()
 	: Super()
@@ -50,6 +53,7 @@ void ASplitSecondGameMode::BeginPlay()
 
 	StartPlay();
 
+	SpawnNextArena();
 }
 
 void ASplitSecondGameMode::SetDefaultWeapon(EWeapons NewWeapon, TSubclassOf<ASuper_Gun> WeaponClass)
@@ -77,4 +81,43 @@ void ASplitSecondGameMode::SetDefaultWeapon(EWeapons NewWeapon, TSubclassOf<ASup
 		break;
 	}
 	
+}
+
+void ASplitSecondGameMode::SpawnNextArena()
+{
+	auto MyGameState = Cast<ASplitSecondGameState>(GameState);
+	if (!ensure(MyGameState != nullptr)) { return; }
+	UE_LOG(LogTemp, Log, TEXT("Current Level: %i"), MyGameState->GetCurrentLevel());
+
+	if (PossibleArenas.Num() <= 0) return;
+
+	if (MyGameState->GetCurrentLevel() % 10 != 0)
+	{
+		auto RoomIndex = FMath::RandRange(0, PossibleArenas.Num() - 1);
+		if (auto Spawned = GetWorld()->SpawnActor<AArena>(PossibleArenas[RoomIndex]))
+		{
+			Spawned->SpawnActors();
+			Spawned->OnArenaFinished.BindUFunction(this, TEXT("SpawnNextArena"));
+			PossibleArenas.RemoveAt(RoomIndex);
+			UNavigationSystemV1::GetNavigationSystem(GetWorld())->Build();
+		}
+	}
+	else
+	{
+		switch (MyGameState->GetCurrentLevel())
+		{
+		case 10:
+			UE_LOG(LogTemp, Log, TEXT("Spawning Boss Room #1"));
+			break;
+		case 20:
+			UE_LOG(LogTemp, Log, TEXT("Spawning Boss Room #2"));
+			break;
+		case 30:
+			UE_LOG(LogTemp, Log, TEXT("Spawning Boss Room #3"));
+			break;
+		default:
+			UE_LOG(LogTemp, Error, TEXT("Something went wrong when spawning a level"));
+			break;
+		}
+	}
 }

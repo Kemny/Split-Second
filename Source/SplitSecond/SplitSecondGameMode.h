@@ -28,12 +28,22 @@ protected:
 	/*Final game will let the player pick from a menu of weapons*/
     UPROPERTY(EditDefaultsOnly, Category = "Defaults")
     TEnumAsByte<EWeapons> Temp_StartingGun;
+    UPROPERTY(EditDefaultsOnly, Category = "Arenas")
+    TArray<TSubclassOf<class AArena>> PossibleArenas;
+	UPROPERTY(EditDefaultsOnly, Category = "Arenas")
+	TSubclassOf<class AArena> Boss1Arena;
+	UPROPERTY(EditDefaultsOnly, Category = "Arenas")
+	TSubclassOf<class AArena> Boss2Arena;
+	UPROPERTY(EditDefaultsOnly, Category = "Arenas")
+	TSubclassOf<class AArena> Boss3Arena;
 
 public:
 	ASplitSecondGameMode();
 	void BeginPlay() override;
 
     void SetDefaultWeapon(EWeapons NewWeapon, TSubclassOf<class ASuper_Gun> Pistol);
+
+	void SpawnNextArena();
 
 private:
 	TSubclassOf<class ASuper_Gun> PistolClass;
