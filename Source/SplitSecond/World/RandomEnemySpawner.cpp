@@ -19,6 +19,9 @@ URandomEnemySpawner::URandomEnemySpawner()
     if (BP_Enemy_Shooter_Class.Class) Enemy_Shooter_Class = BP_Enemy_Shooter_Class.Class;
 
     BoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    BoxComponent->SetBoxExtent(FVector(1500, 4000, 100));
+
+    AmountToSpawn = 5;
 }
 
 void URandomEnemySpawner::SpawnEnemies(AActor* Parent)
