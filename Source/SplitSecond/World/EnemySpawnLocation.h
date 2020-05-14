@@ -16,6 +16,7 @@ enum EEnemySpawnType
   Enemy_Turret,
 };
 
+/* This component will spawn a enemy inside of it's collision box */
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent), HideCategories = (Rendering, Tags, Replication, Activation, Cooking, Physics, LOD, Collision, Replication, AssetUserData, ComponentReplication, Variable))
 class SPLITSECOND_API UEnemySpawnLocation : public USceneComponent
 {

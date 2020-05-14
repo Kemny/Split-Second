@@ -15,6 +15,7 @@ enum ESpawnType
 	Player_Location
 };
 
+/* This component will spawn the player or objective at it's placed location */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), HideCategories = (Rendering, Tags, Replication, Activation, Cooking, Physics, LOD, Collision, Replication, AssetUserData, ComponentReplication, Variable ) )
 class SPLITSECOND_API UActorSpawnLocationComponent : public USceneComponent
 {
