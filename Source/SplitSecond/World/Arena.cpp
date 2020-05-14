@@ -1,6 +1,7 @@
 // This project falls under CC-BY-SA lisence
 
 #include "Arena.h"
+#include "EnemySpawnLocation.h"
 #include "ActorSpawnLocationComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
@@ -42,6 +43,19 @@ void AArena::SpawnActors()
 			}
 		}
 	}
+  auto EnemySpawnLocations = GetComponentsByClass(UEnemySpawnLocation::StaticClass());
+  for (auto ActorToSpawn : EnemySpawnLocations)
+  {
+    if (auto EnemySpawnLocationComponent = Cast<UEnemySpawnLocation>(ActorToSpawn))
+    {
+      TSubclassOf<AActor> EnemyClassToSpawn = EnemySpawnLocationComponent->GetCurrentTypeClass();
+      if (auto Spawned = GetWorld()->SpawnActor<AActor>(EnemyClassToSpawn))
+      {
+        Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+        Spawned->SetActorLocation(EnemySpawnLocationComponent->GetBoxCenter());
+      }
+    }
+  }
 }
 
 void AArena::FinishObjective()
@@ -51,7 +65,7 @@ void AArena::FinishObjective()
 
 void AArena::FinishArena()
 {
-	///TODO after the condition created from finish objective is fufulled, we call finished arena to tell the gamemode to spawn the next one
+	///TODO after the condition created from finish objective is fulled, we call finished arena to tell the gamemode to spawn the next one
 	OnArenaFinished.ExecuteIfBound();
 	Destroy();
 }

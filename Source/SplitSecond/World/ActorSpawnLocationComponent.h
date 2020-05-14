@@ -9,10 +9,6 @@
 UENUM()
 enum ESpawnType
 {
-	Enemy_Charger,
-	Enemy_Healer,
-	Enemy_Shooter,
-	Enemy_Turret,
 	Objective_Flag,
 	Objective_FlagTarget,
 	Objective_PlayerTarget,
@@ -34,10 +30,6 @@ public:
 private:
 	UActorSpawnLocationComponent();
 
-	TSubclassOf<AActor> Enemy_Charger_Class;
-	TSubclassOf<AActor> Enemy_Healer_Class;
-	TSubclassOf<AActor> Enemy_Shooter_Class;
-	TSubclassOf<AActor> Enemy_Turret_Class;
 	TSubclassOf<AActor> Objective_Flag_Class;
 	TSubclassOf<AActor> Objective_FlagTarget_Class;
 	TSubclassOf<AActor> Objective_PlayerTarget_Class;

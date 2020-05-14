@@ -23,11 +23,6 @@ ASuper_AI_Character::ASuper_AI_Character()
   AIControllerClass = ASplitSecond_AI_Controller::StaticClass();
   AIGunClass = ASuper_Gun::StaticClass();
 
-  auto Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
-  SetRootComponent(Root);
-
-  GetCapsuleComponent()->SetupAttachment(Root);
-
   TraceComp = CreateDefaultSubobject<UBoxComponent>(TEXT("TraceComp"));
   TraceComp->SetupAttachment(GetCapsuleComponent());
   TraceComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
