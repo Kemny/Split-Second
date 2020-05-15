@@ -13,6 +13,7 @@ UEnemySpawnLocation::UEnemySpawnLocation()
     BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
     BoxComponent->SetupAttachment(this);
     BoxComponent->SetBoxExtent(FVector(32, 32, 95));
+    BoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     
     ConstructorHelpers::FClassFinder<AActor> BP_Enemy_Charger_Class(TEXT("/Game/Blueprint/NPC/BP_Charger"));
     if (BP_Enemy_Charger_Class.Class) Enemy_Charger_Class = BP_Enemy_Charger_Class.Class;
