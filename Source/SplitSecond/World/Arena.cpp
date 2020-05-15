@@ -44,27 +44,27 @@ void AArena::SpawnActors()
 			}
 		}
 	}
-  auto EnemySpawnLocations = GetComponentsByClass(UEnemySpawnLocation::StaticClass());
-  for (auto ActorToSpawn : EnemySpawnLocations)
-  {
-    if (auto EnemySpawnLocationComponent = Cast<UEnemySpawnLocation>(ActorToSpawn))
-    {
-      TSubclassOf<AActor> EnemyClassToSpawn = EnemySpawnLocationComponent->GetCurrentTypeClass();
-      if (auto Spawned = GetWorld()->SpawnActor<AActor>(EnemyClassToSpawn))
-      {
-        Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-        Spawned->SetActorLocation(EnemySpawnLocationComponent->GetBoxCenter());
-      }
-    }
-  }
-  auto RandomEnemySpawnLocations = GetComponentsByClass(URandomEnemySpawner::StaticClass());
-  for (auto ActorToSpawn : RandomEnemySpawnLocations)
-  {
-    if (auto RandomEnemySpawnLocationComponent = Cast<URandomEnemySpawner>(ActorToSpawn))
-    {
-      RandomEnemySpawnLocationComponent->SpawnEnemies(this);
-    }
-  }
+	auto EnemySpawnLocations = GetComponentsByClass(UEnemySpawnLocation::StaticClass());
+	for (auto ActorToSpawn : EnemySpawnLocations)
+	{
+		if (auto EnemySpawnLocationComponent = Cast<UEnemySpawnLocation>(ActorToSpawn))
+		{
+			TSubclassOf<AActor> EnemyClassToSpawn = EnemySpawnLocationComponent->GetCurrentTypeClass();
+			if (auto Spawned = GetWorld()->SpawnActor<AActor>(EnemyClassToSpawn))
+			{
+				Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+				Spawned->SetActorLocation(EnemySpawnLocationComponent->GetBoxCenter());
+			}
+		}
+	}
+	auto RandomEnemySpawnLocations = GetComponentsByClass(URandomEnemySpawner::StaticClass());
+	for (auto ActorToSpawn : RandomEnemySpawnLocations)
+	{
+		if (auto RandomEnemySpawnLocationComponent = Cast<URandomEnemySpawner>(ActorToSpawn))
+		{
+			RandomEnemySpawnLocationComponent->SpawnEnemies(this);
+		}
+	}
 }
 
 void AArena::FinishObjective()
