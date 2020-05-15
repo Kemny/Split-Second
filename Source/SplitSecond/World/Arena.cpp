@@ -2,6 +2,7 @@
 
 #include "Arena.h"
 #include "EnemySpawnLocation.h"
+#include "RandomEnemySpawner.h"
 #include "ActorSpawnLocationComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
@@ -54,6 +55,14 @@ void AArena::SpawnActors()
         Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
         Spawned->SetActorLocation(EnemySpawnLocationComponent->GetBoxCenter());
       }
+    }
+  }
+  auto RandomEnemySpawnLocations = GetComponentsByClass(URandomEnemySpawner::StaticClass());
+  for (auto ActorToSpawn : RandomEnemySpawnLocations)
+  {
+    if (auto RandomEnemySpawnLocationComponent = Cast<URandomEnemySpawner>(ActorToSpawn))
+    {
+      RandomEnemySpawnLocationComponent->SpawnEnemies(this);
     }
   }
 }
