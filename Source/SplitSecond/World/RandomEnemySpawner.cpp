@@ -26,45 +26,46 @@ URandomEnemySpawner::URandomEnemySpawner()
 
 void URandomEnemySpawner::SpawnEnemies(AActor* Parent)
 {
-    if (!ensure(Parent != nullptr)) { return; }
+	if (!ensure(Parent != nullptr)) { return; }
 
-    for (int32 Index = 0; Index < AmountToSpawn; Index++)
-    {
-        if (auto RandomEnemy = GetRandomType())
-        {
-          FVector RandomLocation = GetRandomPoint();
-          FTransform RandomTransform = FTransform(FRotator(0), RandomLocation, FVector(1));
-          
-          FActorSpawnParameters ActorParams;
-          ActorParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	for (int32 Index = 0; Index < AmountToSpawn; Index++)
+	{
+		if (auto RandomEnemy = GetRandomType())
+		{
+			FVector RandomLocation = GetRandomPoint();
+			FTransform RandomTransform = FTransform(FRotator(0), RandomLocation, FVector(1));
 
-          if (auto Spawned = GetWorld()->SpawnActor<AActor>(RandomEnemy, RandomTransform, ActorParams))
-          {
-            Spawned->AttachToActor(Parent, FAttachmentTransformRules::KeepWorldTransform);
-          }
-        }
-    }
+			FActorSpawnParameters ActorParams;
+			ActorParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+			if (auto Spawned = GetWorld()->SpawnActor<AActor>(RandomEnemy, RandomTransform, ActorParams))
+			{
+				Spawned->AttachToActor(Parent, FAttachmentTransformRules::KeepWorldTransform);
+			}
+		}
+	}
 }
 
 TSubclassOf<AActor> URandomEnemySpawner::GetRandomType() const
 {
-  ERandomSpawnEnemy EnemiesToSpawn = ERandomSpawnEnemy(FMath::Rand() % 2);
+	ERandomSpawnEnemy EnemiesToSpawn = ERandomSpawnEnemy(FMath::Rand() % 2);
 
-  switch (EnemiesToSpawn)
-  {
-  case E_Charger:
-    return Enemy_Charger_Class;
-    break;
-  case E_Shooter:
-    return Enemy_Shooter_Class;
-    break;
-  default:
-    return TSubclassOf<AActor>();
-    break;
-  }
+	switch (EnemiesToSpawn)
+	{
+	case E_Charger:
+		return Enemy_Charger_Class;
+		break;
+	case E_Shooter:
+		return Enemy_Shooter_Class;
+		break;
+	default:
+		return TSubclassOf<AActor>();
+		break;
+	}
 }
 
 FVector URandomEnemySpawner::GetRandomPoint() const
 {
   return UKismetMathLibrary::RandomPointInBoundingBox(GetOwner()->GetActorLocation(), BoxComponent->GetScaledBoxExtent());
 }
+
