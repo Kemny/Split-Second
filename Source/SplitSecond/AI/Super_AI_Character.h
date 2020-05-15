@@ -40,10 +40,6 @@ public:
     UPROPERTY(BlueprintReadWrite)
     bool bAbleToRotate;
 
-	/* whether or not the AI is able to shoot there current weapon */
-	UPROPERTY(BlueprintReadWrite)
-    bool bCanShoot;
-
     /* Enemies gun fire delay */
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Settings")
     float GunFireDelay;

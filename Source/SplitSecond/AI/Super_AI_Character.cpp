@@ -20,38 +20,38 @@ ASuper_AI_Character::ASuper_AI_Character()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-  AIControllerClass = ASplitSecond_AI_Controller::StaticClass();
-  AIGunClass = ASuper_Gun::StaticClass();
+	AIControllerClass = ASplitSecond_AI_Controller::StaticClass();
+	AIGunClass = ASuper_Gun::StaticClass();
 
-  TraceComp = CreateDefaultSubobject<UBoxComponent>(TEXT("TraceComp"));
-  TraceComp->SetupAttachment(GetCapsuleComponent());
-  TraceComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-  TraceComp->SetCollisionObjectType(ECC_WorldDynamic);
-  TraceComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-  TraceComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
-  TraceComp->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
-  TraceComp->SetBoxExtent(FVector(32, 32, 80));
+	TraceComp = CreateDefaultSubobject<UBoxComponent>(TEXT("TraceComp"));
+	TraceComp->SetupAttachment(GetCapsuleComponent());
+	TraceComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	TraceComp->SetCollisionObjectType(ECC_WorldDynamic);
+	TraceComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	TraceComp->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+	TraceComp->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
+	TraceComp->SetBoxExtent(FVector(32, 32, 80));
 
-  HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
 
-  GunFireDelay = 2.0f;
-  MaxTargetDistance = 2000.f;
-  
-  GetCharacterMovement()->bUseRVOAvoidance = true;
+	GunFireDelay = 2.0f;
+	MaxTargetDistance = 2000.f;
+
+	GetCharacterMovement()->bUseRVOAvoidance = true;
 }
 
 void ASuper_AI_Character::BeginPlay()
 {
-  Super::BeginPlay();
+	Super::BeginPlay();
 
-  SpawnGun();
+	SpawnGun();
 }
 
 void ASuper_AI_Character::FireGun()
 {
-  if (!ensure(CurrentGun != nullptr)) { return; }
+	if (!ensure(CurrentGun != nullptr)) { return; }
 
-  CurrentGun->FireGun();
+	CurrentGun->FireGun();
 }
 
 void ASuper_AI_Character::SpawnGun()
