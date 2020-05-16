@@ -104,6 +104,7 @@ void AArena::SpawnActors()
 			{
 				Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 				Spawned->SetActorLocation(TrapSpawnLocationComponent->GetBoxCenter());
+				Spawned->SetActorRotation(TrapSpawnLocationComponent->GetRelativeRotation());
 			}
 		}
 	}

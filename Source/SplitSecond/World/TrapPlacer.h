@@ -11,6 +11,7 @@ enum ETrapType
 {
 	Trap_Spike,
 	Trap_Fire,
+	Trap_Cannon,
 };
 
 /* This place the selected trap on this components location */
@@ -36,4 +37,5 @@ private:
 
 	TSubclassOf<AActor> Trap_Spike_Class;
 	TSubclassOf<AActor> Trap_Fire_Class;
+	TSubclassOf<AActor> Trap_Cannon_Class;
 };

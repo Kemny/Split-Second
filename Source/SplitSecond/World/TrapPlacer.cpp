@@ -20,6 +20,9 @@ UTrapPlacer::UTrapPlacer()
 
 	ConstructorHelpers::FClassFinder<AActor> BP_Trap_Fire_Class(TEXT("/Game/Blueprint/World/Traps/BP_FireTrap"));
 	if (BP_Trap_Fire_Class.Class) Trap_Fire_Class = BP_Trap_Fire_Class.Class;
+
+	ConstructorHelpers::FClassFinder<AActor> BP_Trap_Cannon_Class(TEXT("/Game/Blueprint/World/Traps/BP_CannonTrap"));
+	if (BP_Trap_Cannon_Class.Class) Trap_Cannon_Class = BP_Trap_Cannon_Class.Class;
 }
 
 TSubclassOf<AActor> UTrapPlacer::GetCurrentTypeClass() const
@@ -31,6 +34,8 @@ TSubclassOf<AActor> UTrapPlacer::GetCurrentTypeClass() const
 		break;
 	case Trap_Spike:
 		return Trap_Spike_Class;
+	case Trap_Cannon:
+		return Trap_Cannon_Class;
 	default:
 		return TSubclassOf<AActor>();
 		break;
