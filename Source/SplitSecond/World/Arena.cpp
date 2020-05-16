@@ -5,6 +5,7 @@
 #include "RandomEnemySpawner.h"
 #include "ActorSpawnLocationComponent.h"
 #include "Engine/World.h"
+#include "TrapPlacer.h"
 #include "GameFramework/PlayerController.h"
 #include "Flag.h"
 #include "TargetLocation.h"
@@ -91,6 +92,19 @@ void AArena::SpawnActors()
 		if (auto RandomEnemySpawnLocationComponent = Cast<URandomEnemySpawner>(ActorToSpawn))
 		{
 			RandomEnemySpawnLocationComponent->SpawnEnemies(this);
+		}
+	}
+	auto TrapPlacersLocations = GetComponentsByClass(UTrapPlacer::StaticClass());
+	for (auto ActorToSpawn : TrapPlacersLocations)
+	{
+		if (auto TrapSpawnLocationComponent = Cast<UTrapPlacer>(ActorToSpawn))
+		{
+			TSubclassOf<AActor> TrapClassToSpawn = TrapSpawnLocationComponent->GetCurrentTypeClass();
+			if (auto Spawned = GetWorld()->SpawnActor<AActor>(TrapClassToSpawn))
+			{
+				Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+				Spawned->SetActorLocation(TrapSpawnLocationComponent->GetBoxCenter());
+			}
 		}
 	}
 }
