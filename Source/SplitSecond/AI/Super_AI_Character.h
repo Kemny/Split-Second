@@ -66,6 +66,12 @@ protected:
 
   // Called when the game starts or when spawned
   virtual void BeginPlay() override;
+  void Tick(float DeltaTime) override;
+
+  UPROPERTY(BlueprintReadWrite)
+  FRotator TargetRotation;
+  UPROPERTY(BlueprintReadWrite)
+  float RotationSpeed = 2;
 
 private:
     bool bIsSlowed;

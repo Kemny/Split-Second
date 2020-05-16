@@ -13,6 +13,8 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ASuper_AI_Character::ASuper_AI_Character()
@@ -45,6 +47,21 @@ void ASuper_AI_Character::BeginPlay()
 	Super::BeginPlay();
 
 	SpawnGun();
+}
+
+void ASuper_AI_Character::Tick(float DeltaTime)
+{
+    Super::Tick(DeltaTime);
+
+    if (bAbleToRotate)
+    {
+        if (auto Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0))
+        {
+            //TargetRotation = UKismetMathLibrary::Conv_VectorToRotator(Player->GetActorLocation());
+            TargetRotation = FMath::RInterpTo(GetActorRotation(), UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Player->GetActorLocation()), DeltaTime, RotationSpeed);
+            SetActorRelativeRotation(FRotator(0, TargetRotation.Yaw, 0));
+        }
+    }
 }
 
 void ASuper_AI_Character::FireGun()
