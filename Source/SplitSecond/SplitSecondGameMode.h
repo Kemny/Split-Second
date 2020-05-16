@@ -43,7 +43,7 @@ public:
 
     void SetDefaultWeapon(EWeapons NewWeapon, TSubclassOf<class ASuper_Gun> Pistol);
 
-	void SpawnNextArena();
+	UFUNCTION() void SpawnNextArena();
 
 private:
 	TSubclassOf<class ASuper_Gun> PistolClass;

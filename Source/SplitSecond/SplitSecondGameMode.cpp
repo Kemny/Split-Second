@@ -89,16 +89,16 @@ void ASplitSecondGameMode::SpawnNextArena()
 	if (!ensure(MyGameState != nullptr)) { return; }
 	UE_LOG(LogTemp, Log, TEXT("Current Level: %i"), MyGameState->GetCurrentLevel());
 
-	if (PossibleArenas.Num() <= 0) return;
+	if (!ensure(PossibleArenas.Num() > 0)) { return; }
 
 	if (MyGameState->GetCurrentLevel() % 10 != 0)
 	{
 		auto RoomIndex = FMath::RandRange(0, PossibleArenas.Num() - 1);
 		if (auto Spawned = GetWorld()->SpawnActor<AArena>(PossibleArenas[RoomIndex]))
 		{
-			Spawned->SpawnActors();
-			Spawned->OnArenaFinished.BindUFunction(this, TEXT("SpawnNextArena"));
 			PossibleArenas.RemoveAt(RoomIndex);
+			Spawned->OnArenaFinished.BindUFunction(this, TEXT("SpawnNextArena"));
+			Spawned->SpawnActors();
 			UNavigationSystemV1::GetNavigationSystem(GetWorld())->Build();
 		}
 	}

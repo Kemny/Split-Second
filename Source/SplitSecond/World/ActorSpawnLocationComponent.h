@@ -25,13 +25,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TEnumAsByte<ESpawnType> SpawnType;
 
-	TSubclassOf<AActor> GetCurrentTypeClass() const;
-	TSubclassOf<AActor> GetActorClass;
+	TSubclassOf<AActor> Objective_Flag_Class;
+	TSubclassOf<AActor> Objective_FlagTarget_Class;
+	TSubclassOf<AActor> Objective_PlayerTarget_Class;
 
 private:
 	UActorSpawnLocationComponent();
 
-	TSubclassOf<AActor> Objective_Flag_Class;
-	TSubclassOf<AActor> Objective_FlagTarget_Class;
-	TSubclassOf<AActor> Objective_PlayerTarget_Class;
 };

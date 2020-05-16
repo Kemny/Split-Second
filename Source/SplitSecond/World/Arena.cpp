@@ -6,12 +6,18 @@
 #include "ActorSpawnLocationComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
+#include "Flag.h"
+#include "TargetLocation.h"
+#include "../UI/PopupMessage.h"
+#include "UObject/ConstructorHelpers.h"
 
 // Sets default values
 AArena::AArena()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
+
+	ConstructorHelpers::FClassFinder<UPopupMessage> BP_PopupMessageClass(TEXT("/Game/Blueprint/UI/WBP_PopupMessage"));
+	if (BP_PopupMessageClass.Class) PopupMessageClass = BP_PopupMessageClass.Class;
 
 }
 
@@ -29,18 +35,40 @@ void AArena::SpawnActors()
 	{
 		if (auto ActorSpawnLocationComponent = Cast<UActorSpawnLocationComponent>(ActorToSpawn))
 		{
-			if (ActorSpawnLocationComponent->SpawnType == Player_Location)
+			switch (ActorSpawnLocationComponent->SpawnType)
 			{
+			case Player_Location:
 				GetWorld()->GetFirstPlayerController()->GetPawn()->SetActorLocation(ActorSpawnLocationComponent->GetComponentLocation());
-			}
-			else
-			{
-				TSubclassOf<AActor> ActorClassToSpawn = ActorSpawnLocationComponent->GetCurrentTypeClass();
-				if (auto Spawned = GetWorld()->SpawnActor<AActor>(ActorClassToSpawn))
+				break;
+
+			case Objective_Flag:
+				if (auto Spawned = GetWorld()->SpawnActor<AFlag>(ActorSpawnLocationComponent->Objective_Flag_Class))
 				{
 					Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 					Spawned->SetActorLocation(ActorSpawnLocationComponent->GetComponentLocation());
+					Spawned->OnFlagCollision.BindUFunction(this, FName("AquireFlag"));
 				}
+				break;
+
+			case Objective_FlagTarget:
+				if (auto Spawned = GetWorld()->SpawnActor<AFlag>(ActorSpawnLocationComponent->Objective_FlagTarget_Class))
+				{
+					Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+					Spawned->SetActorLocation(ActorSpawnLocationComponent->GetComponentLocation());
+					Spawned->OnFlagCollision.BindUFunction(this, FName("TryDeliverFlag"));
+				}
+				break;
+
+			case Objective_PlayerTarget:
+				if (auto Spawned = GetWorld()->SpawnActor<ATargetLocation>(ActorSpawnLocationComponent->Objective_PlayerTarget_Class))
+				{
+					Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+					Spawned->SetActorLocation(ActorSpawnLocationComponent->GetComponentLocation());
+					Spawned->OnTargetLocationCollision.BindUFunction(this, FName("FinishObjective"));
+				}
+				break;
+			default:
+				break;
 			}
 		}
 	}
@@ -67,14 +95,27 @@ void AArena::SpawnActors()
 	}
 }
 
+void AArena::TryDeliverFlag()
+{
+	if (bHasFlag)
+	{
+		FinishObjective();
+	}
+}
+
 void AArena::FinishObjective()
 {
-	//TODO Spawn a button or something to let the player progress
+	if (auto Spawned = CreateWidget<UPopupMessage>(GetWorld(), PopupMessageClass))
+	{
+		Spawned->AddToPlayerScreen();
+		Spawned->SetUserFocus(GetWorld()->GetFirstPlayerController());
+		Spawned->ShowPopupMessage(FKey("F"), FText::FromString("PRESS F TO CONTINUE"));
+		Spawned->OnConditionFufilled.BindUFunction(this, TEXT("FinishArena"));
+	}
 }
 
 void AArena::FinishArena()
 {
-	///TODO after the condition created from finish objective is fulled, we call finished arena to tell the gamemode to spawn the next one
 	OnArenaFinished.ExecuteIfBound();
 	Destroy();
 }

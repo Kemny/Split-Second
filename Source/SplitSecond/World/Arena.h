@@ -31,12 +31,16 @@ public:
 	virtual void BeginPlay() override;
 	FArenaDelegate OnArenaFinished;
 	void SpawnActors();
+	
+private:
+	bool bHasFlag = false;
 
+	UFUNCTION() void AquireFlag() { bHasFlag = true; }
+	UFUNCTION() void TryDeliverFlag();
 	/* Called when the arenas objective is completed, to give the player the option to continue to the next one*/
-	void FinishObjective();
+	UFUNCTION() void FinishObjective();
 	/* Called when player gives the input to load the next level*/
-	void FinishArena();
-	
-	
+	UFUNCTION() void FinishArena();
 
+	TSubclassOf<class UPopupMessage> PopupMessageClass;
 };
