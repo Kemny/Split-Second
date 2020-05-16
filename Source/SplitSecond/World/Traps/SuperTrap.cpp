@@ -7,7 +7,7 @@
 ASuperTrap::ASuperTrap()
 {
 	TraceComp = CreateDefaultSubobject<UBoxComponent>(TEXT("TraceComp"));
-	TraceComp->SetupAttachment(RootComponent);
+	RootComponent = TraceComp;
 	TraceComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	TraceComp->SetCollisionObjectType(ECC_WorldDynamic);
 	TraceComp->SetCollisionResponseToAllChannels(ECR_Ignore);
