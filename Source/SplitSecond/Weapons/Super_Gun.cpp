@@ -125,12 +125,9 @@ void ASuper_Gun::AfterPlayerFireGun(UMeshComponent* GunMeshToEdit)
       }
     }
 
-    if (IsOutOfAmmo())
-    {
-      if (!ensure(LocalGunMeshToEdit != nullptr)) { return; }
+	if (!ensure(LocalGunMeshToEdit != nullptr)) { return; }
 
-      StartRegen();
-    }
+	StartRegen();
 }
 
 void ASuper_Gun::StartRegen()
