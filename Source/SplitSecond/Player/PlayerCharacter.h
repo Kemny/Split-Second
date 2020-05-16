@@ -21,8 +21,6 @@ class APlayerCharacter : public ACharacter
 public:
 	APlayerCharacter(const FObjectInitializer& ObjectInitializer);
 
-	virtual void Tick(float DeltaTime) override;
-
     /* This is the mesh the gun is attached to */
     UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
     class UStaticMeshComponent* GunAttachMesh;
@@ -42,7 +40,9 @@ protected:
 	virtual void PostInitializeComponents() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 
-protected:
+    void Jump() override;
+    void Landed(const FHitResult& Hit) override;
+
     /* The player's current gun */
     UPROPERTY(BlueprintReadWrite, Category = "Gun Var's")
     ASuper_Gun* CurrentGun;
@@ -59,6 +59,8 @@ protected:
 private:
 	class UPlayerMovementComponent* PlayerMovementComponent;
 
+    
+
 public:
 	/** Returns FirstPersonCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
@@ -68,26 +70,22 @@ public:
 
 private:
 
-  void DashRightPressed();
-
-  void DashRightReleased();
-
-  void ResetRightDash();
-
-  void DashLeftPressed();
-
-  void ResetLeftDash();
-
-  void DashLeftReleased();
+  void ResetDash();
 
   int32 RightKeyCount;
 
   int32 LeftKeyCount;
 
-  FTimerHandle RightDashTimerHandle;
-
-  FTimerHandle LeftDashTimerHandle;
+  FTimerHandle DashTimerHandle;
 
   class ASplitSecondPlayerController* PlayerController;
+  class ASplitSecondPlayerState* PlayerState;
+
+  int32 CurrentJump;
+
+  bool bCanDash = false;
+  bool bDashOffCooldown = true;
+  void AllowDash() { bCanDash = true; }
+  void ForbidDash() { bCanDash = false; }
 };
 

@@ -11,6 +11,7 @@
 #include "GameFramework/InputSettings.h"
 #include "Kismet/GameplayStatics.h"
 #include "PlayerMovementComponent.h"
+#include "../SplitSecondPlayerState.h"
 
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -37,7 +38,10 @@ void APlayerCharacter::BeginPlay()
 
     PlayerController = Cast<ASplitSecondPlayerController>(GetWorld()->GetFirstPlayerController());
     if (!ensure(PlayerController != nullptr)) { return; }
+    PlayerState = GetPlayerState<ASplitSecondPlayerState>();
+    if (!ensure(PlayerState != nullptr)) { return; }
 }
+
 void APlayerCharacter::EquipGun(TSubclassOf<class ASuper_Gun> GunClass)
 {
     if (GunClass)
@@ -77,11 +81,28 @@ void APlayerCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
-    PlayerInputComponent->BindAction("Dash Right", IE_Pressed, this, &APlayerCharacter::DashRightPressed);
-    PlayerInputComponent->BindAction("Dash Right", IE_Released, this, &APlayerCharacter::DashRightReleased);
+    // Dashing
+	PlayerInputComponent->BindAction("Dash Toggle", IE_Pressed, this, &APlayerCharacter::AllowDash);
+	PlayerInputComponent->BindAction("Dash Toggle", IE_Released, this, &APlayerCharacter::ForbidDash);
+}
 
-    PlayerInputComponent->BindAction("Dash Left", IE_Pressed, this, &APlayerCharacter::DashLeftPressed);
-    PlayerInputComponent->BindAction("Dash Left", IE_Released, this, &APlayerCharacter::DashLeftReleased);
+void APlayerCharacter::Jump()
+{
+    Super::Jump();
+
+    if (!ensure(PlayerState != nullptr)) { return; }
+
+    if (CurrentJump < PlayerState->CurrentStats.MaxJumps && CurrentJump > 0)
+    {
+        LaunchCharacter(FVector(0, 0, 600), false, true);
+    }
+    ++CurrentJump;
+}
+
+void APlayerCharacter::Landed(const FHitResult& Hit)
+{
+    Super::Landed(Hit);
+    CurrentJump = 0;
 }
 
 void APlayerCharacter::OnFirePressed()
@@ -102,7 +123,14 @@ void APlayerCharacter::OnFireReleased()
 
 void APlayerCharacter::MoveForward(float Value)
 {
-	if (Value != 0.0f)
+    if (bCanDash && bDashOffCooldown && Value != 0)
+    {
+        LaunchCharacter(GetActorForwardVector() * Value * DashMultiplier, true, true);
+        bDashOffCooldown = false;
+        ForbidDash();
+        GetWorldTimerManager().SetTimer(DashTimerHandle, this, &APlayerCharacter::ResetDash, DashInputDelay, false);
+    } 
+    else if (Value != 0.0f)
 	{
 		// add movement in that direction
 		AddMovementInput(GetActorForwardVector(), Value);
@@ -111,80 +139,22 @@ void APlayerCharacter::MoveForward(float Value)
 
 void APlayerCharacter::MoveRight(float Value)
 {
-	if (Value != 0.0f)
+    if (bCanDash && bDashOffCooldown && Value != 0)
+    {
+        LaunchCharacter(GetActorRightVector() * Value * DashMultiplier, true, true);
+        bDashOffCooldown = false;
+        ForbidDash();
+        GetWorldTimerManager().SetTimer(DashTimerHandle, this, &APlayerCharacter::ResetDash, DashInputDelay, false);
+    }
+    else if (Value != 0.0f)
 	{
 		// add movement in that direction
 		AddMovementInput(GetActorRightVector(), Value);
 	}
 }
 
-void APlayerCharacter::DashRightPressed()
+void APlayerCharacter::ResetDash()
 {
-  if (!ensure(PlayerController != nullptr)) { return; }
-
-  if (!PlayerController->bIsUsingGamepad)
-  {
-    RightKeyCount++;
-
-    if (RightKeyCount >= 2)
-    {
-      FVector LaunchVelocity = GetActorRightVector() * DashMultiplier;
-
-      LaunchCharacter(LaunchVelocity, true, true);
-    }
-  }
-  else
-  {
-    FVector LaunchVelocity = GetActorRightVector() * DashMultiplier;
-
-    LaunchCharacter(LaunchVelocity, true, true);
-  }
+    bDashOffCooldown = true;
 }
 
-void APlayerCharacter::DashRightReleased()
-{
-  GetWorldTimerManager().SetTimer(RightDashTimerHandle, this, &APlayerCharacter::ResetRightDash, DashInputDelay, false);
-}
-
-void APlayerCharacter::ResetRightDash()
-{
-  RightKeyCount = 0;
-}
-
-void APlayerCharacter::DashLeftPressed()
-{
-  if (!ensure(PlayerController != nullptr)) { return; }
-
-  if (!PlayerController->bIsUsingGamepad)
-  {
-    LeftKeyCount++;
-
-    if (LeftKeyCount >= 2)
-    {
-      FVector LaunchVelocity = GetActorRightVector() * DashMultiplier * -1;
-
-      LaunchCharacter(LaunchVelocity, true, true);
-    }
-  }
-  else
-  {
-    FVector LaunchVelocity = GetActorRightVector() * DashMultiplier * -1;
-
-    LaunchCharacter(LaunchVelocity, true, true);
-  }
-}
-
-void APlayerCharacter::ResetLeftDash()
-{
-  LeftKeyCount = 0;
-}
-
-void APlayerCharacter::DashLeftReleased()
-{
-  GetWorldTimerManager().SetTimer(LeftDashTimerHandle, this, &APlayerCharacter::ResetLeftDash, DashInputDelay, false);
-}
-
-void APlayerCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}

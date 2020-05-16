@@ -70,7 +70,7 @@ protected:
 
   UPROPERTY(BlueprintReadWrite)
   FRotator TargetRotation;
-  UPROPERTY(BlueprintReadWrite)
+  UPROPERTY(EditAnywhere, Category = "AI Settings")
   float RotationSpeed = 2;
 
 private:
