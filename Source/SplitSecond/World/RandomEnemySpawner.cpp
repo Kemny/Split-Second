@@ -5,6 +5,14 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/BoxComponent.h"
+/*
+	This class
+	Enemy Vertical Aiming ABP
+	Arena Objectives
+
+	Animations
+*/
+
 
 // Sets default values for this component's properties
 URandomEnemySpawner::URandomEnemySpawner()
@@ -28,7 +36,7 @@ void URandomEnemySpawner::SpawnEnemies(AActor* Parent)
 {
 	if (!ensure(Parent != nullptr)) { return; }
 
-	for (int32 Index = 0; Index < AmountToSpawn; Index++)
+	for (int32 Index = 0; Index <= AmountToSpawn; Index++)
 	{
 		if (auto RandomEnemy = GetRandomType())
 		{

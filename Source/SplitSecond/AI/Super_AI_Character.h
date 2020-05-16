@@ -67,9 +67,6 @@ protected:
   // Called when the game starts or when spawned
   virtual void BeginPlay() override;
   void Tick(float DeltaTime) override;
-
-  UPROPERTY(BlueprintReadWrite)
-  FRotator TargetRotation;
   UPROPERTY(EditAnywhere, Category = "AI Settings")
   float RotationSpeed = 2;
 
