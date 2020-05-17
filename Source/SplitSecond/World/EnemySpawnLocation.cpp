@@ -3,6 +3,7 @@
 
 #include "EnemySpawnLocation.h"
 #include "Components/BoxComponent.h"
+#include "../AI/Super_AI_Character.h"
 #include "UObject/ConstructorHelpers.h"
 
 // Sets default values for this component's properties
@@ -13,7 +14,10 @@ UEnemySpawnLocation::UEnemySpawnLocation()
     BoxComponent = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
     BoxComponent->SetupAttachment(this);
     BoxComponent->SetBoxExtent(FVector(32, 32, 95));
-    BoxComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+    BoxComponent->SetCollisionResponseToAllChannels(ECR_Overlap);
+    BoxComponent->OnComponentBeginOverlap.AddDynamic(this, &UEnemySpawnLocation::OnOverlapBegin);
+    BoxComponent->OnComponentEndOverlap.AddDynamic(this, &UEnemySpawnLocation::OnOverlapEnd);
     
     ConstructorHelpers::FClassFinder<AActor> BP_Enemy_Charger_Class(TEXT("/Game/Blueprint/NPC/BP_Charger"));
     if (BP_Enemy_Charger_Class.Class) Enemy_Charger_Class = BP_Enemy_Charger_Class.Class;
@@ -57,3 +61,31 @@ FVector UEnemySpawnLocation::GetBoxCenter() const
 
     return BoxComponent->Bounds.GetBox().GetCenter();
 }
+
+bool UEnemySpawnLocation::HasEnemyInBounds()
+{
+    return bEnemyInBounds;
+}
+
+void UEnemySpawnLocation::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+    if (OtherActor)
+    {
+        if (OtherActor->IsA<ASuper_AI_Character>())
+        {
+            bEnemyInBounds = true;
+        }
+    }
+}
+
+void UEnemySpawnLocation::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor)
+	{
+		if (OtherActor->IsA<ASuper_AI_Character>())
+		{
+			bEnemyInBounds = false;
+		}
+	}
+}
+

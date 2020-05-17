@@ -236,10 +236,13 @@ void AArena::SpawnEnemies(int32 SpawnNum, TArray<UActorComponent*> SpawnLocation
 		auto ActorToSpawn = SpawnLocations[SpawnedIndexes[i]];
 		if (auto EnemySpawnLocationComponent = Cast<UEnemySpawnLocation>(ActorToSpawn))
 		{
-			if (auto Spawned = GetWorld()->SpawnActor<AActor>(EnemySpawnLocationComponent->GetCurrentTypeClass()))
+			if (!EnemySpawnLocationComponent->HasEnemyInBounds())
 			{
-				Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-				Spawned->SetActorLocation(EnemySpawnLocationComponent->GetBoxCenter());
+				if (auto Spawned = GetWorld()->SpawnActor<AActor>(EnemySpawnLocationComponent->GetCurrentTypeClass()))
+				{
+					Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+					Spawned->SetActorLocation(EnemySpawnLocationComponent->GetBoxCenter());
+				}
 			}
 		}
 	}

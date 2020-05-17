@@ -36,11 +36,21 @@ public:
   UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
   class UBoxComponent* BoxComponent;
 
+  bool HasEnemyInBounds();
+
+  UFUNCTION()
+  void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+  UFUNCTION()
+  void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
 private:
 
   TSubclassOf<AActor> Enemy_Charger_Class;
   TSubclassOf<AActor> Enemy_Healer_Class;
   TSubclassOf<AActor> Enemy_Shooter_Class;
   TSubclassOf<AActor> Enemy_Turret_Class;
+
+  bool bEnemyInBounds;
 
 };
