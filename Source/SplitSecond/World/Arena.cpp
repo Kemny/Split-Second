@@ -9,7 +9,9 @@
 #include "Engine/EngineTypes.h"
 #include "GameFramework/PlayerController.h"
 #include "Flag.h"
+#include "../World/Traps/SuperTrap.h"
 #include "TargetLocation.h"
+#include "../AI/Super_AI_Character.h"
 #include "../UI/PopupMessage.h"
 #include "UObject/ConstructorHelpers.h"
 #include "TimerManager.h"
@@ -93,6 +95,18 @@ void AArena::SpawnActors(const FArenaSettings& NewSettings)
 				Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 				Spawned->SetActorLocation(TrapSpawnLocationComponent->GetBoxCenter());
 				Spawned->SetActorRotation(TrapSpawnLocationComponent->GetRelativeRotation());
+			}
+		}
+	}
+	auto EnemyPlacersLocations = GetComponentsByClass(UEnemySpawnLocation::StaticClass());
+	for (auto ActorToSpawn : EnemyPlacersLocations)
+	{
+		if (auto EnemySpawnLocationComponent = Cast<UEnemySpawnLocation>(ActorToSpawn))
+		{
+			TSubclassOf<AActor> EnemyClassToSpawn = EnemySpawnLocationComponent->GetCurrentTypeClass();
+			if (auto Spawned = GetWorld()->SpawnActor<AActor>(EnemyClassToSpawn))
+			{
+				SpawnEnemies(EnemyPlacersLocations.Num(), EnemyPlacersLocations);
 			}
 		}
 	}
@@ -245,7 +259,6 @@ void AArena::FinishArena()
 {
 	OnArenaFinished.ExecuteIfBound();
 
-	//This is causing a freeze, and I don't know why
 	TArray<AActor*> ChildActors;
 	FDetachmentTransformRules DetachRules = FDetachmentTransformRules(EDetachmentRule::KeepWorld, true);
 	GetAllChildActors(ChildActors, true);
@@ -255,6 +268,19 @@ void AArena::FinishArena()
 		ChildActor->Destroy();
 	}
 
+	// Destroy Traps
+	TArray<AActor*> FoundTraps;
+	UGameplayStatics::GetAllActorsOfClass(this, ASuperTrap::StaticClass(), FoundTraps);
+
+	for (auto Trap : FoundTraps)
+	{
+		if (Trap)
+		{
+			Trap->Destroy();
+		}
+	}
+
 	Destroy();
 }
+
 

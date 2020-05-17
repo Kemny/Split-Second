@@ -12,8 +12,8 @@ struct FSurvival
 	GENERATED_USTRUCT_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)int32 SurviveTime;
-	UPROPERTY(EditAnywhere)int32 WaveInterval;
+	UPROPERTY(EditAnywhere)int32 SurviveTime = 180;
+	UPROPERTY(EditAnywhere)int32 WaveInterval = 1;
 	UPROPERTY(EditAnywhere, meta = (UIMin = '1'))int32 EnemiesPerWaveMin = 1;
 	UPROPERTY(EditAnywhere, meta = (UIMin = '1'))int32 EnemiesPerWaveMax = 1;
 };
@@ -23,7 +23,7 @@ struct FCaptureTheFlag
 	GENERATED_USTRUCT_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)int32 WaveInterval;
+	UPROPERTY(EditAnywhere)int32 WaveInterval = 1;
 	UPROPERTY(EditAnywhere, meta = (UIMin = '1'))int32 EnemiesPerWaveMin = 1;
 	UPROPERTY(EditAnywhere, meta = (UIMin = '1'))int32 EnemiesPerWaveMax = 1;
 };
@@ -33,7 +33,7 @@ struct FReachObjective
 	GENERATED_USTRUCT_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)int32 WaveInterval;
+	UPROPERTY(EditAnywhere)int32 WaveInterval = 1;
 	UPROPERTY(EditAnywhere, meta = (UIMin = '1'))int32 EnemiesPerWaveMin = 1;
 	UPROPERTY(EditAnywhere, meta = (UIMin = '1'))int32 EnemiesPerWaveMax = 1;
 };
