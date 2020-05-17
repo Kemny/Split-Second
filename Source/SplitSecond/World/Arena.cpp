@@ -98,18 +98,6 @@ void AArena::SpawnActors(const FArenaSettings& NewSettings)
 			}
 		}
 	}
-	auto EnemyPlacersLocations = GetComponentsByClass(UEnemySpawnLocation::StaticClass());
-	for (auto ActorToSpawn : EnemyPlacersLocations)
-	{
-		if (auto EnemySpawnLocationComponent = Cast<UEnemySpawnLocation>(ActorToSpawn))
-		{
-			TSubclassOf<AActor> EnemyClassToSpawn = EnemySpawnLocationComponent->GetCurrentTypeClass();
-			if (auto Spawned = GetWorld()->SpawnActor<AActor>(EnemyClassToSpawn))
-			{
-				SpawnEnemies(EnemyPlacersLocations.Num(), EnemyPlacersLocations);
-			}
-		}
-	}
 }
 
 void AArena::SetupSurvive()
@@ -120,7 +108,7 @@ void AArena::SetupSurvive()
 void AArena::SpawnNextEnemyWave_Survival()
 {
 	auto EnemySpawnLocations = GetComponentsByClass(UEnemySpawnLocation::StaticClass());
-	if (!ensure(EnemySpawnLocations.Num() > CurrentSettings.SurvivalSettings.EnemiesPerWaveMin)) { return; }
+	if (!ensure(EnemySpawnLocations.Num() >= CurrentSettings.SurvivalSettings.EnemiesPerWaveMin)) { return; }
 
 	auto SpawnNum = FMath::RandRange(CurrentSettings.SurvivalSettings.EnemiesPerWaveMin, CurrentSettings.SurvivalSettings.EnemiesPerWaveMax);
 
@@ -165,7 +153,7 @@ void AArena::SetupFlag(TArray<UActorSpawnLocationComponent*> SpawnLocations)
 void AArena::SpawnNextEnemyWave_CaptureTheFlag()
 {
 	auto EnemySpawnLocations = GetComponentsByClass(UEnemySpawnLocation::StaticClass());
-	if (!ensure(EnemySpawnLocations.Num() > CurrentSettings.CaptureTheFlagSettings.EnemiesPerWaveMin)) { return; }
+	if (!ensure(EnemySpawnLocations.Num() >= CurrentSettings.CaptureTheFlagSettings.EnemiesPerWaveMin)) { return; }
 
 	auto SpawnNum = FMath::RandRange(CurrentSettings.CaptureTheFlagSettings.EnemiesPerWaveMin, CurrentSettings.CaptureTheFlagSettings.EnemiesPerWaveMax);
 
@@ -205,7 +193,7 @@ void AArena::SetupObjective(TArray<UActorSpawnLocationComponent*> SpawnLocations
 void AArena::SpawnNextEnemyWave_ReachTheObjective()
 {
 	auto EnemySpawnLocations = GetComponentsByClass(UEnemySpawnLocation::StaticClass());
-	if (!ensure(EnemySpawnLocations.Num() > CurrentSettings.ReachObjectiveSettings.EnemiesPerWaveMin)) { return; }
+	if (!ensure(EnemySpawnLocations.Num() >= CurrentSettings.ReachObjectiveSettings.EnemiesPerWaveMin)) { return; }
 
 	auto SpawnNum = FMath::RandRange(CurrentSettings.ReachObjectiveSettings.EnemiesPerWaveMin, CurrentSettings.ReachObjectiveSettings.EnemiesPerWaveMax);
 
@@ -259,13 +247,17 @@ void AArena::FinishArena()
 {
 	OnArenaFinished.ExecuteIfBound();
 
-	TArray<AActor*> ChildActors;
+	// Destroy Level
+	TArray<USceneComponent*> ChildActors;
 	FDetachmentTransformRules DetachRules = FDetachmentTransformRules(EDetachmentRule::KeepWorld, true);
-	GetAllChildActors(ChildActors, true);
-	for (auto ChildActor : ChildActors)
+	
+	GetComponents<USceneComponent>(ChildActors);
+
+	// For what ever reason this doesn't destroy enemies or traps not sure why
+	for (auto Actor : ChildActors)
 	{
-		ChildActor->DetachFromActor(DetachRules);
-		ChildActor->Destroy();
+		Actor->DetachFromParent(false, false);
+		Actor->DestroyComponent();
 	}
 
 	// Destroy Traps
@@ -279,6 +271,19 @@ void AArena::FinishArena()
 			Trap->Destroy();
 		}
 	}
+
+	// Destroy Enemies
+	TArray<AActor*> FoundEnemis;
+	UGameplayStatics::GetAllActorsOfClass(this, ASuper_AI_Character::StaticClass(), FoundTraps);
+
+	for (auto Enemy : FoundEnemis)
+	{
+		if (Enemy)
+		{
+			Enemy->Destroy();
+		}
+	}
+
 
 	Destroy();
 }
