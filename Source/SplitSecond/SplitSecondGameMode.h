@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 
 #include "Libraries/SplitSecondWeapons.h" ///Structs cannot be forward declared
+#include "Libraries/SplitSecondArenas.h"
 
 #include "SplitSecondGameMode.generated.h"
 
@@ -28,6 +29,7 @@ protected:
 	/*Final game will let the player pick from a menu of weapons*/
     UPROPERTY(EditDefaultsOnly, Category = "Defaults")
     TEnumAsByte<EWeapons> Temp_StartingGun;
+
     UPROPERTY(EditDefaultsOnly, Category = "Arenas")
     TArray<TSubclassOf<class AArena>> PossibleArenas;
 	UPROPERTY(EditDefaultsOnly, Category = "Arenas")
@@ -36,6 +38,9 @@ protected:
 	TSubclassOf<class AArena> Boss2Arena;
 	UPROPERTY(EditDefaultsOnly, Category = "Arenas")
 	TSubclassOf<class AArena> Boss3Arena;
+	UPROPERTY(EditDefaultsOnly, Category = "Arenas")
+	FArenaSettings ArenaSettings;
+	
 
 public:
 	ASplitSecondGameMode();

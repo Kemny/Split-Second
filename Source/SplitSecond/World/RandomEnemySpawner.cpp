@@ -5,14 +5,6 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/BoxComponent.h"
-/*
-	This class
-	Enemy Vertical Aiming ABP
-	Arena Objectives
-
-	Animations
-*/
-
 
 // Sets default values for this component's properties
 URandomEnemySpawner::URandomEnemySpawner()
