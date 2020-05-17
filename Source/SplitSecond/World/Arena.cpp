@@ -6,6 +6,7 @@
 #include "ActorSpawnLocationComponent.h"
 #include "Engine/World.h"
 #include "TrapPlacer.h"
+#include "Engine/EngineTypes.h"
 #include "GameFramework/PlayerController.h"
 #include "Flag.h"
 #include "TargetLocation.h"
@@ -245,12 +246,14 @@ void AArena::FinishArena()
 	OnArenaFinished.ExecuteIfBound();
 
 	//This is causing a freeze, and I don't know why
-	/*TArray<AActor*> ChildActors;
+	TArray<AActor*> ChildActors;
+	FDetachmentTransformRules DetachRules = FDetachmentTransformRules(EDetachmentRule::KeepWorld, true);
 	GetAllChildActors(ChildActors, true);
 	for (auto ChildActor : ChildActors)
 	{
+		ChildActor->DetachFromActor(DetachRules);
 		ChildActor->Destroy();
-	}*/
+	}
 
 	Destroy();
 }
