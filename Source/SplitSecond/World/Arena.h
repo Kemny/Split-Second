@@ -62,6 +62,4 @@ private:
 	UFUNCTION() void FinishArena();
 
 	TSubclassOf<class UPopupMessage> PopupMessageClass;
-
-	bool IsEnemyAtLocation(FVector Location);
 };
