@@ -49,6 +49,7 @@ void AArena::SpawnActors(const FArenaSettings& NewSettings)
 			if (ActorSpawnLocationComponent->SpawnType == Player_Location)
 			{
 				GetWorld()->GetFirstPlayerController()->GetPawn()->SetActorLocation(ActorSpawnLocationComponent->GetComponentLocation());
+				GetWorld()->GetFirstPlayerController()->GetPawn()->SetActorLocationAndRotation(ActorSpawnLocationComponent->GetComponentLocation(), ActorSpawnLocationComponent->GetComponentRotation());
 				ActorSpawnLocationComponent->DestroyComponent(false);
 			}
 		}
@@ -100,6 +101,7 @@ void AArena::SpawnActors(const FArenaSettings& NewSettings)
 	}
 }
 
+#pragma region Survival
 void AArena::SetupSurvive()
 {
 	GetWorldTimerManager().SetTimer(SurviveHandle, this, &AArena::FinishSurvive, CurrentSettings.SurvivalSettings.SurviveTime, false);
@@ -118,7 +120,8 @@ void AArena::FinishSurvive()
 {
 	FinishObjective();
 }
-
+#pragma endregion
+#pragma region Capture The Flag
 void AArena::SetupFlag(TArray<UActorSpawnLocationComponent*> SpawnLocations)
 {
 	GetWorldTimerManager().SetTimer(SpawnEnemiesHandle, this, &AArena::SpawnNextEnemyWave_CaptureTheFlag, CurrentSettings.SurvivalSettings.WaveInterval, true, 0);
@@ -166,7 +169,8 @@ void AArena::TryDeliverFlag()
 		FinishObjective();
 	}
 }
-
+#pragma endregion
+#pragma region Objective
 void AArena::SetupObjective(TArray<UActorSpawnLocationComponent*> SpawnLocations)
 {
 	GetWorldTimerManager().SetTimer(SpawnEnemiesHandle, this, &AArena::SpawnNextEnemyWave_ReachTheObjective, CurrentSettings.ReachObjectiveSettings.WaveInterval, true, 0);
@@ -199,11 +203,13 @@ void AArena::SpawnNextEnemyWave_ReachTheObjective()
 
 	SpawnEnemies(SpawnNum, EnemySpawnLocations);
 }
-
+#pragma endregion
+#pragma region Kill All Enemies
 void AArena::SetupKillAll()
 {
 	///TODO This cannot be implemented before we have enemy death state
 }
+#pragma endregion
 
 void AArena::SpawnEnemies(int32 SpawnNum, TArray<UActorComponent*> SpawnLocations)
 {
@@ -221,14 +227,10 @@ void AArena::SpawnEnemies(int32 SpawnNum, TArray<UActorComponent*> SpawnLocation
 
 	for (size_t i = 0; i < SpawnedIndexes.Num(); i++)
 	{
-		auto ActorToSpawn = SpawnLocations[SpawnedIndexes[i]];
-		if (auto EnemySpawnLocationComponent = Cast<UEnemySpawnLocation>(ActorToSpawn))
+		auto EnemySpawnLocationComponent = Cast<UEnemySpawnLocation>(SpawnLocations[SpawnedIndexes[i]]);
+		if (auto Spawned = GetWorld()->SpawnActor<AActor>(EnemySpawnLocationComponent->GetCurrentTypeClass(), FTransform(FRotator(0), EnemySpawnLocationComponent->GetBoxCenter(), FVector(1))))
 		{
-			if (auto Spawned = GetWorld()->SpawnActor<AActor>(EnemySpawnLocationComponent->GetCurrentTypeClass()))
-			{
-				Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-				Spawned->SetActorLocation(EnemySpawnLocationComponent->GetBoxCenter());
-			}
+			Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 		}
 	}
 }
