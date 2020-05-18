@@ -80,31 +80,20 @@ void AArena::SpawnActors()
 		}
 		
 	}
-	
-	/*
-	auto RandomEnemySpawnLocations = GetComponentsByClass(URandomEnemySpawner::StaticClass());
-	for (auto ActorToSpawn : RandomEnemySpawnLocations)
-	{
-		if (auto RandomEnemySpawnLocationComponent = Cast<URandomEnemySpawner>(ActorToSpawn))
-		{
-			RandomEnemySpawnLocationComponent->SpawnEnemies(this);
-		}
-	}
 	auto TrapPlacersLocations = GetComponentsByClass(UTrapPlacer::StaticClass());
 	for (auto ActorToSpawn : TrapPlacersLocations)
 	{
 		if (auto TrapSpawnLocationComponent = Cast<UTrapPlacer>(ActorToSpawn))
 		{
-			TSubclassOf<AActor> TrapClassToSpawn = TrapSpawnLocationComponent->GetCurrentTypeClass();
+			TSubclassOf<AActor> TrapClassToSpawn = TrapSpawnLocationComponent->TrapToPlace->GetChildActorClass();
 			if (auto Spawned = GetWorld()->SpawnActor<AActor>(TrapClassToSpawn))
 			{
 				Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-				Spawned->SetActorLocation(TrapSpawnLocationComponent->GetBoxCenter());
+				Spawned->SetActorLocation(TrapSpawnLocationComponent->GetRelativeLocation());
 				Spawned->SetActorRotation(TrapSpawnLocationComponent->GetRelativeRotation());
 			}
 		}
 	}
-	*/
 }
 
 void AArena::SpawnNextEnemyWave()
