@@ -3,12 +3,12 @@
 #include "Arena.h"
 #include "EnemySpawnLocation.h"
 #include "RandomEnemySpawner.h"
-#include "ActorSpawnLocationComponent.h"
 #include "Engine/World.h"
 #include "TrapPlacer.h"
 #include "Engine/EngineTypes.h"
 #include "GameFramework/PlayerController.h"
 #include "Flag.h"
+#include "FlagTarget.h"
 #include "../World/Traps/SuperTrap.h"
 #include "TargetLocation.h"
 #include "../AI/Super_AI_Character.h"
@@ -24,59 +24,64 @@ AArena::AArena()
 	ConstructorHelpers::FClassFinder<UPopupMessage> BP_PopupMessageClass(TEXT("/Game/Blueprint/UI/WBP_PopupMessage"));
 	if (BP_PopupMessageClass.Class) PopupMessageClass = BP_PopupMessageClass.Class;
 
-}
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
+	SetRootComponent(Root);
 
-// Called when the game starts or when spawned
-void AArena::BeginPlay()
-{
-	Super::BeginPlay();
+	PlayerStartLocation = CreateDefaultSubobject<USceneComponent>(TEXT("Player Start Location"));
+	PlayerStartLocation->SetupAttachment(Root);
+
+	FlagMesh = CreateDefaultSubobject<UChildActorComponent>(TEXT("Flag"));
+	FlagMesh->SetupAttachment(Root);
+	FlagMesh->SetHiddenInGame(true);
+	if (auto ChildActor = FlagMesh->GetChildActor()) ChildActor->SetActorEnableCollision(false);
 	
+	FlagTargetMesh = CreateDefaultSubobject<UChildActorComponent>(TEXT("FlagTarget"));
+	FlagTargetMesh->SetupAttachment(Root);
+	FlagTargetMesh->SetHiddenInGame(true);
+	if (auto ChildActor = FlagTargetMesh->GetChildActor()) ChildActor->SetActorEnableCollision(false);
+
+	LocationTargetMesh = CreateDefaultSubobject<UChildActorComponent>(TEXT("LocationTarget"));
+	LocationTargetMesh->SetupAttachment(Root);
+	LocationTargetMesh->SetHiddenInGame(true);
+	if (auto ChildActor = LocationTargetMesh->GetChildActor()) ChildActor->SetActorEnableCollision(false);
 }
 
-void AArena::SpawnActors(const FArenaSettings& NewSettings)
+void AArena::SpawnActors()
 {
-	if (!ensure(PossibleObjectives.Num() > 0)) { return; }
-	CurrentSettings = NewSettings;
+	if (!ensure(Objectives.Num() > 0)) { return; }
 
-	auto SpawnLocations = GetComponentsByClass(UActorSpawnLocationComponent::StaticClass());
-	TArray<UActorSpawnLocationComponent*> ActorSpawnLocationComponents;
+	GetWorld()->GetFirstPlayerController()->GetPawn()->SetActorLocation(PlayerStartLocation->GetComponentLocation());
 
-	for (auto ActorToSpawn : SpawnLocations)
+	TArray<TEnumAsByte<EObjectives>> OutKeys;
+	Objectives.GetKeys(OutKeys);
+	CurrentObjective = OutKeys[FMath::RandRange(0, OutKeys.Num() - 1)];
+
+	if (auto Settings = Objectives.Find(CurrentObjective))
 	{
-		if (auto ActorSpawnLocationComponent = Cast<UActorSpawnLocationComponent>(ActorToSpawn))
+		switch (CurrentObjective)
 		{
-			ActorSpawnLocationComponents.Add(ActorSpawnLocationComponent);
-			if (ActorSpawnLocationComponent->SpawnType == Player_Location)
-			{
-				GetWorld()->GetFirstPlayerController()->GetPawn()->SetActorLocation(ActorSpawnLocationComponent->GetComponentLocation());
-				GetWorld()->GetFirstPlayerController()->GetPawn()->SetActorLocationAndRotation(ActorSpawnLocationComponent->GetComponentLocation(), ActorSpawnLocationComponent->GetComponentRotation());
-				ActorSpawnLocationComponent->DestroyComponent(false);
-			}
+		case Survive:
+			GetWorldTimerManager().SetTimer(SurviveHandle, this, &AArena::FinishObjective, Settings->SurviveTime, false);
+			GetWorldTimerManager().SetTimer(SpawnEnemiesHandle, this, &AArena::SpawnNextEnemyWave, Settings->WaveInterval, true, 0);
+			break;
+		case ReachObjective:
+			GetWorldTimerManager().SetTimer(SpawnEnemiesHandle, this, &AArena::SpawnNextEnemyWave, Settings->WaveInterval, true, 0);
+			SetupObjective();
+			break;
+		case CaptureTheFlag:
+			GetWorldTimerManager().SetTimer(SpawnEnemiesHandle, this, &AArena::SpawnNextEnemyWave, Settings->WaveInterval, true, 0);
+			SetupFlag();
+			break;
+		case KillAllEnemies:
+			SetupKillAll();
+			break;
+		default:
+			break;
 		}
-	}
-
-	switch (PossibleObjectives[FMath::RandRange(0, PossibleObjectives.Num() - 1)])
-	{
-	case Survive:
-		///Spawn Enemies until a timer runs out
-		SetupSurvive();
-		break;
-	case ReachObjective:
-		///Spawn a PlayerTargetLocation && Survive enemies
-		SetupObjective(ActorSpawnLocationComponents);
-		break;
-	case CaptureTheFlag:
-		///Spawn A Flag and FlagTarget && Survive enemies
-		SetupFlag(ActorSpawnLocationComponents);
-		break;
-	case KillAllEnemies:
-		///Spawn a few waves of enemies, each one after the previous dies.
-		SetupKillAll();
-		break;
-	default:
-		break;
+		
 	}
 	
+	/*
 	auto RandomEnemySpawnLocations = GetComponentsByClass(URandomEnemySpawner::StaticClass());
 	for (auto ActorToSpawn : RandomEnemySpawnLocations)
 	{
@@ -99,68 +104,40 @@ void AArena::SpawnActors(const FArenaSettings& NewSettings)
 			}
 		}
 	}
+	*/
 }
 
-#pragma region Survival
-void AArena::SetupSurvive()
+void AArena::SpawnNextEnemyWave()
 {
-	GetWorldTimerManager().SetTimer(SurviveHandle, this, &AArena::FinishSurvive, CurrentSettings.SurvivalSettings.SurviveTime, false);
-	GetWorldTimerManager().SetTimer(SpawnEnemiesHandle, this, &AArena::SpawnNextEnemyWave_Survival, CurrentSettings.SurvivalSettings.WaveInterval, true, 0);
-}
-void AArena::SpawnNextEnemyWave_Survival()
-{
+	auto Settings = Objectives.Find(CurrentObjective);
+	if (!ensure(Settings != nullptr)) { return; }
+
 	auto EnemySpawnLocations = GetComponentsByClass(UEnemySpawnLocation::StaticClass());
-	if (!ensure(EnemySpawnLocations.Num() >= CurrentSettings.SurvivalSettings.EnemiesPerWaveMin)) { return; }
+	if (!ensure(EnemySpawnLocations.Num() >= Settings->EnemiesPerWaveMin)) { return; }
 
-	auto SpawnNum = FMath::RandRange(CurrentSettings.SurvivalSettings.EnemiesPerWaveMin, CurrentSettings.SurvivalSettings.EnemiesPerWaveMax);
 
+	auto SpawnNum = FMath::RandRange(Settings->EnemiesPerWaveMin, Settings->EnemiesPerWaveMax);
 	SpawnEnemies(SpawnNum, EnemySpawnLocations);
 }
-void AArena::FinishSurvive()
+void AArena::SetupFlag()
 {
-	FinishObjective();
-}
-#pragma endregion
-#pragma region Capture The Flag
-void AArena::SetupFlag(TArray<UActorSpawnLocationComponent*> SpawnLocations)
-{
-	GetWorldTimerManager().SetTimer(SpawnEnemiesHandle, this, &AArena::SpawnNextEnemyWave_CaptureTheFlag, CurrentSettings.SurvivalSettings.WaveInterval, true, 0);
-
-	///Spawn Flag
-	for (auto ActorSpawnLocationComponent : SpawnLocations)
+	FlagMesh->SetHiddenInGame(false);
+	if (auto ChildActor = FlagMesh->GetChildActor())
 	{
-		switch (ActorSpawnLocationComponent->SpawnType)
-		{
-		case Objective_Flag:
-			if (auto Spawned = GetWorld()->SpawnActor<AFlag>(ActorSpawnLocationComponent->Objective_Flag_Class))
-			{
-				Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-				Spawned->SetActorLocation(ActorSpawnLocationComponent->GetComponentLocation());
-				Spawned->OnFlagCollision.BindUFunction(this, FName("AquireFlag"));
-				ActorSpawnLocationComponent->DestroyComponent(false);
-			}
-			break;
-		case Objective_FlagTarget:
-			if (auto Spawned = GetWorld()->SpawnActor<AFlag>(ActorSpawnLocationComponent->Objective_FlagTarget_Class))
-			{
-				Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-				Spawned->SetActorLocation(ActorSpawnLocationComponent->GetComponentLocation());
-				Spawned->OnFlagCollision.BindUFunction(this, FName("TryDeliverFlag"));
-				ActorSpawnLocationComponent->DestroyComponent(false);
-			}
-		default:
-			break;
-		}
+		auto Objective = Cast<AFlag>(ChildActor);
+		if (!ensure(Objective != nullptr)) { return; }
+		Objective->SetActorEnableCollision(true);
+		Objective->OnFlagCollision.BindUFunction(this, FName("AquireFlag"));
 	}
-}
-void AArena::SpawnNextEnemyWave_CaptureTheFlag()
-{
-	auto EnemySpawnLocations = GetComponentsByClass(UEnemySpawnLocation::StaticClass());
-	if (!ensure(EnemySpawnLocations.Num() >= CurrentSettings.CaptureTheFlagSettings.EnemiesPerWaveMin)) { return; }
 
-	auto SpawnNum = FMath::RandRange(CurrentSettings.CaptureTheFlagSettings.EnemiesPerWaveMin, CurrentSettings.CaptureTheFlagSettings.EnemiesPerWaveMax);
-
-	SpawnEnemies(SpawnNum, EnemySpawnLocations);
+	FlagTargetMesh->SetHiddenInGame(false);
+	if (auto ChildActor = LocationTargetMesh->GetChildActor())
+	{
+		auto Objective = Cast<AFlagTarget>(ChildActor);
+		if (!ensure(Objective != nullptr)) { return; }
+		Objective->SetActorEnableCollision(true);
+		Objective->OnFlagTargetCollision.BindUFunction(this, FName("TryDeliverFlag"));
+	}
 }
 void AArena::TryDeliverFlag()
 {
@@ -169,47 +146,22 @@ void AArena::TryDeliverFlag()
 		FinishObjective();
 	}
 }
-#pragma endregion
-#pragma region Objective
-void AArena::SetupObjective(TArray<UActorSpawnLocationComponent*> SpawnLocations)
+void AArena::SetupObjective()
 {
-	GetWorldTimerManager().SetTimer(SpawnEnemiesHandle, this, &AArena::SpawnNextEnemyWave_ReachTheObjective, CurrentSettings.ReachObjectiveSettings.WaveInterval, true, 0);
-
-	///Spawn Flag
-	for (auto ActorSpawnLocationComponent : SpawnLocations)
+	LocationTargetMesh->SetHiddenInGame(false);
+	if (auto ChildActor = LocationTargetMesh->GetChildActor())
 	{
-		switch (ActorSpawnLocationComponent->SpawnType)
-		{
-		case Objective_PlayerTarget:
-			if (auto Spawned = GetWorld()->SpawnActor<ATargetLocation>(ActorSpawnLocationComponent->Objective_PlayerTarget_Class))
-			{
-				Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-				Spawned->SetActorLocation(ActorSpawnLocationComponent->GetComponentLocation());
-				Spawned->OnTargetLocationCollision.BindUFunction(this, FName("FinishObjective"));
-				ActorSpawnLocationComponent->DestroyComponent(false);
-			}
-			break;
-		default:
-			break;
-		}
+		auto Objective = Cast<ATargetLocation>(ChildActor);
+		if (!ensure(Objective != nullptr)) { return; }
+		Objective->SetActorEnableCollision(true);
+		Objective->OnTargetLocationCollision.BindUFunction(this, TEXT("FinishObjective"));
 	}
 }
-void AArena::SpawnNextEnemyWave_ReachTheObjective()
-{
-	auto EnemySpawnLocations = GetComponentsByClass(UEnemySpawnLocation::StaticClass());
-	if (!ensure(EnemySpawnLocations.Num() >= CurrentSettings.ReachObjectiveSettings.EnemiesPerWaveMin)) { return; }
-
-	auto SpawnNum = FMath::RandRange(CurrentSettings.ReachObjectiveSettings.EnemiesPerWaveMin, CurrentSettings.ReachObjectiveSettings.EnemiesPerWaveMax);
-
-	SpawnEnemies(SpawnNum, EnemySpawnLocations);
-}
-#pragma endregion
-#pragma region Kill All Enemies
 void AArena::SetupKillAll()
 {
+	UE_LOG(LogTemp, Error, TEXT("Kill All Enemis Not Yet Implemented"));
 	///TODO This cannot be implemented before we have enemy death state
 }
-#pragma endregion
 
 void AArena::SpawnEnemies(int32 SpawnNum, TArray<UActorComponent*> SpawnLocations)
 {
@@ -237,6 +189,33 @@ void AArena::SpawnEnemies(int32 SpawnNum, TArray<UActorComponent*> SpawnLocation
 
 void AArena::FinishObjective()
 {
+	GetWorldTimerManager().ClearAllTimersForObject(this);
+	FDetachmentTransformRules DetachRules = FDetachmentTransformRules(EDetachmentRule::KeepWorld, true);
+
+	// Destroy Traps
+	TArray<AActor*> FoundTraps;
+	UGameplayStatics::GetAllActorsOfClass(this, ASuperTrap::StaticClass(), FoundTraps);
+
+	for (auto Trap : FoundTraps)
+	{
+		Trap->DetachFromActor(DetachRules);
+		Trap->Destroy();
+	}
+
+	// Destroy Enemies
+	TArray<AActor*> FoundEnemis;
+	UGameplayStatics::GetAllActorsOfClass(this, ASuper_AI_Character::StaticClass(), FoundEnemis);
+
+	for (auto Enemy : FoundEnemis)
+	{
+		if (auto EnemyToDestroy = Cast<ASuper_AI_Character>(Enemy))
+		{
+			EnemyToDestroy->DetachFromActor(DetachRules);
+			EnemyToDestroy->DetachFromControllerPendingDestroy();
+			EnemyToDestroy->Destroy();
+		}
+	}
+	///Prompt player into entering next level
 	if (auto Spawned = CreateWidget<UPopupMessage>(GetWorld(), PopupMessageClass))
 	{
 		Spawned->AddToPlayerScreen();
@@ -247,46 +226,15 @@ void AArena::FinishObjective()
 }
 void AArena::FinishArena()
 {
-	OnArenaFinished.ExecuteIfBound();
-
-	// Destroy Level
 	TArray<USceneComponent*> ChildActors;
-	FDetachmentTransformRules DetachRules = FDetachmentTransformRules(EDetachmentRule::KeepWorld, true);
-	
 	GetComponents<USceneComponent>(ChildActors);
-
-	// For what ever reason this doesn't destroy enemies or traps not sure why
 	for (auto Actor : ChildActors)
 	{
 		Actor->DetachFromParent(false, false);
 		Actor->DestroyComponent();
 	}
 
-	// Destroy Traps
-	TArray<AActor*> FoundTraps;
-	UGameplayStatics::GetAllActorsOfClass(this, ASuperTrap::StaticClass(), FoundTraps);
-
-	for (auto Trap : FoundTraps)
-	{
-		if (Trap)
-		{
-			Trap->Destroy();
-		}
-	}
-
-	// Destroy Enemies
-	TArray<AActor*> FoundEnemis;
-	UGameplayStatics::GetAllActorsOfClass(this, ASuper_AI_Character::StaticClass(), FoundTraps);
-
-	for (auto Enemy : FoundEnemis)
-	{
-		if (Enemy)
-		{
-			Enemy->Destroy();
-		}
-	}
-
-
+	OnArenaFinished.ExecuteIfBound();
 	Destroy();
 }
 

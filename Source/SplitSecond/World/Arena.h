@@ -4,9 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-
-#include "../Libraries/SplitSecondArenas.h"
-
 #include "Arena.generated.h"
 
 DECLARE_DYNAMIC_DELEGATE(FArenaDelegate);
@@ -20,39 +17,64 @@ enum EObjectives
 	KillAllEnemies,
 };
 
+/*
+	Some parameters are objetive Specific
+*/
+USTRUCT(BlueprintType)
+struct FArenaSettings
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	/* SURVIVAL ONLY */
+	UPROPERTY(EditAnywhere)int32 SurviveTime = 180;
+	/* NOT APPLIED TO KILL ALL ENEMIES */
+	UPROPERTY(EditAnywhere)int32 WaveInterval = 60;
+	UPROPERTY(EditAnywhere, meta = (UIMin = '1'))int32 EnemiesPerWaveMin = 1;
+	UPROPERTY(EditAnywhere, meta = (UIMin = '1'))int32 EnemiesPerWaveMax = 1;
+};
+
 UCLASS()
 class SPLITSECOND_API AArena : public AActor
 {
 	GENERATED_BODY()
 	
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<TEnumAsByte<EObjectives>> PossibleObjectives;
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+	USceneComponent* Root;
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+	USceneComponent* PlayerStartLocation;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+	UChildActorComponent* FlagMesh;
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+	UChildActorComponent* FlagTargetMesh;
+	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+	UChildActorComponent* LocationTargetMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Arena")
+	TMap<TEnumAsByte<EObjectives>, FArenaSettings> Objectives;
 
 public:
 	AArena();
-	virtual void BeginPlay() override;
+	void SpawnActors();
+
 	FArenaDelegate OnArenaFinished;
-	void SpawnActors(const FArenaSettings& NewSettings);
 	
 private:
-	FArenaSettings CurrentSettings;
+	EObjectives CurrentObjective;
 	FTimerHandle SpawnEnemiesHandle;
 	FTimerHandle SurviveHandle;
 
 	bool bHasFlag = false;
 
-	void SetupSurvive();
-	void SetupFlag(TArray<class UActorSpawnLocationComponent*> SpawnLocations);
-	void SetupObjective(TArray<class UActorSpawnLocationComponent*> SpawnLocations);
+	void SetupFlag();
+	void SetupObjective();
 	void SetupKillAll();
 
 	void SpawnEnemies(int32 NumberToSpawn, TArray<UActorComponent*> SpawnLocations);
 
-	UFUNCTION() void SpawnNextEnemyWave_Survival();
-	UFUNCTION() void SpawnNextEnemyWave_CaptureTheFlag();
-	UFUNCTION() void SpawnNextEnemyWave_ReachTheObjective();
-	UFUNCTION() void FinishSurvive();
+	UFUNCTION() void SpawnNextEnemyWave();
 
 	UFUNCTION() void AquireFlag() { bHasFlag = true; }
 	UFUNCTION() void TryDeliverFlag();

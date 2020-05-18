@@ -98,7 +98,7 @@ void ASplitSecondGameMode::SpawnNextArena()
 		{
 			PossibleArenas.RemoveAt(RoomIndex);
 			Spawned->OnArenaFinished.BindUFunction(this, TEXT("SpawnNextArena"));
-			Spawned->SpawnActors(ArenaSettings);
+			Spawned->SpawnActors();
 			UNavigationSystemV1::GetNavigationSystem(GetWorld())->Build();
 		}
 	}

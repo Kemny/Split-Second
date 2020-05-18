@@ -93,6 +93,7 @@ void ASuper_AI_Character::SpawnGun()
 
 void ASuper_AI_Character::GetSlowed(float SlowTime, float SlowAmmount)
 {
+    if (!GetMesh()) return;
     bIsSlowed = true;
     GetMesh()->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0, 0, 1, 1));
 
@@ -107,3 +108,14 @@ void ASuper_AI_Character::StopBeingSlowed()
     GetMesh()->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor::Red);
     CustomTimeDilation = 1; 
 }
+
+void ASuper_AI_Character::Destroyed()
+{
+    if (CurrentGun)
+    {
+        CurrentGun->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+        CurrentGun->Destroy();
+    }
+    Super::Destroy();
+}
+

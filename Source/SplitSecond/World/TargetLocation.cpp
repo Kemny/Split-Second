@@ -17,15 +17,19 @@ ATargetLocation::ATargetLocation()
 
 	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Capsule"));
 	Sphere->SetupAttachment(Root);
-	Sphere->OnComponentHit.AddUniqueDynamic(this, &ATargetLocation::OnCollision);
+	Sphere->OnComponentBeginOverlap.AddUniqueDynamic(this, &ATargetLocation::OnCollision);
+	Sphere->SetSphereRadius(1000);
+
+	//TODO Add Particles
 
 }
 
-void ATargetLocation::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void ATargetLocation::OnCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor == GetWorld()->GetFirstPlayerController()->GetPawn())
 	{
 		OnTargetLocationCollision.ExecuteIfBound();
+		DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		Destroy();
 	}
 }

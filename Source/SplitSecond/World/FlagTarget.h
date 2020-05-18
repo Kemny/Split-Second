@@ -4,28 +4,30 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "TargetLocation.generated.h"
+#include "FlagTarget.generated.h"
 
-DECLARE_DYNAMIC_DELEGATE(FTargetLocationDelegate);
+DECLARE_DYNAMIC_DELEGATE(FFlagTargetDelegate);
 
 UCLASS()
-class SPLITSECOND_API ATargetLocation : public AActor
+class SPLITSECOND_API AFlagTarget : public AActor
 {
 	GENERATED_BODY()
+
 	
 public:	
-	// Sets default values for this actor's properties
-	ATargetLocation();
-	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	class USphereComponent* Sphere;
+	class UCapsuleComponent* Capsule;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	class USceneComponent* Root;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class UStaticMeshComponent* Mesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	class URotatingMovementComponent* RotatingMovement;
 
-	FTargetLocationDelegate OnTargetLocationCollision;
-
-private:
+	// Sets default values for this actor's properties
+	AFlagTarget();
 	UFUNCTION()void OnCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	FFlagTargetDelegate OnFlagTargetCollision;
 
 };
