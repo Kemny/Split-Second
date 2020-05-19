@@ -18,8 +18,12 @@ class APlayerCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FirstPersonCameraComponent;
 
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+       class UHealthComponent* HealthComponent;
+
 public:
 	APlayerCharacter(const FObjectInitializer& ObjectInitializer);
+
 
     /* This is the mesh the gun is attached to */
     UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
@@ -58,8 +62,9 @@ protected:
 
 private:
 	class UPlayerMovementComponent* PlayerMovementComponent;
-
-    
+    TSubclassOf<class UPlayerUI> PlayerUIClass;
+    TSubclassOf<class UPopupMessage> PopupMessageClass;
+    class UPlayerUI* PlayerUI;
 
 public:
 	/** Returns FirstPersonCameraComponent subobject **/
@@ -69,23 +74,25 @@ public:
 	FORCEINLINE class UPlayerMovementComponent* GetMyMovementComponent() const { return PlayerMovementComponent; }
 
 private:
+    void ResetDash();
 
-  void ResetDash();
+    int32 RightKeyCount;
 
-  int32 RightKeyCount;
+    int32 LeftKeyCount;
 
-  int32 LeftKeyCount;
+    FTimerHandle DashTimerHandle;
 
-  FTimerHandle DashTimerHandle;
+    class ASplitSecondPlayerController* PlayerController;
+    class ASplitSecondPlayerState* PlayerState;
 
-  class ASplitSecondPlayerController* PlayerController;
-  class ASplitSecondPlayerState* PlayerState;
+    int32 CurrentJump;
 
-  int32 CurrentJump;
+    bool bCanDash = false;
+    bool bDashOffCooldown = true;
+    void AllowDash() { bCanDash = true; }
+    void ForbidDash() { bCanDash = false; }
 
-  bool bCanDash = false;
-  bool bDashOffCooldown = true;
-  void AllowDash() { bCanDash = true; }
-  void ForbidDash() { bCanDash = false; }
+    UFUNCTION() void OnTakeDamage();
+    UFUNCTION() void OnConfirmedDeath();
 };
 

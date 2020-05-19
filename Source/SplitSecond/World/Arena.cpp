@@ -2,7 +2,6 @@
 
 #include "Arena.h"
 #include "EnemySpawnLocation.h"
-#include "RandomEnemySpawner.h"
 #include "Engine/World.h"
 #include "TrapPlacer.h"
 #include "Engine/EngineTypes.h"
@@ -207,8 +206,6 @@ void AArena::FinishObjective()
 	///Prompt player into entering next level
 	if (auto Spawned = CreateWidget<UPopupMessage>(GetWorld(), PopupMessageClass))
 	{
-		Spawned->AddToPlayerScreen();
-		Spawned->SetUserFocus(GetWorld()->GetFirstPlayerController());
 		Spawned->ShowPopupMessage(FKey("F"), FText::FromString("PRESS F TO CONTINUE"));
 		Spawned->OnConditionFufilled.BindUFunction(this, TEXT("FinishArena"));
 	}

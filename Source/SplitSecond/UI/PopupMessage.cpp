@@ -8,10 +8,18 @@ UPopupMessage::UPopupMessage(const FObjectInitializer& ObjectInitializer) : Supe
 	bIsFocusable = true;
 }
 
+FReply UPopupMessage::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	return FReply::Handled();
+}
+
 FReply UPopupMessage::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent)
 {
 	if (InKeyEvent.GetKey() == KeyToPress)
 	{
+		FInputModeGameOnly InputMode;
+		GetWorld()->GetFirstPlayerController()->SetInputMode(InputMode);
+
 		OnConditionFufilled.ExecuteIfBound();
 		RemoveFromParent();
 		return FReply::Handled();
@@ -21,6 +29,11 @@ FReply UPopupMessage::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEve
 
 void UPopupMessage::ShowPopupMessage(const FKey& Key, const FText& Text)
 {
+	FInputModeGameAndUI InputMode;
+	GetWorld()->GetFirstPlayerController()->SetInputMode(InputMode);
+	AddToPlayerScreen();
+	SetUserFocus(GetWorld()->GetFirstPlayerController());
+
 	Txt_Middle->SetText(Text);
 	KeyToPress = Key;
 }

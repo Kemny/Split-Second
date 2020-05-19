@@ -6,8 +6,6 @@ public class SplitSecond : ModuleRules
 {
 	public SplitSecond(ReadOnlyTargetRules Target) : base(Target)
 	{
-		PrecompileForTargets = PrecompileTargetsType.Any;
-
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "AIModule", "Niagara", "NavigationSystem", "UMG", "Slate", "SlateCore" });

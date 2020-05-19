@@ -19,6 +19,7 @@
 // Sets default values
 ASuper_AI_Character::ASuper_AI_Character()
 {
+
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -35,6 +36,7 @@ ASuper_AI_Character::ASuper_AI_Character()
 	TraceComp->SetBoxExtent(FVector(32, 32, 80));
 
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
+    HealthComponent->OnHealthChanged.BindUFunction(this, TEXT("OnTakeDamage"));
 
 	GunFireDelay = 2.0f;
 	MaxTargetDistance = 2000.f;
@@ -47,13 +49,14 @@ void ASuper_AI_Character::BeginPlay()
 	Super::BeginPlay();
 
 	SpawnGun();
+
 }
 
 void ASuper_AI_Character::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
-    if (bAbleToRotate)
+    if (bAbleToRotate && !bIsDead)
     {
         if (auto Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0))
         {
@@ -91,11 +94,36 @@ void ASuper_AI_Character::SpawnGun()
     }
 }
 
+void ASuper_AI_Character::Highlight(EHighlightType HighlightType)
+{
+    if (bIsSlowed) HighlightType = EHighlightType::Slow;
+
+    float HealthPercentage = HealthComponent->GetHealth() / HealthComponent->GetMaxHealth();
+    GetMesh()->CreateAndSetMaterialInstanceDynamic(1)->SetScalarParameterValue(TEXT("Emission Multiplier"), HealthPercentage);
+
+    switch (HighlightType)
+    {
+    case EHighlightType::NONE:
+        GetMesh()->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), DefaultColor * HealthPercentage);
+        break;
+    case EHighlightType::Highlight:
+        GetMesh()->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), HighlightColor * HealthPercentage);
+        break;
+    case EHighlightType::Slow:
+        GetMesh()->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), SlowedColor * HealthPercentage);
+        break;
+    default:
+        break;
+    }
+}
+
 void ASuper_AI_Character::GetSlowed(float SlowTime, float SlowAmmount)
 {
     if (!GetMesh()) return;
     bIsSlowed = true;
-    GetMesh()->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0, 0, 1, 1));
+
+    float HealthPercentage = HealthComponent->GetHealth() / HealthComponent->GetMaxHealth();
+    Highlight(EHighlightType::Slow);
 
     FTimerHandle TimerHandle;
     CustomTimeDilation = SlowAmmount;
@@ -105,7 +133,7 @@ void ASuper_AI_Character::StopBeingSlowed()
 { 
     bIsSlowed = false;
 
-    GetMesh()->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor::Red);
+    Highlight(EHighlightType::NONE);
     CustomTimeDilation = 1; 
 }
 
@@ -119,3 +147,23 @@ void ASuper_AI_Character::Destroyed()
     Super::Destroy();
 }
 
+void ASuper_AI_Character::OnTakeDamage()
+{
+    Highlight(EHighlightType::NONE);
+
+    if (HealthComponent->GetHealth() <= 0)
+    {
+        bIsDead = true;
+        SetActorEnableCollision(false);
+        DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+        DetachFromControllerPendingDestroy();
+
+        FTimerHandle DeathHandle;
+        GetWorldTimerManager().SetTimer(DeathHandle, this, &ASuper_AI_Character::DestroyAfterDeath, DeathDespawnTime, false);
+    }
+}
+
+void ASuper_AI_Character::DestroyAfterDeath()
+{
+    Destroy();
+}

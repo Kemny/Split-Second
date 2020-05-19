@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "HealthComponent.generated.h"
 
+DECLARE_DYNAMIC_DELEGATE(FHealthComponentDelegate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPLITSECOND_API UHealthComponent : public UActorComponent
@@ -15,6 +16,8 @@ class SPLITSECOND_API UHealthComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UHealthComponent();
+
+	FHealthComponentDelegate OnHealthChanged;
 
 protected:
 	// Called when the game starts
@@ -29,8 +32,8 @@ protected:
 	UFUNCTION()
 	void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
-  UFUNCTION(BlueprintCallable, Category = "Health Functions")
-  void Heal(float HealAmount);
+	UFUNCTION(BlueprintCallable, Category = "Health Functions")
+	void Heal(float HealAmount);
 
 public:
 	void ChangeMaxHealth(float MaxHealthToAdd) 
@@ -38,4 +41,7 @@ public:
 		MaxHealth += MaxHealthToAdd;
 		Health += MaxHealthToAdd;
 	}
+
+	FORCEINLINE float GetHealth() const { return Health; }
+	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 };

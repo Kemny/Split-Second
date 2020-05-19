@@ -72,6 +72,10 @@ APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector con
             Spawned->GetProjectileMovement()->InitialSpeed = Upgrades.ProjectileSpeed;
             Spawned->GetProjectileMovement()->InitialSpeed *= Upgrades.ProjectileSpeedMultiplier;
 
+            if (Upgrades.bIsPiercing)
+            {
+
+            }
             if (Upgrades.bIsBouncing)
             {
                 Spawned->GetProjectileMovement()->bShouldBounce = true;

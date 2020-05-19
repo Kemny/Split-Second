@@ -8,7 +8,6 @@
 #include "DrawDebugHelpers.h"
 #include "../Weapons/SplitSecondProjectile.h"
 #include "../Weapons/Super_Gun.h"
-#include "Materials/MaterialInstanceDynamic.h"
 #include "../AI/Super_AI_Character.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -63,7 +62,7 @@ void ASplitSecondPlayerController::TraceForActorsToSlow()
 		{
 			if (!HoveredEnemy->GetIsSlowed())
 			{
-				HoveredEnemy->GetMesh()->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor::Red);
+				HoveredEnemy->Highlight(EHighlightType::NONE);
 				HoveredEnemy = nullptr;
 			}
 		}
@@ -77,7 +76,7 @@ void ASplitSecondPlayerController::TraceForActorsToSlow()
 			{
 				if (!HoveredEnemy->GetIsSlowed())
 				{
-					EnemyMesh->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0, 1, 1, 1));
+					HoveredEnemy->Highlight(EHighlightType::Highlight);
 				}
 			}
 		}
@@ -150,4 +149,14 @@ void ASplitSecondPlayerController::PlayerTick(float DeltaTime)
       bIsUsingGamepad = true;
     }
   }
+}
+
+void ASplitSecondPlayerController::HandlePlayerDeath()
+{
+	GetWorldSettings()->TimeDilation = 0.01;
+	OnPlayerDeath.ExecuteIfBound();
+}
+void ASplitSecondPlayerController::HandlePlayerConfirmedDeath()
+{
+	OnPlayerConfirmedDeath.ExecuteIfBound();
 }

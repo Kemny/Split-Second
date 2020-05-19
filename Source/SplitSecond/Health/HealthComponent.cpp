@@ -34,18 +34,22 @@ void UHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDam
 	}
 
 	Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
+
+	OnHealthChanged.ExecuteIfBound();
 }
 
 void UHealthComponent::Heal(float HealAmount)
 {
-  if (HealAmount <= 0)
-  {
-    return;
-  }
+	if (HealAmount <= 0)
+	{
+		return;
+	}
 
-  float NewHealth = Health + HealAmount;
-  Health = FMath::Clamp(NewHealth, 0.0f, MaxHealth);
+	float NewHealth = Health + HealAmount;
+	Health = FMath::Clamp(NewHealth, 0.0f, MaxHealth);
 
-  UE_LOG(LogTemp, Log, TEXT("%s 's Current HP is: %f Amount: %f"), *GetOwner()->GetName(), Health, HealAmount)
+	UE_LOG(LogTemp, Log, TEXT("%s 's Current HP is: %f Amount: %f"), *GetOwner()->GetName(), Health, HealAmount);
+
+	OnHealthChanged.ExecuteIfBound();
 }
 

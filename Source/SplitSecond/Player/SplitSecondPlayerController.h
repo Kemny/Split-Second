@@ -9,9 +9,8 @@
 
 #include "SplitSecondPlayerController.generated.h"
 
-/**
- * 
- */
+DECLARE_DYNAMIC_DELEGATE(FPlayerDeathDelegate);
+
 UCLASS()
 class SPLITSECOND_API ASplitSecondPlayerController : public APlayerController
 {
@@ -20,6 +19,10 @@ class SPLITSECOND_API ASplitSecondPlayerController : public APlayerController
 public:
 
   ASplitSecondPlayerController();
+
+
+  FPlayerDeathDelegate OnPlayerDeath;
+  FPlayerDeathDelegate OnPlayerConfirmedDeath;
 
   /** Can be called to check and see if the player is currently using a gamepad */
   UPROPERTY(Transient, BlueprintReadOnly, Category = "Gamepad Settings")
@@ -47,6 +50,9 @@ public:
 
   FHitResult LineTraceFromCamera(ECollisionChannel Collision);
   FHitResult LineTraceFromCamera(ECollisionChannel Collision, FVector EndOffset);
+
+  void HandlePlayerDeath();
+  void HandlePlayerConfirmedDeath();
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Time Manipulation") float ActorSlowDuration = 3;

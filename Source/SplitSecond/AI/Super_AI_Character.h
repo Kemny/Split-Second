@@ -6,6 +6,14 @@
 #include "GameFramework/Character.h"
 #include "Super_AI_Character.generated.h"
 
+UENUM()
+enum class EHighlightType
+{
+    NONE,
+    Highlight,
+    Slow
+};
+
 class ASuper_Gun;
 
 UCLASS()
@@ -57,23 +65,39 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Health")
     FORCEINLINE class UHealthComponent* GetHealthComponent() const { return HealthComponent; }
 
-    void Highlight();
+    void Highlight(EHighlightType HighlightType);
     void GetSlowed(float SlowTime, float SlowAmmount);
     UFUNCTION() void StopBeingSlowed();
     bool GetIsSlowed() const { return bIsSlowed; }
+    
+    UPROPERTY(BlueprintReadWrite)
+    bool bIsDead = false;
 
 protected:
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;
+    void Tick(float DeltaTime) override;
+    void Destroyed() override;
 
-  // Called when the game starts or when spawned
-  virtual void BeginPlay() override;
-  void Tick(float DeltaTime) override;
-  void Destroyed() override;
+    UPROPERTY(EditAnywhere, Category = "AI Settings")
+    float RotationSpeed = 2;
 
-  UPROPERTY(EditAnywhere, Category = "AI Settings")
-  float RotationSpeed = 2;
+    UPROPERTY(EditAnywhere, Category = "Colors")
+    FLinearColor DefaultColor = FLinearColor::Red;
+    UPROPERTY(EditAnywhere, Category = "Colors")
+    FLinearColor HighlightColor = FLinearColor(0, 1, 1, 1);
+    UPROPERTY(EditAnywhere, Category = "Colors")
+    FLinearColor SlowedColor = FLinearColor::Blue;
+
+    UPROPERTY(EditAnywhere, Category = "Health")
+    float DeathDespawnTime = 30;
 
 private:
-    bool bIsSlowed;
+    bool bIsSlowed = false;
+
     void SpawnGun();
+
+    UFUNCTION() void OnTakeDamage();
+    UFUNCTION() void DestroyAfterDeath();
 
 };

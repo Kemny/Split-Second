@@ -11,6 +11,7 @@
 #include "World/Arena.h"
 #include "SplitSecondGameState.h"
 #include "NavigationSystem.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 ASplitSecondGameMode::ASplitSecondGameMode()
 	: Super()
@@ -120,4 +121,32 @@ void ASplitSecondGameMode::SpawnNextArena()
 			break;
 		}
 	}
+}
+
+void ASplitSecondGameMode::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+
+	if (NewPlayer->IsA<ASplitSecondPlayerController>())
+	{
+		auto PC = Cast<ASplitSecondPlayerController>(NewPlayer);
+
+		PC->OnPlayerDeath.BindUFunction(this, TEXT("OnPlayerDeath"));
+		PC->OnPlayerConfirmedDeath.BindUFunction(this, TEXT("OnConfirmedPlayerDeath"));
+	}
+
+}
+
+void ASplitSecondGameMode::OnPlayerDeath()
+{
+	///This triggers immediately after the player dies
+
+	//TODO Move player back to the main menu / Restart the game
+}
+void ASplitSecondGameMode::OnConfirmedPlayerDeath()
+{
+	///This triggers after the player decides to confim his death by hitting a button
+
+	//TODO Move player back to the main menu / Restart the game
+	UKismetSystemLibrary::QuitGame(GetWorld(), GetWorld()->GetFirstPlayerController(), EQuitPreference::Quit, true);
 }

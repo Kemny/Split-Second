@@ -47,6 +47,10 @@ public:
 
 	UFUNCTION() void SpawnNextArena();
 
+	void PostLogin(APlayerController* NewPlayer) override;
+	UFUNCTION() void OnPlayerDeath();
+	UFUNCTION() void OnConfirmedPlayerDeath();
+
 private:
 	TSubclassOf<class ASuper_Gun> PistolClass;
 	TSubclassOf<class ASuper_Gun> ShotgunClass;

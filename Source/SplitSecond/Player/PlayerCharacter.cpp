@@ -12,10 +12,20 @@
 #include "Kismet/GameplayStatics.h"
 #include "PlayerMovementComponent.h"
 #include "../SplitSecondPlayerState.h"
+#include "../Health/HealthComponent.h"
+#include "../UI/PlayerUI.h"
+#include "UObject/ConstructorHelpers.h"
+#include "../UI/PopupMessage.h"
 
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
+    ConstructorHelpers::FClassFinder<UPlayerUI> BP_PlayerUIClass(TEXT("/Game/Blueprint/UI/WBP_PlayerUI"));
+    if (BP_PlayerUIClass.Class) PlayerUIClass = BP_PlayerUIClass.Class;
+
+    ConstructorHelpers::FClassFinder<UPopupMessage> BP_PopupMessageClass(TEXT("/Game/Blueprint/UI/WBP_PopupMessage"));
+    if (BP_PopupMessageClass.Class) PopupMessageClass = BP_PopupMessageClass.Class;
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 
@@ -27,6 +37,9 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 
 	GunAttachMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunAttachMesh"));
 	GunAttachMesh->SetupAttachment(FirstPersonCameraComponent);
+
+    HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
+    HealthComponent->OnHealthChanged.BindUFunction(this, FName("OnTakeDamage"));
 
     DashMultiplier = 400.f;
     DashInputDelay = 0.3f;
@@ -40,6 +53,12 @@ void APlayerCharacter::BeginPlay()
     if (!ensure(PlayerController != nullptr)) { return; }
     PlayerState = GetPlayerState<ASplitSecondPlayerState>();
     if (!ensure(PlayerState != nullptr)) { return; }
+
+
+    PlayerUI = CreateWidget<UPlayerUI>(GetWorld(), PlayerUIClass);
+    if (!ensure(PlayerUI != nullptr)) { return; }
+    PlayerUI->AddToPlayerScreen();
+    PlayerUI->UpdateHealth(HealthComponent->GetHealth(), HealthComponent->GetMaxHealth());
 }
 
 void APlayerCharacter::EquipGun(TSubclassOf<class ASuper_Gun> GunClass)
@@ -153,8 +172,33 @@ void APlayerCharacter::MoveRight(float Value)
 	}
 }
 
+
 void APlayerCharacter::ResetDash()
 {
     bDashOffCooldown = true;
 }
 
+void APlayerCharacter::OnTakeDamage()
+{
+    if (!ensure(PlayerUI != nullptr)) { return; }
+    PlayerUI->UpdateHealth(HealthComponent->GetHealth(), HealthComponent->GetMaxHealth());
+    if (HealthComponent->GetHealth() <= 0)
+    {
+        if (!ensure(PlayerController != nullptr)) { return; }
+
+        PlayerUI->RemoveFromParent();
+        PlayerController->HandlePlayerDeath();
+
+        if (auto Message = CreateWidget<UPopupMessage>(GetWorld(), PopupMessageClass))
+        {
+            Message->ShowPopupMessage(FKey("F"), FText::FromString("YOU DIED \n PRESS F TO RESTART"));
+            Message->OnConditionFufilled.BindUFunction(this, TEXT("OnConfirmedDeath"));
+        }
+    }
+}
+
+void APlayerCharacter::OnConfirmedDeath()
+{
+    if (!ensure(PlayerController != nullptr)) { return; }
+    PlayerController->HandlePlayerConfirmedDeath();
+}

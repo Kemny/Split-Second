@@ -26,6 +26,7 @@ public:
 	FPopupMessageDelegate OnConditionFufilled;
 
 	FReply NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEvent& InKeyEvent) override;
+	FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	
 	void ShowPopupMessage(const FKey& Key, const FText& Text);
 
