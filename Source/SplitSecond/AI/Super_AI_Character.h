@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "Super_AI_Character.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAIDeathDelegate, ASuper_AI_Character*, KilledAI);
+
 UENUM()
 enum class EHighlightType
 {
@@ -31,7 +33,6 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     class UBoxComponent* TraceComp;
 
-public:	
     /* Gun to give AI */
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Gun Settings")
     TSubclassOf<ASuper_Gun> AIGunClass;
@@ -72,6 +73,8 @@ public:
     
     UPROPERTY(BlueprintReadWrite)
     bool bIsDead = false;
+
+    FAIDeathDelegate OnDeath;
 
 protected:
     // Called when the game starts or when spawned

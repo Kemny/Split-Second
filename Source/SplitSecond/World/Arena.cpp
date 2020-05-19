@@ -12,6 +12,7 @@
 #include "TargetLocation.h"
 #include "../AI/Super_AI_Character.h"
 #include "../UI/PopupMessage.h"
+#include "../AI/AI_TurretBase.h"
 #include "UObject/ConstructorHelpers.h"
 #include "TimerManager.h"
 
@@ -168,9 +169,19 @@ void AArena::SpawnEnemies(int32 SpawnNum, TArray<UActorComponent*> SpawnLocation
 	for (size_t i = 0; i < SpawnedIndexes.Num(); i++)
 	{
 		auto EnemySpawnLocationComponent = Cast<UEnemySpawnLocation>(SpawnLocations[SpawnedIndexes[i]]);
-		if (auto Spawned = GetWorld()->SpawnActor<AActor>(EnemySpawnLocationComponent->GetCurrentTypeClass(), FTransform(FRotator(0), EnemySpawnLocationComponent->GetBoxCenter(), FVector(1))))
+		if (!SpawnedTurrets.Find(EnemySpawnLocationComponent))
 		{
-			Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+			if (auto Spawned = GetWorld()->SpawnActor<ASuper_AI_Character>(EnemySpawnLocationComponent->GetCurrentTypeClass(), FTransform(FRotator(0), EnemySpawnLocationComponent->GetBoxCenter(), FVector(1))))
+			{
+				Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+				Spawned->OnDeath.AddUniqueDynamic(this, &AArena::OnEnemyDeath);
+				SpawnedEnemies.Add(Spawned);
+				if (Spawned->IsA<AAI_TurretBase>())
+				{
+					Spawned->OnDeath.AddUniqueDynamic(this, &AArena::OnTurretDeath);
+					SpawnedTurrets.Add(EnemySpawnLocationComponent, Spawned);
+				}
+			}
 		}
 	}
 }
@@ -191,18 +202,13 @@ void AArena::FinishObjective()
 	}
 
 	// Destroy Enemies
-	TArray<AActor*> FoundEnemis;
-	UGameplayStatics::GetAllActorsOfClass(this, ASuper_AI_Character::StaticClass(), FoundEnemis);
-
-	for (auto Enemy : FoundEnemis)
+	for (auto EnemyToDestroy : SpawnedEnemies)
 	{
-		if (auto EnemyToDestroy = Cast<ASuper_AI_Character>(Enemy))
-		{
-			EnemyToDestroy->DetachFromActor(DetachRules);
-			EnemyToDestroy->DetachFromControllerPendingDestroy();
-			EnemyToDestroy->Destroy();
-		}
+		EnemyToDestroy->DetachFromActor(DetachRules);
+		EnemyToDestroy->DetachFromControllerPendingDestroy();
+		EnemyToDestroy->Destroy();
 	}
+
 	///Prompt player into entering next level
 	if (auto Spawned = CreateWidget<UPopupMessage>(GetWorld(), PopupMessageClass))
 	{
@@ -224,4 +230,25 @@ void AArena::FinishArena()
 	Destroy();
 }
 
+void AArena::OnEnemyDeath(ASuper_AI_Character* KilledAI)
+{
+	SpawnedEnemies.Remove(KilledAI);
+}
 
+void AArena::OnTurretDeath(ASuper_AI_Character* KilledAI)
+{
+	TArray<UEnemySpawnLocation*> OutKeys;
+	SpawnedTurrets.GetKeys(OutKeys);
+	for (auto Key : OutKeys)
+	{
+		if (auto FoundValue = *SpawnedTurrets.Find(Key))
+		{
+			if (FoundValue == KilledAI)
+			{
+				SpawnedTurrets.Remove(Key);
+				FoundValue->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+				FoundValue->Destroy();
+			}
+		}
+	}
+}

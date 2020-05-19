@@ -160,6 +160,8 @@ void ASuper_AI_Character::OnTakeDamage()
 
         FTimerHandle DeathHandle;
         GetWorldTimerManager().SetTimer(DeathHandle, this, &ASuper_AI_Character::DestroyAfterDeath, DeathDespawnTime, false);
+
+        OnDeath.Broadcast(this);
     }
 }
 

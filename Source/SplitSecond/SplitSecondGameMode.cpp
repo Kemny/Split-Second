@@ -141,7 +141,6 @@ void ASplitSecondGameMode::OnPlayerDeath()
 {
 	///This triggers immediately after the player dies
 
-	//TODO Move player back to the main menu / Restart the game
 }
 void ASplitSecondGameMode::OnConfirmedPlayerDeath()
 {

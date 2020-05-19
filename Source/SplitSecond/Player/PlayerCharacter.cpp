@@ -182,7 +182,7 @@ void APlayerCharacter::OnTakeDamage()
 {
     if (!ensure(PlayerUI != nullptr)) { return; }
     PlayerUI->UpdateHealth(HealthComponent->GetHealth(), HealthComponent->GetMaxHealth());
-    if (HealthComponent->GetHealth() <= 0)
+    if (HealthComponent->GetHealth() <= 0 && !bIsInvinclible)
     {
         if (!ensure(PlayerController != nullptr)) { return; }
 

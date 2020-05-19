@@ -62,6 +62,9 @@ public:
 	FArenaDelegate OnArenaFinished;
 	
 private:
+	TArray<class ASuper_AI_Character*> SpawnedEnemies;
+	TMap<class UEnemySpawnLocation* , class ASuper_AI_Character*> SpawnedTurrets;
+
 	EObjectives CurrentObjective;
 	FTimerHandle SpawnEnemiesHandle;
 	FTimerHandle SurviveHandle;
@@ -82,6 +85,9 @@ private:
 	UFUNCTION() void FinishObjective();
 	/* Called when player gives the input to load the next level*/
 	UFUNCTION() void FinishArena();
+
+	UFUNCTION() void OnTurretDeath(ASuper_AI_Character* KilledAI);
+	UFUNCTION() void OnEnemyDeath(ASuper_AI_Character* KilledAI);
 
 	TSubclassOf<class UPopupMessage> PopupMessageClass;
 };

@@ -59,6 +59,9 @@ protected:
 	void MoveForward(float Val);
 	/** Handles stafing movement, left and right */
 	void MoveRight(float Val);
+    
+    UPROPERTY(EditAnywhere, Category = "Health")
+    bool bIsInvinclible = false;
 
 private:
 	class UPlayerMovementComponent* PlayerMovementComponent;
