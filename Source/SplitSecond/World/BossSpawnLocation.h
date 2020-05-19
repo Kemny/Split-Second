@@ -1,0 +1,42 @@
+// This project falls under CC-BY-SA lisence
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Components/SceneComponent.h"
+#include "BossSpawnLocation.generated.h"
+
+UENUM()
+enum EBossSpawnType
+{
+	Boss_1,
+	Boss_2,
+	Boss_3,
+};
+
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent), HideCategories = (Rendering, Tags, Replication, Activation, Cooking, Physics, LOD, Collision, Replication, AssetUserData, ComponentReplication, Variable))
+class SPLITSECOND_API UBossSpawnLocation : public USceneComponent
+{
+	GENERATED_BODY()
+
+public:	
+	// Sets default values for this component's properties
+	UBossSpawnLocation();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TEnumAsByte<EBossSpawnType> SpawnType;
+
+	TSubclassOf<AActor> GetCurrentTypeClass() const;
+	TSubclassOf<AActor> GetActorClass;
+	FVector GetBoxCenter() const;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	class UBoxComponent* BoxComponent;
+
+private:
+
+	TSubclassOf<AActor> Boss_1_Class;
+	TSubclassOf<AActor> Boss_2_Class;
+	TSubclassOf<AActor>	Boss_3_Class;
+		
+};

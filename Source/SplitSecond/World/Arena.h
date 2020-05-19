@@ -59,6 +59,12 @@ public:
 	AArena();
 	void SpawnActors();
 
+	UFUNCTION(BlueprintCallable, Category = "Arean Functions")
+	void SpawnBoss(int32 SpawnNum, TArray<UActorComponent*> SpawnLocations);
+
+	UFUNCTION(BlueprintCallable, Category = "Arean Functions")
+	void SpawnBossAdds(int32 SpawnNum, TArray<UActorComponent*> SpawnLocations);
+
 	FArenaDelegate OnArenaFinished;
 	
 private:
