@@ -20,7 +20,7 @@ void AAIShotgun::FireGun()
         {
             for (size_t i = 0; i < DefaultBulletNum; i++)
             {
-                const FRotator SpawnRotation = CurrentPawn->GetControlRotation();
+                const FRotator SpawnRotation = GetActorRotation();
                 const FVector SpawnLocation = GunMesh->GetSocketLocation(FName("MuzzleLocation"));
 
                 //Set Spawn Collision Handling Override
