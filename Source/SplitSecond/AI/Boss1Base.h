@@ -19,6 +19,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UBossShieldComponent* ShieldComp;
 
+	UPROPERTY(BlueprintReadOnly)
+	bool bShieldIsUp;
+
 	/* Active boss shield */
 	UFUNCTION(BlueprintCallable, Category = "Boss Functions")
 	void ActivateShield();

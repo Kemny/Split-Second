@@ -15,6 +15,8 @@ void UBossShieldComponent::ActivateShield()
 
 	FAttachmentTransformRules AttachmentRules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false);
 	CurrentShield->AttachToComponent(this, AttachmentRules);
+
+	CurrentShield->ActivateShield();
 }
 
 void UBossShieldComponent::DeactivateShield()

@@ -32,6 +32,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss Settings")
 	float Phase3Threshold = 10;
 
+	/* Amount of adds this boss spawns */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss Settings")
+	int32 AmountOfAddToSpawn = 4;
+
+
     /* Resets time dilation back to 1 */
     UFUNCTION(BlueprintCallable, Category = "Boss Functions")
     void ResetTimeDilation();

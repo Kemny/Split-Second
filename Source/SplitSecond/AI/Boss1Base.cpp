@@ -14,10 +14,12 @@ void ABoss1Base::ActivateShield()
 {
 	if (!ensure(ShieldComp != nullptr)) { return; }
 	ShieldComp->ActivateShield();
+	bShieldIsUp = true;
 }
 
 void ABoss1Base::DeactivateShield()
 {
 	if (!ensure(ShieldComp != nullptr)) { return; }
 	ShieldComp->DeactivateShield();
+	bShieldIsUp = false;
 }

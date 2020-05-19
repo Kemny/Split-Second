@@ -2,8 +2,3 @@
 
 
 #include "BossShieldBase.h"
-
-void ABossShieldBase::ConstructShield()
-{
-
-}

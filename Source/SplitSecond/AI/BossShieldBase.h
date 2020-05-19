@@ -17,10 +17,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Shield Events")
 	void ActivateShield();
 
-	/* Called when shield is despawning */
+	/* Called when shield is despawned */
 	UFUNCTION(BlueprintImplementableEvent, Category = "Shield Events")
 	void DeactivateShield();
-
-	void ConstructShield();
-
 };
