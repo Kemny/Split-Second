@@ -19,7 +19,10 @@ class APlayerCharacter : public ACharacter
 	class UCameraComponent* FirstPersonCameraComponent;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-       class UHealthComponent* HealthComponent;
+    class UHealthComponent* HealthComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+    class USceneComponent* BossTeleportPoint;
 
 public:
 	APlayerCharacter(const FObjectInitializer& ObjectInitializer);

@@ -16,19 +16,11 @@ class SPLITSECOND_API ABoss1Base : public ASuper_Boss
 
 public:
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	class UBossShieldComponent* ShieldComp;
+	/* Delay before the boss teleports */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss Settings")
+	float TeleportDelay = 2;
 
-	UPROPERTY(BlueprintReadOnly)
-	bool bShieldIsUp;
-
-	/* Active boss shield */
-	UFUNCTION(BlueprintCallable, Category = "Boss Functions")
-	void ActivateShield();
-
-	/* Deactivate boss shield */
-	UFUNCTION(BlueprintCallable, Category = "Boss Functions")
-	void DeactivateShield();
-	
-	ABoss1Base();
+	/* Delay before the shoots his gun */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss Settings")
+	float GunShotDelay = 3;
 };

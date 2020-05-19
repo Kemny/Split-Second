@@ -41,6 +41,9 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
     HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
     HealthComponent->OnHealthChanged.BindUFunction(this, FName("OnTakeDamage"));
 
+    BossTeleportPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Boss Teleport Point"));
+    BossTeleportPoint->SetupAttachment(RootComponent);
+
     DashMultiplier = 400.f;
     DashInputDelay = 0.3f;
 }

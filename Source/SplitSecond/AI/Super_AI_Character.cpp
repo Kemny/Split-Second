@@ -89,7 +89,7 @@ void ASuper_AI_Character::SpawnGun()
             CurrentGun = GetWorld()->SpawnActor<ASuper_Gun>(AIGunClass, SpawnTransform, ActorSpawnParams);
 
             CurrentGun->SetCurrentPawn(this);
-            CurrentGun->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GunSocket"));
+            CurrentGun->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), GunSocket);
         }
     }
 }

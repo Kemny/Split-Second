@@ -53,6 +53,10 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Settings")
     float GunFireDelay;
 
+    /* Socket to to attach gun to */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Settings")
+    FName GunSocket = "GunSocket";
+
     /* AI's current gun */
     UPROPERTY(BlueprintReadWrite, Category = "Gun Vars")
     ASuper_Gun* CurrentGun;
