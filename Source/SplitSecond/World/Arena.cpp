@@ -5,14 +5,17 @@
 #include "Engine/World.h"
 #include "TrapPlacer.h"
 #include "Engine/EngineTypes.h"
+#include "BossAddsSpawnLocation.h"
 #include "GameFramework/PlayerController.h"
 #include "Flag.h"
 #include "FlagTarget.h"
+#include "../AI/Super_Boss.h"
 #include "../World/Traps/SuperTrap.h"
 #include "TargetLocation.h"
 #include "../AI/Super_AI_Character.h"
 #include "../UI/PopupMessage.h"
 #include "../AI/AI_TurretBase.h"
+#include "BossSpawnLocation.h"
 #include "UObject/ConstructorHelpers.h"
 #include "TimerManager.h"
 
@@ -182,6 +185,58 @@ void AArena::SpawnEnemies(int32 SpawnNum, TArray<UActorComponent*> SpawnLocation
 					SpawnedTurrets.Add(EnemySpawnLocationComponent, Spawned);
 				}
 			}
+		}
+	}
+}
+
+void AArena::SpawnBoss(int32 SpawnNum, TArray<UActorComponent*> SpawnLocations)
+{
+	TArray<int32> SpawnedIndexes;
+	for (size_t i = 0; i < SpawnNum; i++)
+	{
+		int32 SpawnIndex;
+		do
+		{
+			SpawnIndex = FMath::RandRange(0, SpawnLocations.Num() - 1);
+		} while (SpawnedIndexes.Contains(SpawnIndex));
+
+		SpawnedIndexes.Add(SpawnIndex);
+	}
+
+	for (size_t i = 0; i < SpawnedIndexes.Num(); i++)
+	{
+		auto BossSpawnLocationComponent = Cast<UBossSpawnLocation>(SpawnLocations[SpawnedIndexes[i]]);
+		if (auto Spawned = GetWorld()->SpawnActor<ASuper_Boss>(BossSpawnLocationComponent->GetCurrentTypeClass(), FTransform(FRotator(0), BossSpawnLocationComponent->GetBoxCenter(), FVector(1))))
+		{
+			Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+			Spawned->OnDeath.AddUniqueDynamic(this, &AArena::OnEnemyDeath);
+			SpawnedEnemies.Add(Spawned);
+		}
+	}
+}
+
+void AArena::SpawnBossAdds(int32 SpawnNum, TArray<UActorComponent*> SpawnLocations)
+{
+	TArray<int32> SpawnedIndexes;
+	for (size_t i = 0; i < SpawnNum; i++)
+	{
+		int32 SpawnIndex;
+		do
+		{
+			SpawnIndex = FMath::RandRange(0, SpawnLocations.Num() - 1);
+		} while (SpawnedIndexes.Contains(SpawnIndex));
+
+		SpawnedIndexes.Add(SpawnIndex);
+	}
+
+	for (size_t i = 0; i < SpawnedIndexes.Num(); i++)
+	{
+		auto BossAddsSpawnLocationComponent = Cast<UBossAddsSpawnLocation>(SpawnLocations[SpawnedIndexes[i]]);
+		if (auto Spawned = GetWorld()->SpawnActor<ASuper_AI_Character>(BossAddsSpawnLocationComponent->GetCurrentTypeClass(), FTransform(FRotator(0), BossAddsSpawnLocationComponent->GetBoxCenter(), FVector(1))))
+		{
+			Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+			Spawned->OnDeath.AddUniqueDynamic(this, &AArena::OnEnemyDeath);
+			SpawnedEnemies.Add(Spawned);
 		}
 	}
 }
