@@ -10,7 +10,6 @@ UHealthComponent::UHealthComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
-	Health = MaxHealth;
 }
 
 
@@ -18,6 +17,8 @@ UHealthComponent::UHealthComponent()
 void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Health = MaxHealth;
 
 	AActor* Owner = GetOwner();
 	if (Owner) 
