@@ -103,11 +103,6 @@ public:
     UPROPERTY(EditAnywhere)bool bIsBouncing = false;
     UPROPERTY(EditAnywhere)bool bExplodingBullets = false;
 
-    ///Guns
-    UPROPERTY(EditAnywhere)bool bBossOneHat = false;
-    UPROPERTY(EditAnywhere)bool bBossTwoHat = false;
-    UPROPERTY(EditAnywhere)bool bBossThreeHat = false;
-
     ///Player
     UPROPERTY(EditAnywhere)bool bHasExtraLife = false;
     UPROPERTY(EditAnywhere)bool bCanThrowGun = false;
