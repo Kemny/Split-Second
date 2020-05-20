@@ -45,6 +45,5 @@ public:
 protected:
 	class UNiagaraSystem* NiagaraSystem;
 	FTimerHandle SlowTimerHandle;
-
 };
 

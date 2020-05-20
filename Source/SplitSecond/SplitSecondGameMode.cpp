@@ -11,6 +11,7 @@
 #include "World/Arena.h"
 #include "SplitSecondGameState.h"
 #include "NavigationSystem.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 ASplitSecondGameMode::ASplitSecondGameMode()
@@ -144,8 +145,23 @@ void ASplitSecondGameMode::OnPlayerDeath()
 }
 void ASplitSecondGameMode::OnConfirmedPlayerDeath()
 {
-	///This triggers after the player decides to confim his death by hitting a button
+	///This triggers after the player decides to confirm his death by hitting a button
 
 	//TODO Move player back to the main menu / Restart the game
 	UKismetSystemLibrary::QuitGame(GetWorld(), GetWorld()->GetFirstPlayerController(), EQuitPreference::Quit, true);
+}
+
+void ASplitSecondGameMode::StartTimeSkip()
+{
+	TArray<AActor*> CurrentProjectiles;
+	UGameplayStatics::GetAllActorsOfClass(this, ASplitSecondProjectile::StaticClass(), CurrentProjectiles);
+
+	for (auto Projectile : CurrentProjectiles)
+	{
+		if (Projectile)
+		{
+			auto NewLocation = (Projectile->GetActorForwardVector() * Boss1SkipAmmount) * Projectile->GetActorLocation();
+			Projectile->TeleportTo(NewLocation, Projectile->GetActorRotation());
+		}
+	}
 }

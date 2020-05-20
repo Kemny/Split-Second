@@ -23,7 +23,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Defaults")FShotgunDefault DefaultStatsForShotgun;
 	UPROPERTY(EditDefaultsOnly, Category = "Defaults")FBowDefault DefaultStatsForBow;
 	
-	///TODO Remove debug Weapon calss
+	///TODO Remove debug Weapon class
 
 	/*Final game will let the player pick from a menu of weapons*/
     UPROPERTY(EditDefaultsOnly, Category = "Defaults")
@@ -37,6 +37,10 @@ protected:
 	TSubclassOf<class AArena> Boss2Arena;
 	UPROPERTY(EditDefaultsOnly, Category = "Arenas")
 	TSubclassOf<class AArena> Boss3Arena;
+
+	// Boss 1 Time skip multiplier multiplies all projectiles current velocity
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss 1 Settings")
+	float Boss1SkipAmmount = 2;
 	
 
 public:
@@ -50,6 +54,8 @@ public:
 	void PostLogin(APlayerController* NewPlayer) override;
 	UFUNCTION() void OnPlayerDeath();
 	UFUNCTION() void OnConfirmedPlayerDeath();
+
+	UFUNCTION(BlueprintCallable, Category = "Time Functions") void StartTimeSkip();
 
 private:
 	TSubclassOf<class ASuper_Gun> PistolClass;
