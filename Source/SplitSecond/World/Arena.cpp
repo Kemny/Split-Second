@@ -81,21 +81,6 @@ void AArena::SpawnActors()
 		default:
 			break;
 		}
-		
-	}
-	auto TrapPlacersLocations = GetComponentsByClass(UTrapPlacer::StaticClass());
-	for (auto ActorToSpawn : TrapPlacersLocations)
-	{
-		if (auto TrapSpawnLocationComponent = Cast<UTrapPlacer>(ActorToSpawn))
-		{
-			TSubclassOf<AActor> TrapClassToSpawn = TrapSpawnLocationComponent->TrapToPlace->GetChildActorClass();
-			if (auto Spawned = GetWorld()->SpawnActor<AActor>(TrapClassToSpawn))
-			{
-				Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-				Spawned->SetActorLocation(TrapSpawnLocationComponent->GetRelativeLocation());
-				Spawned->SetActorRotation(TrapSpawnLocationComponent->GetRelativeRotation());
-			}
-		}
 	}
 }
 
