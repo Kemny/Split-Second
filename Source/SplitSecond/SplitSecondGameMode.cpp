@@ -160,8 +160,9 @@ void ASplitSecondGameMode::StartTimeSkip()
 	{
 		if (Projectile)
 		{
-			auto NewLocation = (Projectile->GetActorForwardVector() * Boss1SkipAmmount) * Projectile->GetActorLocation();
-			Projectile->TeleportTo(NewLocation, Projectile->GetActorRotation());
+			auto NewLocation = (Projectile->GetActorLocation().GetSafeNormal() * Boss1SkipAmmount) * Projectile->GetActorLocation();
+			UE_LOG(LogTemp, Warning, TEXT("Actor Locatoion %s NewLocation %s"), *Projectile->GetActorLocation().ToString(), *NewLocation.ToString())
+			Projectile->SetActorLocation(NewLocation);
 		}
 	}
 }
