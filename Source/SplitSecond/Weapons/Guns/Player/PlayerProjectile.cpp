@@ -13,6 +13,11 @@ void APlayerProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 		// Called to apply damage to hit actor
 		OnBulletHit(HitComp, OtherActor, OtherComp, NormalImpulse, Hit);
 
+		if (bShouldBounce && CurrentBounce < BounceNum)
+		{
+
+		}
+
 		if (!OtherActor->IsA<APlayerCharacter>())
 		{
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NiagaraSystem, Hit.TraceStart, GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);

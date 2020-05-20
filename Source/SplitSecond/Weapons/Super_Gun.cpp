@@ -44,7 +44,7 @@ void ASuper_Gun::BeginPlay()
 void ASuper_Gun::OnInputPressed_Implementation()
 {
     if (!ensure(PlayerState != nullptr)) { return; }
-    float FirstDelay = FMath::Max(LastTimeFired + (PlayerState->CurrentStats.FireRate * PlayerState->CurrentStats.FireRateMultiplier) - GetWorld()->TimeSeconds, 0.0f);
+    float FirstDelay = FMath::Max(LastTimeFired + (PlayerState->CurrentStats.FireRate) - GetWorld()->TimeSeconds, 0.0f);
 
     GetWorldTimerManager().SetTimer(FireRateTimer, this, &ASuper_Gun::FireGun, PlayerState->CurrentStats.FireRate, true, FirstDelay);
 }
@@ -68,26 +68,15 @@ APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector con
             auto Upgrades = PlayerCharacter->GetPlayerStateChecked<ASplitSecondPlayerState>()->CurrentStats;
 
             Spawned->DamageValue = Upgrades.Damage;
-            Spawned->DamageValue *= Upgrades.DamageMultiplier;
             Spawned->GetProjectileMovement()->InitialSpeed = Upgrades.ProjectileSpeed;
-            Spawned->GetProjectileMovement()->InitialSpeed *= Upgrades.ProjectileSpeedMultiplier;
 
-            if (Upgrades.bIsPiercing)
-            {
+            
+            Spawned->bIsPiercing = Upgrades.bIsPiercing;
+            Spawned->bIsExplosive = Upgrades.bExplodingBullets;
 
-            }
             if (Upgrades.bIsBouncing)
             {
                 Spawned->GetProjectileMovement()->bShouldBounce = true;
-            }
-            if (Upgrades.bBiggerBullets)
-            {
-                Spawned->SetActorScale3D(FVector(3));
-                Spawned->DamageValue *= 2;
-            }
-            if (Upgrades.bExplodingBullets)
-            {
-
             }
             if (Upgrades.bIsHoming)
             {
@@ -136,17 +125,9 @@ void ASuper_Gun::AfterPlayerFireGun(UMeshComponent* GunMeshToEdit)
 
 void ASuper_Gun::StartRegen()
 {
-    if (!PlayerState->CurrentStats.bReloadConstant)
-    {
-      ReloadSpeed = PlayerState->CurrentStats.ReloadSpeed * PlayerState->CurrentStats.ReloadSpeedMultiplier;
+    ReloadSpeed = PlayerState->CurrentStats.ReloadSpeed;
 
-      GetWorldTimerManager().SetTimer(ReloadTimer, this, &ASuper_Gun::RegenAmmo, ReloadSpeed, true, ReloadSpeed);
-    }
-    else
-    {
-      // TODO Make delay affected by time dilation
-      
-    }
+    GetWorldTimerManager().SetTimer(ReloadTimer, this, &ASuper_Gun::RegenAmmo, ReloadSpeed, true, ReloadSpeed);
 }
 
 void ASuper_Gun::RegenAmmo()
