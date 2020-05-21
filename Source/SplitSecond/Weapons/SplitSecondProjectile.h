@@ -46,8 +46,14 @@ public:
 	void OnBulletOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	virtual void OnBulletOverlap_Implementation(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+	void CalcReflection(const FHitResult& Hit);
+
 	UPROPERTY(EditAnywhere)
 	float DamageValue = 10;
+
+	/* How much speed is lost when projectile bounces off a surface */
+	UPROPERTY(BlueprintReadWrite, Category = "Projectile")
+	float BounceSpeedLoss = 1;
 
 protected:
 	class UNiagaraSystem* NiagaraSystem;

@@ -85,3 +85,13 @@ void ASplitSecondProjectile::OnBulletOverlap_Implementation(class UPrimitiveComp
 
 	UGameplayStatics::ApplyDamage(OtherActor, DamageValue, PlayerController, this, UDamageType::StaticClass());
 }
+
+void ASplitSecondProjectile::CalcReflection(const FHitResult& Hit)
+{
+	auto MyVelocity = GetProjectileMovement()->Velocity;
+
+	FVector ReflectedVelocity = BounceSpeedLoss * (-2 * FVector::DotProduct(MyVelocity, Hit.Normal) * Hit.Normal + MyVelocity);
+	MyVelocity = ReflectedVelocity;
+	ReflectedVelocity.Normalize();
+	SetActorRotation(ReflectedVelocity.Rotation());
+}

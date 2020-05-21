@@ -21,7 +21,8 @@ public:
 	bool bIsExplosive = false;
 	UPROPERTY(EditAnywhere) 
 	bool bIsPiercing = false; // TODO this is not getting set by the gamemode that needs to be fixed
-	bool bShouldBounce = false;
+	UPROPERTY(EditAnywhere)
+	bool bShouldBounce = false; // TODO this is not getting set by the gamemode that needs to be fixed
 	int32 BounceNum = 3;
 	int32 CurrentBounce = 0;
 
@@ -32,6 +33,9 @@ public:
 	/* If explosion upgrade is active this the explosion that will spawn */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Upgrade Settings")
 	TSubclassOf<class AProjectile_Explosion> ExplosionToSpawn;
+
+	virtual void OnBulletHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
+
 protected:
 	virtual void BeginPlay() override;
 };
