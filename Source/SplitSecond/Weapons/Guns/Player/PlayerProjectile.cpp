@@ -3,10 +3,10 @@
 #include "PlayerProjectile.h"
 #include "Projectile_Explosion.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/SphereComponent.h"
 #include "../../../Player/PlayerCharacter.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
-
 
 void APlayerProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
@@ -30,16 +30,25 @@ void APlayerProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 			CurrentExplosion->ApplyExplosionDamage(DamageValue, ExplosionUpTime);
 		}
 
-		if (bIsPiercing)
-		{
-
-		}
-
 		if (!OtherActor->IsA<APlayerCharacter>())
 		{
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NiagaraSystem, Hit.TraceStart, GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
 		}
 
 		Destroy();
+	}
+}
+
+void APlayerProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (bIsPiercing)
+	{
+		GetCollisionComp()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	}
+	else
+	{
+		GetCollisionComp()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	}
 }

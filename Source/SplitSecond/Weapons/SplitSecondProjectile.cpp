@@ -31,6 +31,8 @@ ASplitSecondProjectile::ASplitSecondProjectile()
 	// Set as root component
 	RootComponent = CollisionComp;
 
+	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ASplitSecondProjectile::OnOverlapBegin);
+
 	// Use a ProjectileMovementComponent to govern this projectile's movement
 	BulletMovement = CreateDefaultSubobject<UBulletMovementComponent>(TEXT("BulletComp"));
 	BulletMovement->UpdatedComponent = CollisionComp;
@@ -44,6 +46,11 @@ ASplitSecondProjectile::ASplitSecondProjectile()
 	BulletMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	BulletMesh->SetupAttachment(CollisionComp);
 	BulletMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void ASplitSecondProjectile::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	OnBulletOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 }
 
 void ASplitSecondProjectile::GetSlowed(float SlowTime, float SlowAmmount)
@@ -69,4 +76,12 @@ void ASplitSecondProjectile::OnBulletHit_Implementation(UPrimitiveComponent* Hit
   if (!ensure(PlayerController != nullptr)) { return; }
 
   UGameplayStatics::ApplyDamage(OtherActor, DamageValue, PlayerController, this, UDamageType::StaticClass());
+}
+
+void ASplitSecondProjectile::OnBulletOverlap_Implementation(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (!ensure(PlayerController != nullptr)) { return; }
+
+	UGameplayStatics::ApplyDamage(OtherActor, DamageValue, PlayerController, this, UDamageType::StaticClass());
 }
