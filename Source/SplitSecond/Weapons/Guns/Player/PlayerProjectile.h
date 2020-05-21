@@ -22,4 +22,12 @@ public:
 	bool bShouldBounce = false;
 	int32 BounceNum = 3;
 	int32 CurrentBounce = 0;
+
+	/* If explosion upgrade is active this determines how long the effect is up for */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Upgrade Settings")
+	float ExplosionUpTime = 1;
+
+	/* If explosion upgrade is active this the explosion that will spawn */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Upgrade Settings")
+	TSubclassOf<class AProjectile_Explosion> ExplosionToSpawn;
 };
