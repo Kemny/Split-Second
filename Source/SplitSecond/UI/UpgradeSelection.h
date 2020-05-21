@@ -10,15 +10,61 @@
 
 #include "UpgradeSelection.generated.h"
 
+DECLARE_DYNAMIC_DELEGATE(FUpgradeSelectionDelegate);
+
+UENUM(BlueprintType)
+enum class EArenaUpgrades : uint8
+{
+	NONE,
+	Ammo,
+	Damage,
+	ProjectileSpeed,
+	ReloadSpeed,
+	FireRate,
+	MaxJumps,
+	BulletNum,
+	BulletSpread,
+	BowDrawSpeed,
+};
+UENUM(BlueprintType)
+enum class EBosssUpgrades : uint8
+{
+	NONE,
+	IsPiercing,
+	IsHoming,
+	IsBouncing,
+	ExplodingBullets,
+	ExtraLife,
+	CanThrowGun,
+};
+
+USTRUCT(Blueprintable)
+struct FUpgradeValue
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	
+	UPROPERTY(EditAnywhere)float MinValue = 0;
+	UPROPERTY(EditAnywhere)float MaxValue = 1;
+};
+
 UCLASS()
 class SPLITSECOND_API UUpgradeSelection : public UUserWidget
 {
 	GENERATED_BODY()
 	
 public:
-	void ShowUpgradeSelection(FUpgrades& CurrentUpgrades, const EWeapons& CurrentWeapon, const bool& bBossUpgrades, const float& CurrentHealth, const float& MaxHealth);
+	FUpgradeSelectionDelegate OnUpgradeSelected;
+
+	void ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const EWeapons& CurrentWeapon, const bool& bBossUpgrades, class UHealthComponent* HealthComponent);
 
 protected:
+	UPROPERTY(EditAnywhere)
+	TMap<EArenaUpgrades, FUpgradeValue> UpgradeValues;
+	UPROPERTY(EditAnywhere)
+	int32 MAX_ATTEMPTS = 500;
+
 #pragma region Upgrade Selection
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	UVerticalBox* VB_Upgrade1;
@@ -112,15 +158,34 @@ protected:
 #pragma endregion
 
 private:
+	FUpgrades* PlayerUpgrades = nullptr;
+	class UHealthComponent* PlayerHealthComponent = nullptr;
+	EWeapons PlayerCurrentWeapon;
+	TMap<EArenaUpgrades, float> ArenaUpgradeValues;
+	TMap<EBosssUpgrades, bool> BossUpgradeValues;
+	float UpgradeValue;
+
 	FText BoolToText(const bool& BoolToConvert);
 	FText FloatToText(const float& Value, const int32& FractalDigits);
 	FString FloatToString(const float& Value, const int32& FractalDigits);
 	FText IntToText(const int32& Value);
 	FText IntToTextWithPlus(const int32& Value);
 
-	UFUNCTION() void SelectUpgradeOne();
-	UFUNCTION() void SelectUpgradeTwo();
-	UFUNCTION() void SelectUpgradeThree();
-	UFUNCTION() void SelectUpgradeFour();
-	UFUNCTION() void SelectUpgradeFive();
+	void CreateRandomUpgrade();
+	void CreateRandomBossUpgrade();
+
+	UFUNCTION() void SelectBossUpgradeOne();
+	UFUNCTION() void SelectBossUpgradeTwo();
+	UFUNCTION() void SelectBossUpgradeThree();
+	void ApplyBossUpgrade(EBosssUpgrades TypeToApply);
+
+	UFUNCTION() void SelectArenaUpgradeOne();
+	UFUNCTION() void SelectArenaUpgradeTwo();
+	UFUNCTION() void SelectArenaUpgradeThree();
+	UFUNCTION() void SelectArenaUpgradeFour();
+	UFUNCTION() void SelectArenaUpgradeFive();
+	void ApplyArenaUpgrade(EArenaUpgrades TypeToApply);
+
+	void SetBossTextUpgradeValue(UTextBlock* TextToSet, int32 ButtonIndex);
+	void SetArenaTextUpgradeValue(UTextBlock* TextToSet, int32 ButtonIndex);
 };

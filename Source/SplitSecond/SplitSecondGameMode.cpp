@@ -13,6 +13,7 @@
 #include "NavigationSystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "UI/UpgradeSelection.h"
 
 ASplitSecondGameMode::ASplitSecondGameMode()
 	: Super()
@@ -26,6 +27,9 @@ ASplitSecondGameMode::ASplitSecondGameMode()
 	if (Shotgun_BP.Class) ShotgunClass = Shotgun_BP.Class;
 	static ConstructorHelpers::FClassFinder<ASuper_Gun> Bow_BP(TEXT("/Game/Blueprint/Player/Weapons/BP_PlayerBow"));
 	if (Bow_BP.Class) BowClass = Bow_BP.Class;
+
+	static ConstructorHelpers::FClassFinder<UUpgradeSelection> BP_UpgradeSelectionClass(TEXT("/Game/Blueprint/UI/WBP_UpgradeSelection"));
+	if (BP_UpgradeSelectionClass.Class) UpgradeSelectionClass = BP_UpgradeSelectionClass.Class;
 
 	// use our custom HUD class
 	HUDClass = ASplitSecondHUD::StaticClass();
@@ -87,40 +91,55 @@ void ASplitSecondGameMode::SetDefaultWeapon(EWeapons NewWeapon, TSubclassOf<ASup
 
 void ASplitSecondGameMode::SpawnNextArena()
 {
+	if (CurrentArena) CurrentArena->Destroy(); 
+
 	auto MyGameState = Cast<ASplitSecondGameState>(GameState);
 	if (!ensure(MyGameState != nullptr)) { return; }
-	UE_LOG(LogTemp, Log, TEXT("Current Level: %i"), MyGameState->GetCurrentLevel());
 
 	if (!ensure(PossibleArenas.Num() > 0)) { return; }
 
 	if (MyGameState->GetCurrentLevel() % 10 != 0)
 	{
 		auto RoomIndex = FMath::RandRange(0, PossibleArenas.Num() - 1);
-		if (auto Spawned = GetWorld()->SpawnActor<AArena>(PossibleArenas[RoomIndex]))
+		CurrentArena = GetWorld()->SpawnActor<AArena>(PossibleArenas[RoomIndex]);
+		if (CurrentArena)
 		{
-			PossibleArenas.RemoveAt(RoomIndex);
-			Spawned->OnArenaFinished.BindUFunction(this, TEXT("SpawnNextArena"));
-			Spawned->SpawnActors();
+			CurrentArena->OnArenaFinished.BindUFunction(this, TEXT("SpawnUpgradeScreen"));
+			CurrentArena->SpawnActors();
 			UNavigationSystemV1::GetNavigationSystem(GetWorld())->Build();
 		}
 	}
 	else
 	{
-		switch (MyGameState->GetCurrentLevel())
+		CurrentArena = GetWorld()->SpawnActor<AArena>(BossArena);
+		if(CurrentArena)
 		{
-		case 10:
-			UE_LOG(LogTemp, Log, TEXT("Spawning Boss Room #1"));
-			break;
-		case 20:
-			UE_LOG(LogTemp, Log, TEXT("Spawning Boss Room #2"));
-			break;
-		case 30:
-			UE_LOG(LogTemp, Log, TEXT("Spawning Boss Room #3"));
-			break;
-		default:
-			UE_LOG(LogTemp, Error, TEXT("Something went wrong when spawning a level"));
-			break;
+			CurrentArena->OnArenaFinished.BindUFunction(this, TEXT("SpawnBossUpgradeScreen"));
+			CurrentArena->SpawnActors();
+			UNavigationSystemV1::GetNavigationSystem(GetWorld())->Build();
 		}
+	}
+}
+
+void ASplitSecondGameMode::SpawnUpgradeScreen()
+{
+	if (!ensure(SplitSecondPlayerState != nullptr)) { return; }
+	if (!ensure(SplitSecondPlayerCharacter != nullptr)) { return; }
+	if (auto Created = CreateWidget<UUpgradeSelection>(GetWorld(), UpgradeSelectionClass))
+	{
+		Created->ShowUpgradeSelection(&SplitSecondPlayerState->CurrentStats, Temp_StartingGun, false, SplitSecondPlayerCharacter->GetHealthComponent());
+		Created->OnUpgradeSelected.BindUFunction(this, TEXT("SpawnNextArena"));
+	}
+}
+void ASplitSecondGameMode::SpawnBossUpgradeScreen()
+{
+	if (!ensure(SplitSecondPlayerState != nullptr)) { return; }
+	if (!ensure(SplitSecondPlayerCharacter != nullptr)) { return; }
+
+	if (auto Created = CreateWidget<UUpgradeSelection>(GetWorld(), UpgradeSelectionClass))
+	{
+		Created->ShowUpgradeSelection(&SplitSecondPlayerState->CurrentStats, Temp_StartingGun, true, SplitSecondPlayerCharacter->GetHealthComponent());
+		Created->OnUpgradeSelected.BindUFunction(this, TEXT("SpawnNextArena"));
 	}
 }
 
@@ -130,10 +149,18 @@ void ASplitSecondGameMode::PostLogin(APlayerController* NewPlayer)
 
 	if (NewPlayer->IsA<ASplitSecondPlayerController>())
 	{
-		auto PC = Cast<ASplitSecondPlayerController>(NewPlayer);
+		SplitSecondPlayerController = Cast<ASplitSecondPlayerController>(NewPlayer);
 
-		PC->OnPlayerDeath.BindUFunction(this, TEXT("OnPlayerDeath"));
-		PC->OnPlayerConfirmedDeath.BindUFunction(this, TEXT("OnConfirmedPlayerDeath"));
+		if (!ensure(SplitSecondPlayerController != nullptr)) { return; }
+
+		SplitSecondPlayerController->OnPlayerDeath.BindUFunction(this, TEXT("OnPlayerDeath"));
+		SplitSecondPlayerController->OnPlayerConfirmedDeath.BindUFunction(this, TEXT("OnConfirmedPlayerDeath"));
+
+		SplitSecondPlayerState = SplitSecondPlayerController->GetPlayerState<ASplitSecondPlayerState>();
+		if (!ensure(SplitSecondPlayerState != nullptr)) { return; }
+
+		SplitSecondPlayerCharacter = SplitSecondPlayerController->GetPawn<APlayerCharacter>();
+		if (!ensure(SplitSecondPlayerCharacter != nullptr)) { return; }
 	}
 
 }
@@ -149,20 +176,4 @@ void ASplitSecondGameMode::OnConfirmedPlayerDeath()
 
 	//TODO Move player back to the main menu / Restart the game
 	UKismetSystemLibrary::QuitGame(GetWorld(), GetWorld()->GetFirstPlayerController(), EQuitPreference::Quit, true);
-}
-
-void ASplitSecondGameMode::StartTimeSkip()
-{
-	TArray<AActor*> CurrentProjectiles;
-	UGameplayStatics::GetAllActorsOfClass(this, ASplitSecondProjectile::StaticClass(), CurrentProjectiles);
-
-	for (auto Projectile : CurrentProjectiles)
-	{
-		if (Projectile)
-		{
-			auto NewLocation = (Projectile->GetActorLocation().GetSafeNormal() * Boss1SkipAmmount) * Projectile->GetActorLocation();
-			UE_LOG(LogTemp, Warning, TEXT("Actor Locatoion %s NewLocation %s"), *Projectile->GetActorLocation().ToString(), *NewLocation.ToString())
-			Projectile->SetActorLocation(NewLocation);
-		}
-	}
 }

@@ -32,16 +32,7 @@ protected:
     UPROPERTY(EditDefaultsOnly, Category = "Arenas")
     TArray<TSubclassOf<class AArena>> PossibleArenas;
 	UPROPERTY(EditDefaultsOnly, Category = "Arenas")
-	TSubclassOf<class AArena> Boss1Arena;
-	UPROPERTY(EditDefaultsOnly, Category = "Arenas")
-	TSubclassOf<class AArena> Boss2Arena;
-	UPROPERTY(EditDefaultsOnly, Category = "Arenas")
-	TSubclassOf<class AArena> Boss3Arena;
-
-	// Boss 1 Time skip multiplier multiplies all projectiles current velocity
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss 1 Settings")
-	float Boss1SkipAmmount = 2;
-	
+	TSubclassOf<class AArena> BossArena;
 
 public:
 	ASplitSecondGameMode();
@@ -50,17 +41,25 @@ public:
     void SetDefaultWeapon(EWeapons NewWeapon, TSubclassOf<class ASuper_Gun> Pistol);
 
 	UFUNCTION() void SpawnNextArena();
+	UFUNCTION() void SpawnUpgradeScreen();
+	UFUNCTION() void SpawnBossUpgradeScreen();
 
 	void PostLogin(APlayerController* NewPlayer) override;
 	UFUNCTION() void OnPlayerDeath();
 	UFUNCTION() void OnConfirmedPlayerDeath();
 
-	UFUNCTION(BlueprintCallable, Category = "Time Functions") void StartTimeSkip();
-
 private:
+	class ASplitSecondPlayerController* SplitSecondPlayerController;
+	class ASplitSecondPlayerState* SplitSecondPlayerState;
+	class APlayerCharacter* SplitSecondPlayerCharacter;
+
+	class AArena* CurrentArena;
+
 	TSubclassOf<class ASuper_Gun> PistolClass;
 	TSubclassOf<class ASuper_Gun> ShotgunClass;
 	TSubclassOf<class ASuper_Gun> BowClass;
+
+	TSubclassOf<class UUpgradeSelection> UpgradeSelectionClass;
 };
 
 
