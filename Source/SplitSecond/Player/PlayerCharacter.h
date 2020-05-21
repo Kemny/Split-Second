@@ -78,6 +78,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	FORCEINLINE class UPlayerMovementComponent* GetMyMovementComponent() const { return PlayerMovementComponent; }
+	FORCEINLINE class UHealthComponent* GetHealthComponent() const { return HealthComponent; }
 
 private:
     void ResetDash();

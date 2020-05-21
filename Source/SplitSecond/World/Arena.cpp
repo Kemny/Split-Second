@@ -53,6 +53,10 @@ void AArena::SpawnActors()
 {
 	if (!ensure(Objectives.Num() > 0)) { return; }
 
+	if (!ensure(GetWorld() != nullptr)) { return; }
+	if (!ensure(GetWorld()->GetFirstPlayerController() != nullptr)) { return; }
+	if (!ensure(GetWorld()->GetFirstPlayerController()->GetPawn() != nullptr)) { return; }
+
 	GetWorld()->GetFirstPlayerController()->GetPawn()->SetActorLocation(PlayerStartLocation->GetComponentLocation());
 
 	TArray<TEnumAsByte<EObjectives>> OutKeys;
@@ -258,16 +262,7 @@ void AArena::FinishObjective()
 }
 void AArena::FinishArena()
 {
-	TArray<USceneComponent*> ChildActors;
-	GetComponents<USceneComponent>(ChildActors);
-	for (auto Actor : ChildActors)
-	{
-		Actor->DetachFromParent(false, false);
-		Actor->DestroyComponent();
-	}
-
 	OnArenaFinished.ExecuteIfBound();
-	Destroy();
 }
 
 void AArena::OnEnemyDeath(ASuper_AI_Character* KilledAI)
