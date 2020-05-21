@@ -16,10 +16,6 @@ class SPLITSECOND_API ABoss1Base : public ASuper_Boss
 
 public:
 
-	/* Delay before the shoots his gun */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss Settings")
-	float GunShotDelay = 3;
-
 	/* Multiplier used for dashing */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Boss Settings")
 	float DashMultiplier = 1500;
@@ -36,17 +32,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Boss Settings")
 	void StartDashCooldown();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	class USphereComponent* DashCollision;
-
-	/* Impact normal on Dash Collision */
-	UPROPERTY(BlueprintReadOnly)
-	FVector BulletOverlapNormal = FVector(0);
-
-	ABoss1Base();
-
-	UFUNCTION()
-	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void Tick(float DeltaTime) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -56,7 +42,5 @@ private:
 
 	void OnCooldownEnd();
 
-	class AAIController* Controller = nullptr;
-
-	FVector GetLaunchDirection(FVector Normal);
+	class AAIController* AIController = nullptr;
 };

@@ -7,12 +7,6 @@
 #include "Components/SphereComponent.h"
 #include "TimerManager.h"
 
-ABoss1Base::ABoss1Base()
-{
-	DashCollision = CreateDefaultSubobject<USphereComponent>(TEXT("DashCollision"));
-	DashCollision->SetupAttachment(RootComponent);
-}
-
 void ABoss1Base::StartDashCooldown()
 {
 	bDashOnCooldown = true;
@@ -24,41 +18,25 @@ void ABoss1Base::OnCooldownEnd()
 	bDashOnCooldown = false;
 }
 
-void ABoss1Base::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (OtherActor)
-	{
-		BulletOverlapNormal = SweepResult.Normal;
-		UE_LOG(LogTemp, Log, TEXT("Normal %s"), *BulletOverlapNormal.ToString())
-
-		if (!bDashOnCooldown)
-		{
-			auto DashDirection = GetLaunchDirection(BulletOverlapNormal) * DashMultiplier;
-			UE_LOG(LogTemp, Log, TEXT("Direction %s"), *DashDirection.ToString())
-			
-			if (!ensure(Controller != nullptr)) { return; }
-			Controller->BrainComponent->StopLogic(TEXT("Starting Dash"));
-
-			LaunchCharacter(DashDirection, true, true);
-			BulletOverlapNormal = FVector(0);
-
-			Controller->BrainComponent->RestartLogic();
-			StartDashCooldown();
-		}
-	}
-}
-
 void ABoss1Base::BeginPlay()
 {
 	Super::BeginPlay();
 
-	DashCollision->OnComponentBeginOverlap.AddDynamic(this, &ABoss1Base::OnOverlapBegin);
-
-	Controller = Cast<AAIController>(GetController());
+	AIController = Cast<AAIController>(GetController());
 }
 
-FVector ABoss1Base::GetLaunchDirection(FVector Normal)
+void ABoss1Base::Tick(float DeltaTime)
 {
-	return FVector(0);
-}
+	Super::Tick(DeltaTime);
 
+	//if (!bDashOnCooldown)
+	//{
+	//	auto DashDirection = GetActorRightVector() * DashMultiplier;
+	//	AIController->BrainComponent->StopLogic(TEXT("Started Dash"));
+
+	//	LaunchCharacter(DashDirection, true, true);
+
+	//	AIController->BrainComponent->RestartLogic();
+	//	StartDashCooldown();
+	//}
+}
