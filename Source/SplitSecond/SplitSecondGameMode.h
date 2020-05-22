@@ -49,6 +49,8 @@ public:
 	UFUNCTION() void OnConfirmedPlayerDeath();
 
 private:
+	int32 ArenaNum = 1;
+
 	class ASplitSecondPlayerController* SplitSecondPlayerController;
 	class ASplitSecondPlayerState* SplitSecondPlayerState;
 	class APlayerCharacter* SplitSecondPlayerCharacter;

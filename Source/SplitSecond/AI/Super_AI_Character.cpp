@@ -99,6 +99,8 @@ void ASuper_AI_Character::Highlight(EHighlightType HighlightType)
     if (bIsSlowed) HighlightType = EHighlightType::Slow;
 
     float HealthPercentage = HealthComponent->GetHealth() / HealthComponent->GetMaxHealth();
+    HealthPercentage = FMath::Clamp<float>(HealthPercentage, MinEmmision, 1);
+
     GetMesh()->CreateAndSetMaterialInstanceDynamic(1)->SetScalarParameterValue(TEXT("Emission Multiplier"), HealthPercentage);
 
     switch (HighlightType)
@@ -144,6 +146,9 @@ void ASuper_AI_Character::Destroyed()
         CurrentGun->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
         CurrentGun->Destroy();
     }
+
+    OnDestroyed.Broadcast(this);
+
     Super::Destroy();
 }
 

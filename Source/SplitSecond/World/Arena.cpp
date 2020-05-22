@@ -177,7 +177,7 @@ void AArena::SpawnEnemies(int32 SpawnNum, TArray<UActorComponent*> SpawnLocation
 				SpawnedEnemies.Add(Spawned);
 				if (Spawned->IsA<AAI_TurretBase>())
 				{
-					Spawned->OnDeath.AddUniqueDynamic(this, &AArena::OnTurretDeath);
+					Spawned->OnDestroyed.AddUniqueDynamic(this, &AArena::OnTurretDeath);
 					SpawnedTurrets.Add(EnemySpawnLocationComponent, Spawned);
 				}
 			}
@@ -255,9 +255,12 @@ void AArena::FinishObjective()
 	// Destroy Enemies
 	for (auto EnemyToDestroy : SpawnedEnemies)
 	{
-		EnemyToDestroy->DetachFromActor(DetachRules);
-		EnemyToDestroy->DetachFromControllerPendingDestroy();
-		EnemyToDestroy->Destroy();
+		if (EnemyToDestroy)
+		{
+			EnemyToDestroy->DetachFromActor(DetachRules);
+			EnemyToDestroy->DetachFromControllerPendingDestroy();
+			EnemyToDestroy->Destroy();
+		}
 	}
 
 	///Prompt player into entering next level

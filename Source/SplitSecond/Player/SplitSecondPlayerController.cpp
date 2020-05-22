@@ -78,13 +78,20 @@ void ASplitSecondPlayerController::TraceForActorsToSlow()
 			{
 				if (!HoveredEnemy->GetIsSlowed())
 				{
+					HoveredEnemy->OnDestroyed.AddUniqueDynamic(this, &ASplitSecondPlayerController::OnSlowingTargetDeath);
 					HoveredEnemy->Highlight(EHighlightType::Highlight);
 				}
 			}
 		}
 	}
 }
-
+void ASplitSecondPlayerController::OnSlowingTargetDeath(ASuper_AI_Character* KilledAI)
+{
+	if (HoveredEnemy == KilledAI)
+	{
+		HoveredEnemy = nullptr;
+	}
+}
 FHitResult ASplitSecondPlayerController::LineTraceFromCamera(ECollisionChannel Collision)
 {
 	FHitResult HitResult;

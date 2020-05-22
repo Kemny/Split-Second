@@ -84,6 +84,7 @@ private:
 	UFUNCTION() void IncreaseSlow(float Value);
 
 	UFUNCTION() void SlowTarget();
+	UFUNCTION() void OnSlowingTargetDeath(class ASuper_AI_Character* KilledAI);
 
 	class ASplitSecondHUD* Hud;
 

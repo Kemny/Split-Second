@@ -98,7 +98,7 @@ void ASplitSecondGameMode::SpawnNextArena()
 
 	if (!ensure(PossibleArenas.Num() > 0)) { return; }
 
-	if (MyGameState->GetCurrentLevel() % 10 != 0)
+	if (ArenaNum % 10 != 0)
 	{
 		auto RoomIndex = FMath::RandRange(0, PossibleArenas.Num() - 1);
 		CurrentArena = GetWorld()->SpawnActor<AArena>(PossibleArenas[RoomIndex]);
@@ -119,6 +119,7 @@ void ASplitSecondGameMode::SpawnNextArena()
 			UNavigationSystemV1::GetNavigationSystem(GetWorld())->Build();
 		}
 	}
+	++ArenaNum;
 }
 
 void ASplitSecondGameMode::SpawnUpgradeScreen()
