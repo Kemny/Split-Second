@@ -18,6 +18,8 @@
 #include "BossSpawnLocation.h"
 #include "UObject/ConstructorHelpers.h"
 #include "TimerManager.h"
+#include "../Player/PlayerCharacter.h"
+#include "../UI/PlayerUI.h"
 
 // Sets default values
 AArena::AArena()
@@ -57,8 +59,9 @@ void AArena::SpawnActors()
 	if (!ensure(GetWorld()->GetFirstPlayerController() != nullptr)) { return; }
 	if (!ensure(GetWorld()->GetFirstPlayerController()->GetPawn() != nullptr)) { return; }
 
-	GetWorld()->GetFirstPlayerController()->GetPawn()->SetActorLocation(PlayerStartLocation->GetComponentLocation());
-
+	auto PlayerPawn = Cast<APlayerCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	if (!ensure(PlayerPawn != nullptr)) { return; }
+	PlayerPawn->SetActorLocation(PlayerStartLocation->GetComponentLocation());
 	TArray<TEnumAsByte<EObjectives>> OutKeys;
 	Objectives.GetKeys(OutKeys);
 	CurrentObjective = OutKeys[FMath::RandRange(0, OutKeys.Num() - 1)];
@@ -70,17 +73,21 @@ void AArena::SpawnActors()
 		case Survive:
 			GetWorldTimerManager().SetTimer(SurviveHandle, this, &AArena::FinishObjective, Settings->SurviveTime, false);
 			GetWorldTimerManager().SetTimer(SpawnEnemiesHandle, this, &AArena::SpawnNextEnemyWave, Settings->WaveInterval, true, 0);
+			PlayerPawn->GetPlayerUI()->SetObjectiveName(FString("Survive"));
 			break;
 		case ReachObjective:
 			GetWorldTimerManager().SetTimer(SpawnEnemiesHandle, this, &AArena::SpawnNextEnemyWave, Settings->WaveInterval, true, 0);
+			PlayerPawn->GetPlayerUI()->SetObjectiveName(FString("Reach the End"));
 			SetupObjective();
 			break;
 		case CaptureTheFlag:
 			GetWorldTimerManager().SetTimer(SpawnEnemiesHandle, this, &AArena::SpawnNextEnemyWave, Settings->WaveInterval, true, 0);
+			PlayerPawn->GetPlayerUI()->SetObjectiveName(FString("Capture The Flag"));
 			SetupFlag();
 			break;
 		case KillAllEnemies:
 			SetupKillAll();
+			PlayerPawn->GetPlayerUI()->SetObjectiveName(FString("Kill All Enemies"));
 			break;
 		default:
 			break;
@@ -130,13 +137,13 @@ void AArena::TryDeliverFlag()
 void AArena::SetupObjective()
 {
 	LocationTargetMesh->SetHiddenInGame(false);
-	if (auto ChildActor = LocationTargetMesh->GetChildActor())
-	{
-		auto Objective = Cast<ATargetLocation>(ChildActor);
-		if (!ensure(Objective != nullptr)) { return; }
-		Objective->SetActorEnableCollision(true);
-		Objective->OnTargetLocationCollision.BindUFunction(this, TEXT("FinishObjective"));
-	}
+	auto ChildActor = LocationTargetMesh->GetChildActor();
+	if (!ensure(ChildActor != nullptr)) { return; }
+	
+	auto Objective = Cast<ATargetLocation>(ChildActor);
+	if (!ensure(Objective != nullptr)) { return; }
+	Objective->SetActorEnableCollision(true);
+	Objective->OnTargetLocationCollision.BindUFunction(this, TEXT("FinishObjective"));
 }
 void AArena::SetupKillAll()
 {
@@ -170,7 +177,7 @@ void AArena::SpawnEnemies(int32 SpawnNum, TArray<UActorComponent*> SpawnLocation
 				SpawnedEnemies.Add(Spawned);
 				if (Spawned->IsA<AAI_TurretBase>())
 				{
-					Spawned->OnDeath.AddUniqueDynamic(this, &AArena::OnTurretDeath);
+					Spawned->OnDestroyed.AddUniqueDynamic(this, &AArena::OnTurretDeath);
 					SpawnedTurrets.Add(EnemySpawnLocationComponent, Spawned);
 				}
 			}
@@ -248,9 +255,12 @@ void AArena::FinishObjective()
 	// Destroy Enemies
 	for (auto EnemyToDestroy : SpawnedEnemies)
 	{
-		EnemyToDestroy->DetachFromActor(DetachRules);
-		EnemyToDestroy->DetachFromControllerPendingDestroy();
-		EnemyToDestroy->Destroy();
+		if (EnemyToDestroy)
+		{
+			EnemyToDestroy->DetachFromActor(DetachRules);
+			EnemyToDestroy->DetachFromControllerPendingDestroy();
+			EnemyToDestroy->Destroy();
+		}
 	}
 
 	///Prompt player into entering next level

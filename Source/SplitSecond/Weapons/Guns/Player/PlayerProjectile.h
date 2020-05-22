@@ -17,9 +17,25 @@ class SPLITSECOND_API APlayerProjectile : public ASplitSecondProjectile
 public:
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 
+
 	bool bIsExplosive = false;
-	bool bIsPiercing = false;
-	bool bShouldBounce = false;
+	UPROPERTY(EditAnywhere) 
+	bool bIsPiercing = false; // TODO this is not getting set by the gamemode that needs to be fixed
+	UPROPERTY(EditAnywhere)
+	bool bShouldBounce = false; // TODO this is not getting set by the gamemode that needs to be fixed
 	int32 BounceNum = 3;
 	int32 CurrentBounce = 0;
+
+	/* If explosion upgrade is active this determines how long the effect is up for */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Upgrade Settings")
+	float ExplosionUpTime = 1;
+
+	/* If explosion upgrade is active this the explosion that will spawn */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Upgrade Settings")
+	TSubclassOf<class AProjectile_Explosion> ExplosionToSpawn;
+
+	virtual void OnBulletHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
+
+protected:
+	virtual void BeginPlay() override;
 };

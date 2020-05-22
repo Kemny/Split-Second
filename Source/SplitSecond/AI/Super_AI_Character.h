@@ -79,6 +79,7 @@ public:
     bool bIsDead = false;
 
     FAIDeathDelegate OnDeath;
+    FAIDeathDelegate OnDestroyed;
 
 protected:
     // Called when the game starts or when spawned
@@ -95,9 +96,11 @@ protected:
     FLinearColor HighlightColor = FLinearColor(0, 1, 1, 1);
     UPROPERTY(EditAnywhere, Category = "Colors")
     FLinearColor SlowedColor = FLinearColor::Blue;
+    UPROPERTY(EditAnywhere, Category = "Colors")
+    float MinEmmision = 0.3;
 
     UPROPERTY(EditAnywhere, Category = "Health")
-    float DeathDespawnTime = 30;
+    float DeathDespawnTime = 5;
 
 private:
     bool bIsSlowed = false;

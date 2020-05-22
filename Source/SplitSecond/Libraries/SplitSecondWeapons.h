@@ -36,6 +36,11 @@ public:
 
     ///Player
     UPROPERTY(EditAnywhere)bool bCanThrowGun = false;
+    UPROPERTY(EditAnywhere)float ActorSlowValue = 0.1;
+    UPROPERTY(EditAnywhere)float ActorSlowDuration = 3;
+    UPROPERTY(EditAnywhere)float GameSlowDuration = 3;
+    UPROPERTY(EditAnywhere)float GameSlowValue = 0.4;
+    UPROPERTY(EditAnywhere)float GameSlowCooldown = 10;
     UPROPERTY(EditAnywhere, meta = (UIMin = '1'))int32 MaxJumps = 1;
 };
 USTRUCT(BlueprintType)
@@ -60,6 +65,11 @@ public:
 
     ///Player
     UPROPERTY(EditAnywhere)bool bCanThrowGun = false;
+    UPROPERTY(EditAnywhere)float ActorSlowValue = 0.1;
+    UPROPERTY(EditAnywhere)float ActorSlowDuration = 3;
+    UPROPERTY(EditAnywhere)float GameSlowDuration = 3;
+    UPROPERTY(EditAnywhere)float GameSlowValue = 0.4;
+    UPROPERTY(EditAnywhere)float GameSlowCooldown = 10;
 
     UPROPERTY(EditAnywhere)int32 BulletNum = 5;
     UPROPERTY(EditAnywhere)float BulletSpread = 200;
@@ -86,6 +96,11 @@ public:
 
     ///Player
     UPROPERTY(EditAnywhere)bool bCanThrowGun = false;
+    UPROPERTY(EditAnywhere)float ActorSlowValue = 0.1;
+    UPROPERTY(EditAnywhere)float ActorSlowDuration = 3;
+    UPROPERTY(EditAnywhere)float GameSlowDuration = 3;
+    UPROPERTY(EditAnywhere)float GameSlowValue = 0.4;
+    UPROPERTY(EditAnywhere)float GameSlowCooldown = 10;
 
     UPROPERTY(EditAnywhere)float BowDrawSpeed = 0.01;
     UPROPERTY(EditAnywhere)float MinimalDrawValue = 0.3;
@@ -106,6 +121,11 @@ public:
     ///Player
     UPROPERTY(EditAnywhere)bool bHasExtraLife = false;
     UPROPERTY(EditAnywhere)bool bCanThrowGun = false;
+    UPROPERTY(EditAnywhere)float ActorSlowValue = 0.1;
+    UPROPERTY(EditAnywhere)float ActorSlowDuration = 3;
+    UPROPERTY(EditAnywhere)float GameSlowDuration = 3;
+    UPROPERTY(EditAnywhere)float GameSlowValue = 0.4;
+    UPROPERTY(EditAnywhere)float GameSlowCooldown = 10;
 
     UPROPERTY(EditAnywhere)int32 Ammo = 999;
     UPROPERTY(EditAnywhere)int32 MaxAmmo = 999;
@@ -137,8 +157,14 @@ public:
         bIsHoming = Defaults.bIsHoming;
         bIsBouncing = Defaults.bIsBouncing;
         bExplodingBullets = Defaults.bExplodingBullets;
+        bHasExtraLife = Defaults.bExtraLife;
 
         bCanThrowGun = Defaults.bCanThrowGun;
+        ActorSlowValue = Defaults.ActorSlowValue;
+        ActorSlowDuration = Defaults.ActorSlowDuration;
+        GameSlowDuration = Defaults.GameSlowDuration;
+        GameSlowValue = Defaults.GameSlowValue;
+        GameSlowCooldown = Defaults.GameSlowCooldown;
 
         MaxAmmo = Defaults.MaxAmmo;
         Ammo = MaxAmmo;
@@ -155,8 +181,14 @@ public:
         bIsHoming = Defaults.bIsHoming;
         bIsBouncing = Defaults.bIsBouncing;
         bExplodingBullets = Defaults.bExplodingBullets;
+        bHasExtraLife = Defaults.bExtraLife;
 
         bCanThrowGun = Defaults.bCanThrowGun;
+        ActorSlowValue = Defaults.ActorSlowValue;
+        ActorSlowDuration = Defaults.ActorSlowDuration;
+        GameSlowDuration = Defaults.GameSlowDuration;
+        GameSlowValue = Defaults.GameSlowValue;
+        GameSlowCooldown = Defaults.GameSlowCooldown;
 
         MaxAmmo = Defaults.MaxAmmo;
         Ammo = MaxAmmo;
@@ -174,7 +206,14 @@ public:
         bIsHoming = Defaults.bIsHoming;
         bIsBouncing = Defaults.bIsBouncing;
         bExplodingBullets = Defaults.bExplodingBullets;
+        bHasExtraLife = Defaults.bExtraLife;
+
         bCanThrowGun = Defaults.bCanThrowGun;
+        ActorSlowValue = Defaults.ActorSlowValue;
+        ActorSlowDuration = Defaults.ActorSlowDuration;
+        GameSlowDuration = Defaults.GameSlowDuration;
+        GameSlowValue = Defaults.GameSlowValue;
+        GameSlowCooldown = Defaults.GameSlowCooldown;
 
         MaxAmmo = Defaults.MaxAmmo;
         Ammo = MaxAmmo;

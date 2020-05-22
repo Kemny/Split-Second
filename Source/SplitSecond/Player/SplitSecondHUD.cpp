@@ -11,7 +11,7 @@
 ASplitSecondHUD::ASplitSecondHUD()
 {
 	// Set the crosshair texture
-	static ConstructorHelpers::FObjectFinder<UTexture2D> CrosshairTexObj(TEXT("/Game/Textures/FirstPersonCrosshair"));
+	static ConstructorHelpers::FObjectFinder<UTexture2D> CrosshairTexObj(TEXT("/Game/Textures/T_FirstPersonCrosshair"));
 	CrosshairTex = CrosshairTexObj.Object;
 
 	static ConstructorHelpers::FClassFinder<UDebugMenu> BP_DebugMenuClass(TEXT("/Game/Blueprint/UI/WBP_DebugMenu"));

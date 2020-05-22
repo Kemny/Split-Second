@@ -12,6 +12,9 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "../SplitSecondPlayerState.h"
+#include "PlayerCharacter.h"
+#include "../UI/PlayerUI.h"
+#include "../SplitSecondPlayerState.h"
 
 ASplitSecondPlayerController::ASplitSecondPlayerController()
 {
@@ -40,6 +43,7 @@ void ASplitSecondPlayerController::SetupInputComponent()
 	InputComponent->BindAxis(FName("DEBUG_IncreaseSlow"), this, &ASplitSecondPlayerController::IncreaseSlow);
 
 	InputComponent->BindAction(FName("Ability_SlowTarget"), EInputEvent::IE_Pressed, this, &ASplitSecondPlayerController::SlowTarget);
+	InputComponent->BindAction(FName("Ability_SlowGame"), EInputEvent::IE_Pressed, this, &ASplitSecondPlayerController::SlowGame);
 }
 void ASplitSecondPlayerController::Tick(float DeltaTime)
 {
@@ -76,13 +80,55 @@ void ASplitSecondPlayerController::TraceForActorsToSlow()
 			{
 				if (!HoveredEnemy->GetIsSlowed())
 				{
+					HoveredEnemy->OnDestroyed.AddUniqueDynamic(this, &ASplitSecondPlayerController::OnSlowingTargetDeath);
 					HoveredEnemy->Highlight(EHighlightType::Highlight);
 				}
 			}
 		}
 	}
 }
+void ASplitSecondPlayerController::OnSlowingTargetDeath(ASuper_AI_Character* KilledAI)
+{
+	if (HoveredEnemy == KilledAI)
+	{
+		HoveredEnemy = nullptr;
+	}
+}
+void ASplitSecondPlayerController::SlowTarget()
+{
+	auto SplitSecondPlayerState = GetPawn()->GetPlayerState<ASplitSecondPlayerState>();
+	if (!ensure(PlayerState != nullptr)) { return; }
+	if (HoveredEnemy)
+	{
+		HoveredEnemy->GetSlowed(SplitSecondPlayerState->CurrentStats.ActorSlowDuration, SplitSecondPlayerState->CurrentStats.ActorSlowValue);
 
+		auto PlayerPawn = GetPawn<APlayerCharacter>();
+		if (!ensure(PlayerPawn != nullptr)) { return; }
+		PlayerPawn->GetPlayerUI()->ActivateEnemySlow(SplitSecondPlayerState->CurrentStats.ActorSlowDuration);
+	}
+}
+void ASplitSecondPlayerController::SlowGame()
+{
+	if (GameSlowOnCooldown) return;
+
+	GameSlowOnCooldown = true;
+
+	auto SplitSecondPlayerState = GetPawn()->GetPlayerState<ASplitSecondPlayerState>();
+	if (!ensure(PlayerState != nullptr)) { return; }
+
+	auto PlayerPawn = GetPawn<APlayerCharacter>();
+	if (!ensure(PlayerPawn != nullptr)) { return; }
+	PlayerPawn->GetPlayerUI()->ActivateTimeSlow(SplitSecondPlayerState->CurrentStats.GameSlowCooldown);
+
+	FTimerHandle Handle;
+	GetWorldTimerManager().SetTimer(Handle, this, &ASplitSecondPlayerController::OnGameSlowCooldownFinished, SplitSecondPlayerState->CurrentStats.GameSlowCooldown, false);
+
+	OnPlayerSlowGame.ExecuteIfBound();
+}
+void ASplitSecondPlayerController::OnGameSlowCooldownFinished()
+{
+	GameSlowOnCooldown = false;
+}
 FHitResult ASplitSecondPlayerController::LineTraceFromCamera(ECollisionChannel Collision)
 {
 	FHitResult HitResult;
@@ -110,13 +156,7 @@ void ASplitSecondPlayerController::IncreaseSlow(float Value)
 	GetWorldSettings()->SetTimeDilation(UGameplayStatics::GetGlobalTimeDilation(GetWorld()) + Value *0.01);
 }
 
-void ASplitSecondPlayerController::SlowTarget()
-{
-	if (HoveredEnemy)
-	{
-		HoveredEnemy->GetSlowed(ActorSlowDuration, ActorSlowValue);
-	}
-}
+
 
 bool ASplitSecondPlayerController::InputAxis(FKey Key, float Delta, float DeltaTime, int32 NumSamples, bool bGamepad)
 {

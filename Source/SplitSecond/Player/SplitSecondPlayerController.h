@@ -9,7 +9,7 @@
 
 #include "SplitSecondPlayerController.generated.h"
 
-DECLARE_DYNAMIC_DELEGATE(FPlayerDeathDelegate);
+DECLARE_DYNAMIC_DELEGATE(FPlayerControllerDelegate);
 
 UCLASS()
 class SPLITSECOND_API ASplitSecondPlayerController : public APlayerController
@@ -21,8 +21,9 @@ public:
   ASplitSecondPlayerController();
 
 
-  FPlayerDeathDelegate OnPlayerDeath;
-  FPlayerDeathDelegate OnPlayerConfirmedDeath;
+  FPlayerControllerDelegate OnPlayerDeath;
+  FPlayerControllerDelegate OnPlayerConfirmedDeath;
+  FPlayerControllerDelegate OnPlayerSlowGame;
 
   /** Can be called to check and see if the player is currently using a gamepad */
   UPROPERTY(Transient, BlueprintReadOnly, Category = "Gamepad Settings")
@@ -55,9 +56,6 @@ public:
   void HandlePlayerConfirmedDeath();
 
 protected:
-	UPROPERTY(EditAnywhere, Category = "Time Manipulation") float ActorSlowDuration = 3;
-	UPROPERTY(EditAnywhere, Category = "Time Manipulation") float ActorSlowValue = 0.1;
-
   /** Common logic needed in both `InputAxis()` and `InputKey()` */
   FORCEINLINE void _UpdateGamepad(bool bGamepad)
   {
@@ -74,6 +72,8 @@ protected:
   float LastGamepadInputTime;
 
 private:
+	bool GameSlowOnCooldown = false;
+
 	void BeginPlay() override;
 	void SetupInputComponent() override;
 	void Tick(float DeltaTime) override;
@@ -84,10 +84,13 @@ private:
 	UFUNCTION() void IncreaseSlow(float Value);
 
 	UFUNCTION() void SlowTarget();
-
+	UFUNCTION() void OnSlowingTargetDeath(class ASuper_AI_Character* KilledAI);
+	UFUNCTION() void SlowGame();
+	
 	class ASplitSecondHUD* Hud;
-
 	class ASuper_AI_Character* HoveredEnemy;
+
+	UFUNCTION() void OnGameSlowCooldownFinished();
 
 };
 

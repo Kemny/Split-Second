@@ -49,17 +49,23 @@ public:
 	UFUNCTION() void OnConfirmedPlayerDeath();
 
 private:
+	int32 ArenaNum = 1;
+
 	class ASplitSecondPlayerController* SplitSecondPlayerController;
 	class ASplitSecondPlayerState* SplitSecondPlayerState;
 	class APlayerCharacter* SplitSecondPlayerCharacter;
 
 	class AArena* CurrentArena;
+	TArray<AActor*> SlowedActors;
 
 	TSubclassOf<class ASuper_Gun> PistolClass;
 	TSubclassOf<class ASuper_Gun> ShotgunClass;
 	TSubclassOf<class ASuper_Gun> BowClass;
 
 	TSubclassOf<class UUpgradeSelection> UpgradeSelectionClass;
+
+	UFUNCTION() void PlayerSlowGame();
+	UFUNCTION() void StopPlayerSlowGame();
 };
 
 
