@@ -172,24 +172,21 @@ void ASplitSecondGameMode::PlayerSlowGame()
 {
 	if (!ensure(SplitSecondPlayerState != nullptr)) { return; }
 
-	// Found Actors are currently always 0
 	TArray<AActor*> FoundActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), TSubclassOf<ASuper_AI_Character>(), FoundActors);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASuper_AI_Character::StaticClass(), FoundActors);
 	for (auto FoundActor : FoundActors)
 	{
 		FoundActor->CustomTimeDilation = SplitSecondPlayerState->CurrentStats.GameSlowValue;
 		SlowedActors.Add(FoundActor);
-		UE_LOG(LogTemp, Warning, TEXT("Log message1"));
 	}
 
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), TSubclassOf<ASplitSecondProjectile>(), FoundActors);
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASuper_AI_Character::StaticClass(), FoundActors);
 	UE_LOG(LogTemp, Warning, TEXT("%i"), FoundActors.Num());
 
 	for (auto FoundActor : FoundActors)
 	{
 		FoundActor->CustomTimeDilation = SplitSecondPlayerState->CurrentStats.GameSlowValue;
 		SlowedActors.Add(FoundActor);
-		UE_LOG(LogTemp, Warning, TEXT("Log message2"));
 	}
 
 	FTimerHandle Handle;
