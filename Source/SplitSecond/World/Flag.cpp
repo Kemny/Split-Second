@@ -19,9 +19,12 @@ AFlag::AFlag()
 	Capsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
 	Capsule->SetupAttachment(Root);
 	Capsule->OnComponentBeginOverlap.AddUniqueDynamic(this, &AFlag::OnCollision);
+	Capsule->SetCapsuleRadius(80);
+	Capsule->SetCapsuleHalfHeight(100);
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	Mesh->SetupAttachment(Capsule);
+	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	ConstructorHelpers::FObjectFinder<UStaticMesh> BP_Tablet(TEXT("/Game/Meshes/SM_Tablet"));
 	if (BP_Tablet.Object) Mesh->SetStaticMesh(BP_Tablet.Object);
