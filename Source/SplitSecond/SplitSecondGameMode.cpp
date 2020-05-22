@@ -184,7 +184,6 @@ void ASplitSecondGameMode::PlayerSlowGame()
 
 	TArray<AActor*> FoundProjectiles;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAIProjectile::StaticClass(), FoundProjectiles);
-	UE_LOG(LogTemp, Log, TEXT("%i"), FoundProjectiles.Num())
 
 	for (auto FoundProjectile : FoundProjectiles)
 	{
@@ -201,8 +200,8 @@ void ASplitSecondGameMode::PlayerSlowGame()
 		SlowedActors.Add(FoundTrap);
 	}
 
-	//FTimerHandle Handle;
-	//GetWorldTimerManager().SetTimer(Handle, this, &ASplitSecondGameMode::StopPlayerSlowGame, SplitSecondPlayerState->CurrentStats.GameSlowDuration, false);
+	FTimerHandle Handle;
+	GetWorldTimerManager().SetTimer(Handle, this, &ASplitSecondGameMode::StopPlayerSlowGame, SplitSecondPlayerState->CurrentStats.GameSlowDuration, false);
 }
 void ASplitSecondGameMode::StopPlayerSlowGame()
 {
