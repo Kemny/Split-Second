@@ -137,6 +137,7 @@ public:
         bIsHoming = Defaults.bIsHoming;
         bIsBouncing = Defaults.bIsBouncing;
         bExplodingBullets = Defaults.bExplodingBullets;
+        bHasExtraLife = Defaults.bExtraLife;
 
         bCanThrowGun = Defaults.bCanThrowGun;
 
@@ -155,6 +156,7 @@ public:
         bIsHoming = Defaults.bIsHoming;
         bIsBouncing = Defaults.bIsBouncing;
         bExplodingBullets = Defaults.bExplodingBullets;
+        bHasExtraLife = Defaults.bExtraLife;
 
         bCanThrowGun = Defaults.bCanThrowGun;
 
@@ -175,6 +177,7 @@ public:
         bIsBouncing = Defaults.bIsBouncing;
         bExplodingBullets = Defaults.bExplodingBullets;
         bCanThrowGun = Defaults.bCanThrowGun;
+        bHasExtraLife = Defaults.bExtraLife;
 
         MaxAmmo = Defaults.MaxAmmo;
         Ammo = MaxAmmo;

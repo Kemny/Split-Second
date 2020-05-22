@@ -184,18 +184,28 @@ void APlayerCharacter::ResetDash()
 void APlayerCharacter::OnTakeDamage()
 {
     if (!ensure(PlayerUI != nullptr)) { return; }
+    if (!ensure(PlayerState != nullptr)) { return; }
+
     PlayerUI->UpdateHealth(HealthComponent->GetHealth(), HealthComponent->GetMaxHealth());
     if (HealthComponent->GetHealth() <= 0 && !bIsInvinclible)
     {
-        if (!ensure(PlayerController != nullptr)) { return; }
-
-        PlayerUI->RemoveFromParent();
-        PlayerController->HandlePlayerDeath();
-
-        if (auto Message = CreateWidget<UPopupMessage>(GetWorld(), PopupMessageClass))
+        if (PlayerState->CurrentStats.bHasExtraLife)
         {
-            Message->ShowPopupMessage(FKey("F"), FText::FromString("YOU DIED \n PRESS F TO RESTART"));
-            Message->OnConditionFufilled.BindUFunction(this, TEXT("OnConfirmedDeath"));
+            HealthComponent->Heal(HealthComponent->GetMaxHealth());
+            PlayerState->CurrentStats.bHasExtraLife = false;
+        }
+        else
+        {
+            if (!ensure(PlayerController != nullptr)) { return; }
+
+            PlayerUI->RemoveFromParent();
+            PlayerController->HandlePlayerDeath();
+
+            if (auto Message = CreateWidget<UPopupMessage>(GetWorld(), PopupMessageClass))
+            {
+                Message->ShowPopupMessage(FKey("F"), FText::FromString("YOU DIED \n PRESS F TO RESTART"));
+                Message->OnConditionFufilled.BindUFunction(this, TEXT("OnConfirmedDeath"));
+            }
         }
     }
 }
