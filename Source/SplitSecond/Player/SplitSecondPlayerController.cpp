@@ -12,6 +12,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "../SplitSecondPlayerState.h"
+#include "PlayerCharacter.h"
+#include "../UI/PlayerUI.h"
 
 ASplitSecondPlayerController::ASplitSecondPlayerController()
 {
@@ -115,6 +117,10 @@ void ASplitSecondPlayerController::SlowTarget()
 	if (HoveredEnemy)
 	{
 		HoveredEnemy->GetSlowed(ActorSlowDuration, ActorSlowValue);
+
+		auto PlayerPawn = GetPawn<APlayerCharacter>();
+		if (!ensure(PlayerPawn != nullptr)) { return; }
+		PlayerPawn->GetPlayerUI()->ActivateEnemySlow(ActorSlowDuration);
 	}
 }
 
