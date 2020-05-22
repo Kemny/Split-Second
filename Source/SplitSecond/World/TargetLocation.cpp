@@ -3,7 +3,9 @@
 #include "TargetLocation.h"
 #include "Components/SceneComponent.h"
 #include "Components/SphereComponent.h"
-
+#include "UObject/ConstructorHelpers.h"
+#include "Particles/ParticleSystem.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
 
@@ -18,10 +20,14 @@ ATargetLocation::ATargetLocation()
 	Sphere = CreateDefaultSubobject<USphereComponent>(TEXT("Capsule"));
 	Sphere->SetupAttachment(Root);
 	Sphere->OnComponentBeginOverlap.AddUniqueDynamic(this, &ATargetLocation::OnCollision);
-	Sphere->SetSphereRadius(1000);
+	Sphere->SetSphereRadius(200);
 
-	//TODO Add Particles
+	ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystem_Class(TEXT("/Game/Particles/P_Objective_Circle"));
+	if (ParticleSystem_Class.Object) ParticleSystem = ParticleSystem_Class.Object;
 
+	ParticleSystemComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("Particle System Component"));
+	ParticleSystemComponent->SetupAttachment(RootComponent);
+	ParticleSystemComponent->SetTemplate(ParticleSystem);
 }
 
 void ATargetLocation::OnCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

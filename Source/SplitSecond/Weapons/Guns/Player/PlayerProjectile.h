@@ -35,7 +35,4 @@ public:
 	TSubclassOf<class AProjectile_Explosion> ExplosionToSpawn;
 
 	virtual void OnBulletHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
-
-protected:
-	virtual void BeginPlay() override;
 };

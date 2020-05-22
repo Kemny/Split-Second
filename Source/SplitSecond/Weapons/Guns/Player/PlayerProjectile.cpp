@@ -68,17 +68,3 @@ void APlayerProjectile::OnBulletHit_Implementation(UPrimitiveComponent* HitComp,
 		Super::OnBulletHit_Implementation(HitComp, OtherActor, OtherComp, NormalImpulse, Hit);
 	}
 }
-
-void APlayerProjectile::BeginPlay()
-{
-	Super::BeginPlay();
-
-	if (bIsPiercing)
-	{
-		GetCollisionComp()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	}
-	else
-	{
-		GetCollisionComp()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
-	}
-}

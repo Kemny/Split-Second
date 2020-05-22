@@ -170,12 +170,14 @@ void ASplitSecondGameMode::PostLogin(APlayerController* NewPlayer)
 	}
 
 }
+
 void ASplitSecondGameMode::PlayerSlowGame()
 {
 	if (!ensure(SplitSecondPlayerState != nullptr)) { return; }
 
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASuper_AI_Character::StaticClass(), FoundActors);
+
 	for (auto FoundActor : FoundActors)
 	{
 		FoundActor->CustomTimeDilation = SplitSecondPlayerState->CurrentStats.GameSlowValue;
@@ -203,6 +205,7 @@ void ASplitSecondGameMode::PlayerSlowGame()
 	FTimerHandle Handle;
 	GetWorldTimerManager().SetTimer(Handle, this, &ASplitSecondGameMode::StopPlayerSlowGame, SplitSecondPlayerState->CurrentStats.GameSlowDuration, false);
 }
+
 void ASplitSecondGameMode::StopPlayerSlowGame()
 {
 	for (auto SlowedActor : SlowedActors)
@@ -213,6 +216,7 @@ void ASplitSecondGameMode::StopPlayerSlowGame()
 		}
 	}
 }
+
 void ASplitSecondGameMode::OnPlayerDeath()
 {
 	///This triggers immediately after the player dies
