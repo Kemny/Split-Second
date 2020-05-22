@@ -4,10 +4,16 @@
 #include "Projectile_Explosion.h"
 #include "GameFramework/DamageType.h"
 #include "Kismet/GameplayStatics.h"
+#include "../../BulletMovementComponent.h"
 #include "Components/SphereComponent.h"
 #include "../../../Player/PlayerCharacter.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+
+APlayerProjectile::APlayerProjectile()
+{
+	bShouldBounce = GetProjectileMovement()->bShouldBounce;
+}
 
 void APlayerProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
@@ -38,7 +44,7 @@ void APlayerProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NiagaraSystem, Hit.TraceStart, GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
 		}
 
-		if (!bShouldBounce)
+		if (!bShouldBounce && !bIsExplosive)
 		{
 			Destroy();
 		}
@@ -47,7 +53,7 @@ void APlayerProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 
 void APlayerProjectile::OnBulletHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (bShouldBounce)
+	if (GetProjectileMovement()->bShouldBounce)
 	{
 		CalcReflection(Hit);
 		++CurrentBounce;

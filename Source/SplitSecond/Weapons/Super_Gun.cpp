@@ -9,8 +9,9 @@
 #include "../AI/Super_AI_Character.h"
 #include "../Player/SplitSecondPlayerController.h"
 #include "TimerManager.h"
+#include "Components/SphereComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
-
+#include "SplitSecondProjectile.h"
 #include "Guns/Player/PlayerProjectile.h"
 #include "BulletMovementComponent.h"
 #include "../SplitSecondPlayerState.h"
@@ -59,31 +60,47 @@ ACharacter* ASuper_Gun::GetCurrentPawn() const
   return CurrentPawn;
 }
 
+void ASuper_Gun::SetupPiercingCollison()
+{
+    if (!ensure(CurrentProjectile != nullptr)) { return; }
+
+    if (CurrentProjectile->bIsPiercing)
+    {
+        CurrentProjectile->GetCollisionComp()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+    }
+}
+
 APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector const& Location, FRotator const& Rotation, const FActorSpawnParameters& SpawnParameters)
 {
-    if (auto Spawned = GetWorld()->SpawnActor<APlayerProjectile>(ProjectileClass, Location, Rotation, SpawnParameters))
+    CurrentProjectile = GetWorld()->SpawnActor<APlayerProjectile>(ProjectileClass, Location, Rotation, SpawnParameters);
+
+    if (CurrentProjectile)
     {
         if (auto PlayerCharacter = Cast<APlayerCharacter>(GetCurrentPawn()))
         {
             auto Upgrades = PlayerCharacter->GetPlayerStateChecked<ASplitSecondPlayerState>()->CurrentStats;
 
-            Spawned->DamageValue = Upgrades.Damage;
-            Spawned->GetProjectileMovement()->InitialSpeed = Upgrades.ProjectileSpeed;
+            CurrentProjectile->DamageValue = Upgrades.Damage;
+            CurrentProjectile->GetProjectileMovement()->InitialSpeed = Upgrades.ProjectileSpeed;
 
-            
-            Spawned->bIsPiercing = Upgrades.bIsPiercing;
-            Spawned->bIsExplosive = Upgrades.bExplodingBullets;
+            CurrentProjectile->bIsPiercing = Upgrades.bIsPiercing;
+            if (CurrentProjectile->bIsPiercing)
+            {
+                SetupPiercingCollison();
+            }
+
+            CurrentProjectile->bIsExplosive = Upgrades.bExplodingBullets;
 
             if (Upgrades.bIsBouncing)
             {
-                Spawned->GetProjectileMovement()->bShouldBounce = true;
+                CurrentProjectile->GetProjectileMovement()->bShouldBounce = true;
             }
             if (Upgrades.bIsHoming)
             {
-                Spawned->GetProjectileMovement()->bIsHomingProjectile = true;
+                CurrentProjectile->GetProjectileMovement()->bIsHomingProjectile = true;
             }
         }
-        return Spawned;
+        return CurrentProjectile;
     }
 
     return nullptr;

@@ -19,12 +19,12 @@ public:
 
 
 	bool bIsExplosive = false;
-	UPROPERTY(EditAnywhere) 
-	bool bIsPiercing = false; // TODO this is not getting set by the gamemode that needs to be fixed
-	UPROPERTY(EditAnywhere)
-	bool bShouldBounce = false; // TODO this is not getting set by the gamemode that needs to be fixed
+	bool bIsPiercing = false;
+	bool bShouldBounce = false;
 	int32 BounceNum = 3;
 	int32 CurrentBounce = 0;
+
+	APlayerProjectile();
 
 	/* If explosion upgrade is active this determines how long the effect is up for */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Upgrade Settings")

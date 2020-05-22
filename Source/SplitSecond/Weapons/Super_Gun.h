@@ -56,6 +56,10 @@ public:
 
   virtual class UStaticMeshComponent* GetGunMesh() const { return GunMesh; }
 
+  void SetupPiercingCollison();
+
+  class APlayerProjectile* CurrentProjectile;
+
 protected:
     ACharacter* CurrentPawn;
     class ASplitSecondPlayerState* PlayerState;
