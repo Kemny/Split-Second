@@ -14,6 +14,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "UI/UpgradeSelection.h"
+#include "AI/Super_AI_Character.h"
+#include "Weapons/SplitSecondProjectile.h"
 
 ASplitSecondGameMode::ASplitSecondGameMode()
 	: Super()
@@ -156,6 +158,7 @@ void ASplitSecondGameMode::PostLogin(APlayerController* NewPlayer)
 
 		SplitSecondPlayerController->OnPlayerDeath.BindUFunction(this, TEXT("OnPlayerDeath"));
 		SplitSecondPlayerController->OnPlayerConfirmedDeath.BindUFunction(this, TEXT("OnConfirmedPlayerDeath"));
+		SplitSecondPlayerController->OnPlayerSlowGame.BindUFunction(this, TEXT("PlayerSlowGame"));
 
 		SplitSecondPlayerState = SplitSecondPlayerController->GetPlayerState<ASplitSecondPlayerState>();
 		if (!ensure(SplitSecondPlayerState != nullptr)) { return; }
@@ -165,7 +168,43 @@ void ASplitSecondGameMode::PostLogin(APlayerController* NewPlayer)
 	}
 
 }
+void ASplitSecondGameMode::PlayerSlowGame()
+{
+	if (!ensure(SplitSecondPlayerState != nullptr)) { return; }
 
+	// Found Actors are currently always 0
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), TSubclassOf<ASuper_AI_Character>(), FoundActors);
+	for (auto FoundActor : FoundActors)
+	{
+		FoundActor->CustomTimeDilation = SplitSecondPlayerState->CurrentStats.GameSlowValue;
+		SlowedActors.Add(FoundActor);
+		UE_LOG(LogTemp, Warning, TEXT("Log message1"));
+	}
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), TSubclassOf<ASplitSecondProjectile>(), FoundActors);
+	UE_LOG(LogTemp, Warning, TEXT("%i"), FoundActors.Num());
+
+	for (auto FoundActor : FoundActors)
+	{
+		FoundActor->CustomTimeDilation = SplitSecondPlayerState->CurrentStats.GameSlowValue;
+		SlowedActors.Add(FoundActor);
+		UE_LOG(LogTemp, Warning, TEXT("Log message2"));
+	}
+
+	FTimerHandle Handle;
+	GetWorldTimerManager().SetTimer(Handle, this, &ASplitSecondGameMode::StopPlayerSlowGame, SplitSecondPlayerState->CurrentStats.GameSlowDuration, false);
+}
+void ASplitSecondGameMode::StopPlayerSlowGame()
+{
+	for (auto SlowedActor : SlowedActors)
+	{
+		if (SlowedActor)
+		{
+			SlowedActor->CustomTimeDilation = 1;
+		}
+	}
+}
 void ASplitSecondGameMode::OnPlayerDeath()
 {
 	///This triggers immediately after the player dies
