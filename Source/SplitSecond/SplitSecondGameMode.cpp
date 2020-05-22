@@ -16,6 +16,8 @@
 #include "UI/UpgradeSelection.h"
 #include "AI/Super_AI_Character.h"
 #include "Weapons/SplitSecondProjectile.h"
+#include "Weapons/Guns/AI/AIProjectile.h"
+#include "World/Traps/SuperTrap.h"
 
 ASplitSecondGameMode::ASplitSecondGameMode()
 	: Super()
@@ -180,17 +182,27 @@ void ASplitSecondGameMode::PlayerSlowGame()
 		SlowedActors.Add(FoundActor);
 	}
 
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASuper_AI_Character::StaticClass(), FoundActors);
-	UE_LOG(LogTemp, Warning, TEXT("%i"), FoundActors.Num());
+	TArray<AActor*> FoundProjectiles;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAIProjectile::StaticClass(), FoundProjectiles);
+	UE_LOG(LogTemp, Log, TEXT("%i"), FoundProjectiles.Num())
 
-	for (auto FoundActor : FoundActors)
+	for (auto FoundProjectile : FoundProjectiles)
 	{
-		FoundActor->CustomTimeDilation = SplitSecondPlayerState->CurrentStats.GameSlowValue;
-		SlowedActors.Add(FoundActor);
+		FoundProjectile->CustomTimeDilation = SplitSecondPlayerState->CurrentStats.GameSlowValue;
+		SlowedActors.Add(FoundProjectile);
 	}
 
-	FTimerHandle Handle;
-	GetWorldTimerManager().SetTimer(Handle, this, &ASplitSecondGameMode::StopPlayerSlowGame, SplitSecondPlayerState->CurrentStats.GameSlowDuration, false);
+	TArray<AActor*> FoundTraps;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASuperTrap::StaticClass(), FoundTraps);
+
+	for (auto FoundTrap : FoundTraps)
+	{
+		FoundTrap->CustomTimeDilation = SplitSecondPlayerState->CurrentStats.GameSlowValue;
+		SlowedActors.Add(FoundTrap);
+	}
+
+	//FTimerHandle Handle;
+	//GetWorldTimerManager().SetTimer(Handle, this, &ASplitSecondGameMode::StopPlayerSlowGame, SplitSecondPlayerState->CurrentStats.GameSlowDuration, false);
 }
 void ASplitSecondGameMode::StopPlayerSlowGame()
 {
