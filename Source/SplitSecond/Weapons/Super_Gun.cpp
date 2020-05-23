@@ -144,7 +144,7 @@ void ASuper_Gun::StartRegen()
 {
     ReloadSpeed = PlayerState->CurrentStats.ReloadSpeed;
 
-    GetWorldTimerManager().SetTimer(ReloadTimer, this, &ASuper_Gun::RegenAmmo, ReloadSpeed, true, ReloadSpeed);
+    GetWorldTimerManager().SetTimer(ReloadTimer, this, &ASuper_Gun::RegenAmmo, 1/ReloadSpeed, true, ReloadSpeed);
 }
 
 void ASuper_Gun::RegenAmmo()
