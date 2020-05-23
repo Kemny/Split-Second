@@ -10,8 +10,6 @@ UENUM()
 enum EBossSpawnType
 {
 	Boss_1,
-	Boss_2,
-	Boss_3,
 };
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent), HideCategories = (Rendering, Tags, Replication, Activation, Cooking, Physics, LOD, Collision, Replication, AssetUserData, ComponentReplication, Variable))
@@ -34,9 +32,5 @@ public:
 	class UBoxComponent* BoxComponent;
 
 private:
-
 	TSubclassOf<AActor> Boss_1_Class;
-	TSubclassOf<AActor> Boss_2_Class;
-	TSubclassOf<AActor>	Boss_3_Class;
-		
 };

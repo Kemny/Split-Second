@@ -16,14 +16,8 @@ UBossSpawnLocation::UBossSpawnLocation()
 	BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	BoxComponent->SetCollisionResponseToAllChannels(ECR_Overlap);
 
-	ConstructorHelpers::FClassFinder<AActor> BP_Boss1_Class(TEXT("/Game/Blueprint/NPC/BP_Boss1"));
+	ConstructorHelpers::FClassFinder<AActor> BP_Boss1_Class(TEXT("/Game/Blueprint/NPC/BP_Boss"));
 	if (BP_Boss1_Class.Class) Boss_1_Class = BP_Boss1_Class.Class;
-
-	ConstructorHelpers::FClassFinder<AActor> BP_Boss2_Class(TEXT("/Game/Blueprint/NPC/BP_Boss2"));
-	if (BP_Boss2_Class.Class) Boss_2_Class = BP_Boss2_Class.Class;
-
-	ConstructorHelpers::FClassFinder<AActor> BP_Boss3_Class(TEXT("/Game/Blueprint/NPC/BP_Boss3"));
-	if (BP_Boss3_Class.Class) Boss_3_Class = BP_Boss3_Class.Class;
 }
 
 TSubclassOf<AActor> UBossSpawnLocation::GetCurrentTypeClass() const
@@ -32,12 +26,6 @@ TSubclassOf<AActor> UBossSpawnLocation::GetCurrentTypeClass() const
 	{
 	case Boss_1:
 		return Boss_1_Class;
-		break;
-	case Boss_2:
-		return Boss_2_Class;
-		break;
-	case Boss_3:
-		return Boss_3_Class;
 		break;
 	default:
 		return TSubclassOf<AActor>();
