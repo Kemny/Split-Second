@@ -47,6 +47,7 @@ public:
 	
 	UPROPERTY(EditAnywhere)float MinValue = 0;
 	UPROPERTY(EditAnywhere)float MaxValue = 1;
+	UPROPERTY(EditAnywhere)float MaxDigits = 1;
 };
 
 UCLASS()
@@ -62,6 +63,7 @@ public:
 protected:
 	UPROPERTY(EditAnywhere)
 	TMap<EArenaUpgrades, FUpgradeValue> UpgradeValues;
+
 	UPROPERTY(EditAnywhere)
 	int32 MAX_ATTEMPTS = 500;
 
@@ -165,14 +167,27 @@ private:
 	TMap<EBosssUpgrades, bool> BossUpgradeValues;
 	float UpgradeValue;
 
+	EArenaUpgrades OneUpgrade;
+	EArenaUpgrades TwoUpgrade;
+	EArenaUpgrades ThreeUpgrade;
+	EArenaUpgrades FourUpgrade;
+	EArenaUpgrades FiveUpgrade;
+
+	EBosssUpgrades OneUpgradeBoss;
+	EBosssUpgrades TwoUpgradeBoss;
+	EBosssUpgrades ThreeUpgradeBoss;
+
 	FText BoolToText(const bool& BoolToConvert);
 	FText FloatToText(const float& Value, const int32& FractalDigits);
 	FString FloatToString(const float& Value, const int32& FractalDigits);
 	FText IntToText(const int32& Value);
 	FText IntToTextWithPlus(const int32& Value);
 
-	void CreateRandomUpgrade();
-	void CreateRandomBossUpgrade();
+	void TryToCreateRandomUpgrade(int32 index);
+	void TryToCreateBossUpgrade(int32 index);
+
+	bool CreateRandomUpgrade(int32 index, EArenaUpgrades& OutType);
+	bool CreateRandomBossUpgrade(int32 index, EBosssUpgrades& OutType);
 
 	UFUNCTION() void SelectBossUpgradeOne();
 	UFUNCTION() void SelectBossUpgradeTwo();
@@ -186,6 +201,7 @@ private:
 	UFUNCTION() void SelectArenaUpgradeFive();
 	void ApplyArenaUpgrade(EArenaUpgrades TypeToApply);
 
-	void SetBossTextUpgradeValue(UTextBlock* TextToSet, int32 ButtonIndex);
-	void SetArenaTextUpgradeValue(UTextBlock* TextToSet, int32 ButtonIndex);
+	void SetBossTextUpgradeValue(UTextBlock* TextToSet, EBosssUpgrades TypeToApply);
+	void SetArenaTextUpgradeValue(UTextBlock* TextToSet, EArenaUpgrades TypeToApply);
+
 };
