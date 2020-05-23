@@ -47,13 +47,13 @@ protected:
 
 	//Should Be 100 - 200 Unit Above Ground
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-	USceneComponent* Flag;
+	USceneComponent* FlagScene;
 	//Should Be 100 - 200 Unit Above Ground
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-	USceneComponent* FlagTarget;
+	USceneComponent* FlagTargetScene;
 	//Should Be 1 Unit Above Ground
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-	USceneComponent* LocationTarget;
+	USceneComponent* LocationTargetScene;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Arena")
 	TMap<TEnumAsByte<EObjectives>, FArenaSettings> Objectives;

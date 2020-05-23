@@ -35,17 +35,17 @@ AArena::AArena()
 	PlayerStartLocation = CreateDefaultSubobject<USceneComponent>(TEXT("Player Start Location"));
 	PlayerStartLocation->SetupAttachment(Root);
 
-	Flag = CreateDefaultSubobject<USceneComponent>(TEXT("Flag"));
-	Flag->SetupAttachment(Root);
-	Flag->SetHiddenInGame(true);
+	FlagScene = CreateDefaultSubobject<USceneComponent>(TEXT("Flag"));
+	FlagScene->SetupAttachment(Root);
+	FlagScene->SetHiddenInGame(true);
 	
-	FlagTarget = CreateDefaultSubobject<USceneComponent>(TEXT("FlagTarget"));
-	FlagTarget->SetupAttachment(Root);
-	FlagTarget->SetHiddenInGame(true);
+	FlagTargetScene = CreateDefaultSubobject<USceneComponent>(TEXT("FlagTarget"));
+	FlagTargetScene->SetupAttachment(Root);
+	FlagTargetScene->SetHiddenInGame(true);
 
-	LocationTarget = CreateDefaultSubobject<USceneComponent>(TEXT("LocationTarget"));
-	LocationTarget->SetupAttachment(Root);
-	LocationTarget->SetHiddenInGame(true);
+	LocationTargetScene = CreateDefaultSubobject<USceneComponent>(TEXT("LocationTarget"));
+	LocationTargetScene->SetupAttachment(Root);
+	LocationTargetScene->SetHiddenInGame(true);
 }
 
 void AArena::SpawnActors()
@@ -106,12 +106,12 @@ void AArena::SpawnNextEnemyWave()
 }
 void AArena::SetupFlag()
 {
-	if (auto Spawned = GetWorld()->SpawnActor<AFlag>(Flag->GetComponentLocation(), FRotator(0)))
+	if (auto Spawned = GetWorld()->SpawnActor<AFlag>(FlagScene->GetComponentLocation(), FRotator(0)))
 	{
 		Spawned->OnFlagCollision.BindUFunction(this, FName("AquireFlag"));
 		Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 	}
-	SpawnedFlagTarget = GetWorld()->SpawnActor<AFlagTarget>(FlagTarget->GetComponentLocation(), FRotator(0));
+	SpawnedFlagTarget = GetWorld()->SpawnActor<AFlagTarget>(FlagTargetScene->GetComponentLocation(), FRotator(0));
 	if (!ensure(SpawnedFlagTarget != nullptr)) { return; }
 	SpawnedFlagTarget->OnFlagTargetCollision.BindUFunction(this, FName("TryDeliverFlag"));
 	SpawnedFlagTarget->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
@@ -132,7 +132,7 @@ void AArena::TryDeliverFlag()
 }
 void AArena::SetupObjective()
 {
-	if (auto Spawned = GetWorld()->SpawnActor<ATargetLocation>(LocationTarget->GetComponentLocation(), FRotator(0)))
+	if (auto Spawned = GetWorld()->SpawnActor<ATargetLocation>(LocationTargetScene->GetComponentLocation(), FRotator(0)))
 	{
 		Spawned->OnTargetLocationCollision.BindUFunction(this, FName("FinishObjective"));
 		Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
