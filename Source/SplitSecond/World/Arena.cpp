@@ -57,7 +57,9 @@ void AArena::SpawnActors()
 	if (!ensure(GetWorld()->GetFirstPlayerController()->GetPawn() != nullptr)) { return; }
 
 	auto PlayerPawn = Cast<APlayerCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+
 	if (!ensure(PlayerPawn != nullptr)) { return; }
+
 	PlayerPawn->SetActorLocation(PlayerStartLocation->GetComponentLocation());
 	TArray<TEnumAsByte<EObjectives>> OutKeys;
 	Objectives.GetKeys(OutKeys);

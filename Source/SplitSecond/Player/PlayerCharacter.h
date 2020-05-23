@@ -68,7 +68,6 @@ protected:
 
 private:
 	class UPlayerMovementComponent* PlayerMovementComponent;
-    TSubclassOf<class UPlayerUI> PlayerUIClass;
     TSubclassOf<class UPopupMessage> PopupMessageClass;
     class UPlayerUI* PlayerUI;
 
@@ -80,6 +79,7 @@ public:
 	FORCEINLINE class UPlayerMovementComponent* GetMyMovementComponent() const { return PlayerMovementComponent; }
 	FORCEINLINE class UHealthComponent* GetHealthComponent() const { return HealthComponent; }
 	FORCEINLINE class UPlayerUI* GetPlayerUI() const { return PlayerUI; }
+    void SpawnPlayerUI(TSubclassOf<class UPlayerUI> UIToSpawn);
 
 private:
     void ResetDash();

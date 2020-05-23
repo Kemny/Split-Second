@@ -20,8 +20,6 @@
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
-    ConstructorHelpers::FClassFinder<UPlayerUI> BP_PlayerUIClass(TEXT("/Game/Blueprint/UI/WBP_PlayerUI"));
-    if (BP_PlayerUIClass.Class) PlayerUIClass = BP_PlayerUIClass.Class;
 
     ConstructorHelpers::FClassFinder<UPopupMessage> BP_PopupMessageClass(TEXT("/Game/Blueprint/UI/WBP_PopupMessage"));
     if (BP_PopupMessageClass.Class) PopupMessageClass = BP_PopupMessageClass.Class;
@@ -50,20 +48,21 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 
 void APlayerCharacter::BeginPlay()
 {
-	Super::BeginPlay();
+    Super::BeginPlay();
 
     PlayerController = Cast<ASplitSecondPlayerController>(GetWorld()->GetFirstPlayerController());
     if (!ensure(PlayerController != nullptr)) { return; }
     PlayerState = GetPlayerState<ASplitSecondPlayerState>();
     if (!ensure(PlayerState != nullptr)) { return; }
-
-
-    PlayerUI = CreateWidget<UPlayerUI>(GetWorld(), PlayerUIClass);
     if (!ensure(PlayerUI != nullptr)) { return; }
-    PlayerUI->AddToPlayerScreen();
     PlayerUI->UpdateHealth(HealthComponent->GetHealth(), HealthComponent->GetMaxHealth());
 }
-
+void APlayerCharacter::SpawnPlayerUI(TSubclassOf<class UPlayerUI> UIToSpawn)
+{
+    PlayerUI = CreateWidget<UPlayerUI>(GetWorld(), UIToSpawn);
+    if (!ensure(PlayerUI != nullptr)) { return; }
+    PlayerUI->AddToPlayerScreen();
+}
 void APlayerCharacter::EquipGun(TSubclassOf<class ASuper_Gun> GunClass)
 {
     if (GunClass)

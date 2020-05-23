@@ -17,6 +17,8 @@
 #include "Weapons/SplitSecondProjectile.h"
 #include "Weapons/Guns/AI/AIProjectile.h"
 #include "World/Traps/SuperTrap.h"
+#include "UI/PlayerUI.h"
+#include "SplitSecondGameInstance.h"
 
 ASplitSecondGameMode::ASplitSecondGameMode()
 	: Super()
@@ -31,6 +33,9 @@ ASplitSecondGameMode::ASplitSecondGameMode()
 	static ConstructorHelpers::FClassFinder<ASuper_Gun> Bow_BP(TEXT("/Game/Blueprint/Player/Weapons/BP_PlayerBow"));
 	if (Bow_BP.Class) BowClass = Bow_BP.Class;
 
+	ConstructorHelpers::FClassFinder<UPlayerUI> BP_PlayerUIClass(TEXT("/Game/Blueprint/UI/WBP_PlayerUI"));
+	if (BP_PlayerUIClass.Class) PlayerUIClass = BP_PlayerUIClass.Class;
+
 	static ConstructorHelpers::FClassFinder<UUpgradeSelection> BP_UpgradeSelectionClass(TEXT("/Game/Blueprint/UI/WBP_UpgradeSelection"));
 	if (BP_UpgradeSelectionClass.Class) UpgradeSelectionClass = BP_UpgradeSelectionClass.Class;
 }
@@ -42,46 +47,58 @@ void ASplitSecondGameMode::BeginPlay()
 	GetWorldSettings()->MaxGlobalTimeDilation = MaxTimeDilation;
 	GetWorldSettings()->MinGlobalTimeDilation = MinTimeDilation;
 
-	switch (Temp_StartingGun)
-	{
-	case Pistol:
-		SetDefaultWeapon(Temp_StartingGun, PistolClass);
-		break;
-	case Shotgun:
-		SetDefaultWeapon(Temp_StartingGun, ShotgunClass);
-		break;
-	case Bow:
-		SetDefaultWeapon(Temp_StartingGun, BowClass);
-		break;
-	default:
-		break;
-	}
-
-	StartPlay();
-
 	SpawnNextArena();
 }
-
-void ASplitSecondGameMode::SetDefaultWeapon(EWeapons NewWeapon, TSubclassOf<ASuper_Gun> WeaponClass)
+void ASplitSecondGameMode::PostLogin(APlayerController* NewPlayer)
 {
-	auto PC = GetWorld()->GetFirstPlayerController<ASplitSecondPlayerController>();
-	if (!ensure(PC != nullptr)) { return; }
-	auto Pawn = Cast<APlayerCharacter>(PC->K2_GetPawn());
-	if (!ensure(Pawn != nullptr)) { return; }
-	Pawn->EquipGun(WeaponClass);
-	auto PS = Pawn->GetPlayerState<ASplitSecondPlayerState>();
-	if (!ensure(PC != nullptr)) { return; }
+	Super::PostLogin(NewPlayer);
+
+	if (NewPlayer->IsA<ASplitSecondPlayerController>())
+	{
+		SplitSecondPlayerController = Cast<ASplitSecondPlayerController>(NewPlayer);
+
+		if (!ensure(SplitSecondPlayerController != nullptr)) { return; }
+
+		SplitSecondPlayerController->OnPlayerDeath.BindUFunction(this, TEXT("OnPlayerDeath"));
+		SplitSecondPlayerController->OnPlayerConfirmedDeath.BindUFunction(this, TEXT("OnConfirmedPlayerDeath"));
+		SplitSecondPlayerController->OnPlayerSlowGame.BindUFunction(this, TEXT("PlayerSlowGame"));
+
+		SplitSecondPlayerState = SplitSecondPlayerController->GetPlayerState<ASplitSecondPlayerState>();
+		if (!ensure(SplitSecondPlayerState != nullptr)) { return; }
+
+		SplitSecondPlayerCharacter = SplitSecondPlayerController->GetPawn<APlayerCharacter>();
+		if (!ensure(SplitSecondPlayerCharacter != nullptr)) { return; }
+
+		auto GameInstance = GetGameInstance<USplitSecondGameInstance>();
+		if (!ensure(GameInstance != nullptr)) { return; }
+		PlayerGun = GameInstance->GetStartingWeapon();
+
+		auto Pawn = SplitSecondPlayerController->GetPawn<APlayerCharacter>();
+		if (!ensure(Pawn != nullptr)) { return; }
+		Pawn->SpawnPlayerUI(PlayerUIClass);
+		SetPlayerDefaultWeapon(PlayerGun, Pawn);
+	}
+
+}
+void ASplitSecondGameMode::SetPlayerDefaultWeapon(EWeapons NewWeapon, APlayerCharacter* PlayerPawn)
+{
+	if (!ensure(SplitSecondPlayerController != nullptr)) { return; }
+	if (!ensure(PlayerPawn != nullptr)) { return; }
+	if (!ensure(SplitSecondPlayerState != nullptr)) { return; }
 
 	switch (NewWeapon)
 	{
 	case Pistol:
-		PS->CurrentStats = FUpgrades(DefaultStatsForPistol);
+		SplitSecondPlayerState->CurrentStats = FUpgrades(DefaultStatsForPistol);
+		PlayerPawn->EquipGun(PistolClass);
 		break;
 	case Shotgun:
-		PS->CurrentStats = FUpgrades(DefaultStatsForShotgun);
+		SplitSecondPlayerState->CurrentStats = FUpgrades(DefaultStatsForShotgun);
+		PlayerPawn->EquipGun(ShotgunClass);
 		break;
 	case Bow:
-		PS->CurrentStats = FUpgrades(DefaultStatsForBow);
+		SplitSecondPlayerState->CurrentStats = FUpgrades(DefaultStatsForBow);
+		PlayerPawn->EquipGun(BowClass);
 		break;
 	default:
 		break;
@@ -132,7 +149,7 @@ void ASplitSecondGameMode::SpawnUpgradeScreen()
 	if (!ensure(SplitSecondPlayerCharacter != nullptr)) { return; }
 	if (auto Created = CreateWidget<UUpgradeSelection>(GetWorld(), UpgradeSelectionClass))
 	{
-		Created->ShowUpgradeSelection(&SplitSecondPlayerState->CurrentStats, Temp_StartingGun, false, SplitSecondPlayerCharacter->GetHealthComponent());
+		Created->ShowUpgradeSelection(&SplitSecondPlayerState->CurrentStats, PlayerGun, false, SplitSecondPlayerCharacter->GetHealthComponent());
 		Created->OnUpgradeSelected.BindUFunction(this, TEXT("SpawnNextArena"));
 	}
 }
@@ -145,32 +162,9 @@ void ASplitSecondGameMode::SpawnBossUpgradeScreen()
 
 	if (auto Created = CreateWidget<UUpgradeSelection>(GetWorld(), UpgradeSelectionClass))
 	{
-		Created->ShowUpgradeSelection(&SplitSecondPlayerState->CurrentStats, Temp_StartingGun, true, SplitSecondPlayerCharacter->GetHealthComponent());
+		Created->ShowUpgradeSelection(&SplitSecondPlayerState->CurrentStats, PlayerGun, true, SplitSecondPlayerCharacter->GetHealthComponent());
 		Created->OnUpgradeSelected.BindUFunction(this, TEXT("SpawnNextArena"));
 	}
-}
-
-void ASplitSecondGameMode::PostLogin(APlayerController* NewPlayer)
-{
-	Super::PostLogin(NewPlayer);
-
-	if (NewPlayer->IsA<ASplitSecondPlayerController>())
-	{
-		SplitSecondPlayerController = Cast<ASplitSecondPlayerController>(NewPlayer);
-
-		if (!ensure(SplitSecondPlayerController != nullptr)) { return; }
-
-		SplitSecondPlayerController->OnPlayerDeath.BindUFunction(this, TEXT("OnPlayerDeath"));
-		SplitSecondPlayerController->OnPlayerConfirmedDeath.BindUFunction(this, TEXT("OnConfirmedPlayerDeath"));
-		SplitSecondPlayerController->OnPlayerSlowGame.BindUFunction(this, TEXT("PlayerSlowGame"));
-
-		SplitSecondPlayerState = SplitSecondPlayerController->GetPlayerState<ASplitSecondPlayerState>();
-		if (!ensure(SplitSecondPlayerState != nullptr)) { return; }
-
-		SplitSecondPlayerCharacter = SplitSecondPlayerController->GetPawn<APlayerCharacter>();
-		if (!ensure(SplitSecondPlayerCharacter != nullptr)) { return; }
-	}
-
 }
 
 void ASplitSecondGameMode::PlayerSlowGame()
