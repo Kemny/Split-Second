@@ -1,7 +1,6 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "SplitSecondGameMode.h"
-#include "Player/SplitSecondHUD.h"
 #include "Player/PlayerCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 #include "GameFramework/WorldSettings.h"
@@ -34,9 +33,6 @@ ASplitSecondGameMode::ASplitSecondGameMode()
 
 	static ConstructorHelpers::FClassFinder<UUpgradeSelection> BP_UpgradeSelectionClass(TEXT("/Game/Blueprint/UI/WBP_UpgradeSelection"));
 	if (BP_UpgradeSelectionClass.Class) UpgradeSelectionClass = BP_UpgradeSelectionClass.Class;
-
-	// use our custom HUD class
-	HUDClass = ASplitSecondHUD::StaticClass();
 }
 
 void ASplitSecondGameMode::BeginPlay()

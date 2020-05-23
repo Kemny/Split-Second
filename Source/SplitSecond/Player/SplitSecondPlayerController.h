@@ -80,14 +80,10 @@ private:
 
 	void TraceForActorsToSlow();
 
-	UFUNCTION() void ShowDebugMenu();
-	UFUNCTION() void IncreaseSlow(float Value);
-
 	UFUNCTION() void SlowTarget();
 	UFUNCTION() void OnSlowingTargetDeath(class ASuper_AI_Character* KilledAI);
 	UFUNCTION() void SlowGame();
 	
-	class ASplitSecondHUD* Hud;
 	class ASuper_AI_Character* HoveredEnemy;
 
 	UFUNCTION() void OnGameSlowCooldownFinished();
