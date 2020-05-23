@@ -53,7 +53,7 @@ void APlayerProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 
 void APlayerProjectile::OnBulletHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (GetProjectileMovement()->bShouldBounce)
+	if (bShouldBounce)
 	{
 		CalcReflection(Hit);
 		++CurrentBounce;

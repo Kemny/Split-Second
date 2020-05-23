@@ -4,6 +4,7 @@
 #include "AI_TurretBase.h"
 #include "GameFramework/RotatingMovementComponent.h"
 #include "Engine/World.h"
+#include "../Health/HealthComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "../Weapons/SplitSecondProjectile.h"
 
@@ -50,9 +51,26 @@ void AAI_TurretBase::EnableRotationMovement(bool bEnable)
   bCurrentlyRotating = bEnable;
 }
 
+void AAI_TurretBase::OnTakeDamage()
+{
+	Highlight(EHighlightType::NONE);
+
+	if (HealthComponent->GetHealth() <= 0)
+	{
+		bIsDead = true;
+		SetActorEnableCollision(false);
+		DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		DetachFromControllerPendingDestroy();
+		OnDeath.Broadcast(this);
+
+        Destroy();
+	}
+}
+
 void AAI_TurretBase::BeginPlay()
 {
   Super::BeginPlay();
 
   RotatingMovement->SetActive(false);
 }
+

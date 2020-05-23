@@ -107,7 +107,7 @@ private:
 
     void SpawnGun();
 
-    UFUNCTION() void OnTakeDamage();
+    UFUNCTION() virtual void OnTakeDamage();
     UFUNCTION() void DestroyAfterDeath();
 
 };

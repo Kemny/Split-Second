@@ -45,6 +45,8 @@ public:
   UPROPERTY(BlueprintReadOnly, Category = "Turret Settings")
   bool bCurrentlyRotating;
 
+  void OnTakeDamage() override;
+
 
 protected:
   

@@ -88,10 +88,11 @@ void ASplitSecondProjectile::OnBulletOverlap_Implementation(class UPrimitiveComp
 
 void ASplitSecondProjectile::CalcReflection(const FHitResult& Hit)
 {
+	this->GetProjectileMovement()->bShouldBounce = true;
 	auto MyVelocity = GetProjectileMovement()->Velocity;
 
 	FVector ReflectedVelocity = BounceSpeedLoss * (-2 * FVector::DotProduct(MyVelocity, Hit.Normal) * Hit.Normal + MyVelocity);
-	MyVelocity = ReflectedVelocity;
+	GetProjectileMovement()->SetVelocityInLocalSpace(ReflectedVelocity);
 	ReflectedVelocity.Normalize();
 	SetActorRotation(ReflectedVelocity.Rotation());
 }

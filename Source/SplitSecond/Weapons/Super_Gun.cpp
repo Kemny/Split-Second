@@ -78,7 +78,7 @@ APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector con
     {
         if (auto PlayerCharacter = Cast<APlayerCharacter>(GetCurrentPawn()))
         {
-            auto Upgrades = PlayerCharacter->GetPlayerStateChecked<ASplitSecondPlayerState>()->CurrentStats;
+            auto Upgrades = PlayerCharacter->GetPlayerState<ASplitSecondPlayerState>()->CurrentStats;
 
             CurrentProjectile->DamageValue = Upgrades.Damage;
             CurrentProjectile->GetProjectileMovement()->InitialSpeed = Upgrades.ProjectileSpeed;
@@ -93,7 +93,7 @@ APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector con
 
             if (Upgrades.bIsBouncing)
             {
-                CurrentProjectile->GetProjectileMovement()->bShouldBounce = true;
+                CurrentProjectile->bShouldBounce = true;
             }
             if (Upgrades.bIsHoming)
             {
