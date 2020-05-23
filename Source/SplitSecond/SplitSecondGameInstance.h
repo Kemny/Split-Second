@@ -20,6 +20,8 @@ protected:
 	TEnumAsByte<EWeapons> StartingWeapon;
 
 public:
+	UFUNCTION(BlueprintCallable)
 	void SetStartingWeapon(EWeapons NewWeapon) { StartingWeapon = NewWeapon; }
+	UFUNCTION(BlueprintCallable)
 	EWeapons GetStartingWeapon() const { return StartingWeapon; }
 };
