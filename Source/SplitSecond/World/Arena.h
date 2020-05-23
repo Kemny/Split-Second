@@ -65,9 +65,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Arean Functions")
 	void SpawnBoss(int32 SpawnNum, TArray<UActorComponent*> SpawnLocations);
 
-	UFUNCTION(BlueprintCallable, Category = "Arean Functions")
-	void SpawnBossAdds(int32 SpawnNum, TArray<UActorComponent*> SpawnLocations);
-
 	FArenaDelegate OnArenaFinished;
 	
 private:
@@ -98,6 +95,7 @@ private:
 
 	UFUNCTION() void OnTurretDeath(ASuper_AI_Character* KilledAI);
 	UFUNCTION() void OnEnemyDeath(ASuper_AI_Character* KilledAI);
+	UFUNCTION() void OnBossDeath(ASuper_AI_Character* KilledAI);
 
 	TSubclassOf<class UPopupMessage> PopupMessageClass;
 };

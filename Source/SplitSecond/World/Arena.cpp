@@ -202,40 +202,10 @@ void AArena::SpawnBoss(int32 SpawnNum, TArray<UActorComponent*> SpawnLocations)
 		if (auto Spawned = GetWorld()->SpawnActor<ASuper_Boss>(BossSpawnLocationComponent->GetCurrentTypeClass(), FTransform(FRotator(0), BossSpawnLocationComponent->GetBoxCenter(), FVector(1))))
 		{
 			Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-			Spawned->OnDeath.AddUniqueDynamic(this, &AArena::OnEnemyDeath);
+			Spawned->OnDeath.AddUniqueDynamic(this, &AArena::OnBossDeath);
 			SpawnedEnemies.Add(Spawned);
 		}
 	}
-
-	UE_LOG(LogTemp, Log, TEXT("Spawn Boss"));
-}
-
-void AArena::SpawnBossAdds(int32 SpawnNum, TArray<UActorComponent*> SpawnLocations)
-{
-	TArray<int32> SpawnedIndexes;
-	for (size_t i = 0; i < SpawnNum; i++)
-	{
-		int32 SpawnIndex;
-		do
-		{
-			SpawnIndex = FMath::RandRange(0, SpawnLocations.Num() - 1);
-		} while (SpawnedIndexes.Contains(SpawnIndex));
-
-		SpawnedIndexes.Add(SpawnIndex);
-	}
-
-	for (size_t i = 0; i < SpawnedIndexes.Num(); i++)
-	{
-		auto BossAddsSpawnLocationComponent = Cast<UBossAddsSpawnLocation>(SpawnLocations[SpawnedIndexes[i]]);
-		if (auto Spawned = GetWorld()->SpawnActor<ASuper_AI_Character>(BossAddsSpawnLocationComponent->GetCurrentTypeClass(), FTransform(FRotator(0), BossAddsSpawnLocationComponent->GetBoxCenter(), FVector(1))))
-		{
-			Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-			Spawned->OnDeath.AddUniqueDynamic(this, &AArena::OnEnemyDeath);
-			SpawnedEnemies.Add(Spawned);
-		}
-	}
-
-	UE_LOG(LogTemp, Log, TEXT("Spawn Boss Adds"));
 }
 
 void AArena::FinishObjective()
@@ -282,6 +252,11 @@ void AArena::FinishArena()
 void AArena::OnEnemyDeath(ASuper_AI_Character* KilledAI)
 {
 	SpawnedEnemies.Remove(KilledAI);
+}
+
+void AArena::OnBossDeath(ASuper_AI_Character* KilledAI)
+{
+	FinishObjective();
 }
 
 void AArena::OnTurretDeath(ASuper_AI_Character* KilledAI)
