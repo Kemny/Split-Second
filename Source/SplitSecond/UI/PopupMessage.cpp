@@ -29,7 +29,7 @@ FReply UPopupMessage::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEve
 
 void UPopupMessage::ShowPopupMessage(const FKey& Key, const FText& Text)
 {
-	FInputModeGameAndUI InputMode;
+	FInputModeUIOnly InputMode;
 	GetWorld()->GetFirstPlayerController()->SetInputMode(InputMode);
 	AddToPlayerScreen();
 	SetUserFocus(GetWorld()->GetFirstPlayerController());

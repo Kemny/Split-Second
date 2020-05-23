@@ -26,8 +26,7 @@ protected:
 	///TODO Remove debug Weapon class
 
 	/*Final game will let the player pick from a menu of weapons*/
-    UPROPERTY(EditDefaultsOnly, Category = "Defaults")
-    TEnumAsByte<EWeapons> Temp_StartingGun;
+    EWeapons PlayerGun;
 
     UPROPERTY(EditDefaultsOnly, Category = "Arenas")
     TArray<TSubclassOf<class AArena>> PossibleArenas;
@@ -38,9 +37,11 @@ public:
 	ASplitSecondGameMode();
 	void BeginPlay() override;
 
-    void SetDefaultWeapon(EWeapons NewWeapon, TSubclassOf<class ASuper_Gun> Pistol);
+	UFUNCTION(BlueprintCallable, Category="Weapons")
+    void SetPlayerDefaultWeapon(EWeapons NewWeapon, class APlayerCharacter* PlayerPawn);
 
-	UFUNCTION() void SpawnNextArena();
+	UFUNCTION(BlueprintCallable) 
+	void SpawnNextArena();
 	UFUNCTION() void SpawnUpgradeScreen();
 	UFUNCTION() void SpawnBossUpgradeScreen();
 
@@ -61,6 +62,7 @@ private:
 	TSubclassOf<class ASuper_Gun> PistolClass;
 	TSubclassOf<class ASuper_Gun> ShotgunClass;
 	TSubclassOf<class ASuper_Gun> BowClass;
+	TSubclassOf<class UPlayerUI> PlayerUIClass;
 
 	TSubclassOf<class UUpgradeSelection> UpgradeSelectionClass;
 

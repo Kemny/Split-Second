@@ -3,6 +3,7 @@
 #include "UpgradeSelection.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "../Health/HealthComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 void UUpgradeSelection::ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const EWeapons& CurrentWeapon, const bool& bBossUpgrades, UHealthComponent* HealthComponent)
 {
@@ -14,7 +15,7 @@ void UUpgradeSelection::ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const E
 
 	PlayerCurrentWeapon = CurrentWeapon;
 
-	FInputModeGameAndUI InputMode;
+	FInputModeUIOnly InputMode;
 	GetWorld()->GetFirstPlayerController()->SetInputMode(InputMode);
 	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = true;
 	AddToPlayerScreen();
@@ -23,40 +24,17 @@ void UUpgradeSelection::ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const E
 
 	if (bBossUpgrades)
 	{
-		CreateRandomBossUpgrade();
-		CreateRandomBossUpgrade();
-		CreateRandomBossUpgrade();
-
-		Btn_Upgrade1->OnClicked.AddUniqueDynamic(this, &UUpgradeSelection::SelectBossUpgradeOne);
-		Btn_Upgrade2->OnClicked.AddUniqueDynamic(this, &UUpgradeSelection::SelectBossUpgradeTwo);
-		Btn_Upgrade3->OnClicked.AddUniqueDynamic(this, &UUpgradeSelection::SelectBossUpgradeThree);
-
-		SetBossTextUpgradeValue(txt_UpgradeName1, 0);
-		SetBossTextUpgradeValue(txt_UpgradeName2, 1);
-		SetBossTextUpgradeValue(txt_UpgradeName3, 2);
+		TryToCreateBossUpgrade(0);
+		TryToCreateBossUpgrade(1);
+		TryToCreateBossUpgrade(2);
 	}
 	else
 	{
-		VB_Upgrade4->SetVisibility(ESlateVisibility::Visible);
-		VB_Upgrade5->SetVisibility(ESlateVisibility::Visible);
-
-		Btn_Upgrade1->OnClicked.AddUniqueDynamic(this, &UUpgradeSelection::SelectArenaUpgradeOne);
-		Btn_Upgrade2->OnClicked.AddUniqueDynamic(this, &UUpgradeSelection::SelectArenaUpgradeTwo);
-		Btn_Upgrade3->OnClicked.AddUniqueDynamic(this, &UUpgradeSelection::SelectArenaUpgradeThree);
-		Btn_Upgrade4->OnClicked.AddUniqueDynamic(this, &UUpgradeSelection::SelectArenaUpgradeFour);
-		Btn_Upgrade5->OnClicked.AddUniqueDynamic(this, &UUpgradeSelection::SelectArenaUpgradeFive);
-
-		CreateRandomUpgrade();
-		CreateRandomUpgrade();
-		CreateRandomUpgrade();
-		CreateRandomUpgrade();
-		CreateRandomUpgrade();
-
-		SetArenaTextUpgradeValue(txt_UpgradeName1, 0);
-		SetArenaTextUpgradeValue(txt_UpgradeName2, 1);
-		SetArenaTextUpgradeValue(txt_UpgradeName3, 2);
-		SetArenaTextUpgradeValue(txt_UpgradeName4, 3);
-		SetArenaTextUpgradeValue(txt_UpgradeName5, 4);
+		TryToCreateRandomUpgrade(0);
+		TryToCreateRandomUpgrade(1);
+		TryToCreateRandomUpgrade(2);
+		TryToCreateRandomUpgrade(3);
+		TryToCreateRandomUpgrade(4);
 	}
 
 	txt_Homing->SetText(BoolToText(PlayerUpgrades->bIsHoming));
@@ -69,7 +47,7 @@ void UUpgradeSelection::ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const E
 	txt_Health->SetText(FText::FromString(FloatToString(PlayerHealthComponent->GetHealth(), 0) + FString(" / ") + FloatToString(PlayerHealthComponent->GetMaxHealth(), 0)));
 	txt_Damage->SetText(FloatToText(PlayerUpgrades->Damage, 1));
 	txt_FireRate->SetText(FloatToText(PlayerUpgrades->FireRate, 1));
-	txt_BulletSpeed->SetText(FloatToText(PlayerUpgrades->ProjectileSpeed, 2));
+	txt_BulletSpeed->SetText(FloatToText(PlayerUpgrades->ProjectileSpeed, 0));
 	txt_ReloadSpeed->SetText(FloatToText(PlayerUpgrades->ReloadSpeed, 1));
 	txt_MaxAmmo->SetText(IntToText(PlayerUpgrades->MaxAmmo));
 
@@ -84,7 +62,7 @@ void UUpgradeSelection::ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const E
 		Name_ShotgunSpecificBox->SetVisibility(ESlateVisibility::Visible);
 		Upgrades_ShotgunSpecificBox->SetVisibility(ESlateVisibility::Visible);
 		txt_ShotgunBulletNum->SetText(IntToText(PlayerUpgrades->BulletNum));
-		txt_ShotgunBulletSpread->SetText(FloatToText(PlayerUpgrades->BulletSpread, 1));
+		txt_ShotgunBulletSpread->SetText(FloatToText(PlayerUpgrades->BulletSpread, 0));
 		break;
 	case Bow:
 		Name_BowSpecificBox->SetVisibility(ESlateVisibility::Visible);
@@ -98,15 +76,9 @@ void UUpgradeSelection::ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const E
 
 }
 
-void UUpgradeSelection::SetBossTextUpgradeValue(UTextBlock* TextToSet, int32 ButtonIndex)
+void UUpgradeSelection::SetBossTextUpgradeValue(UTextBlock* TextToSet, EBosssUpgrades TypeToApply)
 {
-	TArray<EBosssUpgrades> Keys;
-	BossUpgradeValues.GenerateKeyArray(Keys);
-
-	if (!ensure(Keys.Num() > ButtonIndex)) { return; }
-	auto Upgrade = Keys[ButtonIndex];
-
-	switch (Upgrade)
+	switch (TypeToApply)
 	{
 	case EBosssUpgrades::IsPiercing:
 		TextToSet->SetText(FText::FromString("Piercing Bullets"));
@@ -130,42 +102,36 @@ void UUpgradeSelection::SetBossTextUpgradeValue(UTextBlock* TextToSet, int32 But
 		break;
 	}
 }
-void UUpgradeSelection::SetArenaTextUpgradeValue(UTextBlock* TextToSet, int32 ButtonIndex)
+void UUpgradeSelection::SetArenaTextUpgradeValue(UTextBlock* TextToSet, EArenaUpgrades TypeToApply)
 {
-	TArray<EArenaUpgrades> Keys;
-	ArenaUpgradeValues.GenerateKeyArray(Keys);
-
-	if (!ensure(Keys.Num() > ButtonIndex)) { return; }
-	auto Upgrade = Keys[ButtonIndex];
-
-	switch (Upgrade)
+	switch (TypeToApply)
 	{
 	case EArenaUpgrades::Ammo:
-		TextToSet->SetText(FText::FromString("Ammo\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(Upgrade), 0)));
+		TextToSet->SetText(FText::FromString("Ammo\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 0)));
 		break;
 	case EArenaUpgrades::Damage:
-		TextToSet->SetText(FText::FromString("Damage\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(Upgrade), 1)));
+		TextToSet->SetText(FText::FromString("Damage\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 1)));
 		break;
 	case EArenaUpgrades::ProjectileSpeed:
-		TextToSet->SetText(FText::FromString("Bullet Speed\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(Upgrade), 1)));
+		TextToSet->SetText(FText::FromString("Bullet\nSpeed\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 0)));
 		break;
 	case EArenaUpgrades::ReloadSpeed:
-		TextToSet->SetText(FText::FromString("Reload Speed\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(Upgrade), 2)));
+		TextToSet->SetText(FText::FromString("Reload\nSpeed\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 1)));
 		break;
 	case EArenaUpgrades::FireRate:
-		TextToSet->SetText(FText::FromString("Fire Rate\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(Upgrade), 2)));
+		TextToSet->SetText(FText::FromString("Fire\nRate\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 1)));
 		break;
 	case EArenaUpgrades::MaxJumps:
-		TextToSet->SetText(FText::FromString("Jumps\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(Upgrade), 0)));
+		TextToSet->SetText(FText::FromString("Jumps\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 0)));
 		break;
 	case EArenaUpgrades::BulletNum:
-		TextToSet->SetText(FText::FromString("Ammo\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(Upgrade), 0)));
+		TextToSet->SetText(FText::FromString("Bullet\nNum\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 0)));
 		break;
 	case EArenaUpgrades::BulletSpread:
-		TextToSet->SetText(FText::FromString("Bullet Spread\n" + FString("-") + FloatToString(*ArenaUpgradeValues.Find(Upgrade), 2)));
+		TextToSet->SetText(FText::FromString("Bullet\nSpread\n" + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 0)));
 		break;
 	case EArenaUpgrades::BowDrawSpeed:
-		TextToSet->SetText(FText::FromString("Bow Draw Speed\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(Upgrade), 2)));
+		TextToSet->SetText(FText::FromString("Bow Draw\nSpeed\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 3)));
 		break;
 	default:
 		break;
@@ -176,51 +142,30 @@ void UUpgradeSelection::SetArenaTextUpgradeValue(UTextBlock* TextToSet, int32 Bu
 #pragma region Arena
 void UUpgradeSelection::SelectArenaUpgradeOne()
 {
-	TArray<EArenaUpgrades> Keys;
-	ArenaUpgradeValues.GenerateKeyArray(Keys);
-
-	if (!ensure(Keys.Num() >= 1)) { return; }
-
-	ApplyArenaUpgrade(Keys[0]);
+	ApplyArenaUpgrade(OneUpgrade);
 }
 void UUpgradeSelection::SelectArenaUpgradeTwo()
 {
-	TArray<EArenaUpgrades> Keys;
-	ArenaUpgradeValues.GenerateKeyArray(Keys);
-
-	if (!ensure(Keys.Num() >= 2)) { return; }
-	ApplyArenaUpgrade(Keys[1]);
+	ApplyArenaUpgrade(TwoUpgrade);
 }
 void UUpgradeSelection::SelectArenaUpgradeThree()
 {
-	TArray<EArenaUpgrades> Keys;
-	ArenaUpgradeValues.GenerateKeyArray(Keys);
-
-	if (!ensure(Keys.Num() >= 3)) { return; }
-	ApplyArenaUpgrade(Keys[2]);
+	ApplyArenaUpgrade(ThreeUpgrade);
 }
 void UUpgradeSelection::SelectArenaUpgradeFour()
 {
-	TArray<EArenaUpgrades> Keys;
-	ArenaUpgradeValues.GenerateKeyArray(Keys);
-
-	if (!ensure(Keys.Num() >= 4)) { return; }
-	ApplyArenaUpgrade(Keys[3]);
+	ApplyArenaUpgrade(FourUpgrade);
 }
 void UUpgradeSelection::SelectArenaUpgradeFive()
 {
-	TArray<EArenaUpgrades> Keys;
-	ArenaUpgradeValues.GenerateKeyArray(Keys);
-
-	if (!ensure(Keys.Num() >= 5)) { return; }
-	ApplyArenaUpgrade(Keys[4]);
+	ApplyArenaUpgrade(FiveUpgrade);
 }
 void UUpgradeSelection::ApplyArenaUpgrade(EArenaUpgrades TypeToApply)
 {
 	switch (TypeToApply)
 	{
 	case EArenaUpgrades::Ammo:
-		PlayerUpgrades->Ammo += *ArenaUpgradeValues.Find(TypeToApply);
+		PlayerUpgrades->MaxAmmo += *ArenaUpgradeValues.Find(TypeToApply);
 		break;
 	case EArenaUpgrades::Damage:
 		PlayerUpgrades->Damage += *ArenaUpgradeValues.Find(TypeToApply);
@@ -260,30 +205,15 @@ void UUpgradeSelection::ApplyArenaUpgrade(EArenaUpgrades TypeToApply)
 #pragma region Boss
 void UUpgradeSelection::SelectBossUpgradeOne()
 {
-	TArray<EBosssUpgrades> Keys;
-	BossUpgradeValues.GenerateKeyArray(Keys);
-
-	if (!ensure(Keys.Num() >= 1)) { return; }
-
-	ApplyBossUpgrade(Keys[0]);
+	ApplyBossUpgrade(OneUpgradeBoss);
 }
 void UUpgradeSelection::SelectBossUpgradeTwo()
 {
-	TArray<EBosssUpgrades> Keys;
-	BossUpgradeValues.GenerateKeyArray(Keys);
-
-	if (!ensure(Keys.Num() >= 2)) { return; }
-
-	ApplyBossUpgrade(Keys[1]);
+	ApplyBossUpgrade(TwoUpgradeBoss);
 }
 void UUpgradeSelection::SelectBossUpgradeThree()
 {
-	TArray<EBosssUpgrades> Keys;
-	BossUpgradeValues.GenerateKeyArray(Keys);
-
-	if (!ensure(Keys.Num() >= 3)) { return; }
-
-	ApplyBossUpgrade(Keys[2]);
+	ApplyBossUpgrade(ThreeUpgradeBoss);
 }
 void UUpgradeSelection::ApplyBossUpgrade(EBosssUpgrades TypeToApply)
 {
@@ -359,50 +289,152 @@ FText UUpgradeSelection::IntToTextWithPlus(const int32& Value)
 }
 #pragma endregion
 
-void UUpgradeSelection::CreateRandomUpgrade()
+void UUpgradeSelection::TryToCreateBossUpgrade(int32 index)
+{
+	EBosssUpgrades Type = EBosssUpgrades::NONE;
+	if (CreateRandomBossUpgrade(index, Type))
+	{
+		switch (index)
+		{
+		case 0:
+			Btn_Upgrade1->OnClicked.AddUniqueDynamic(this, &UUpgradeSelection::SelectBossUpgradeOne);
+			SetBossTextUpgradeValue(txt_UpgradeName1, Type);
+			break;
+		case 1:
+			Btn_Upgrade2->OnClicked.AddUniqueDynamic(this, &UUpgradeSelection::SelectBossUpgradeTwo);
+			SetBossTextUpgradeValue(txt_UpgradeName2, Type);
+			break;
+		case 2:
+			Btn_Upgrade3->OnClicked.AddUniqueDynamic(this, &UUpgradeSelection::SelectBossUpgradeThree);
+			SetBossTextUpgradeValue(txt_UpgradeName3, Type);
+			break;
+		default:
+			break;
+		}
+	}
+	else
+	{
+		TryToCreateRandomUpgrade(index);
+	}
+}
+void UUpgradeSelection::TryToCreateRandomUpgrade(int32 index)
+{
+	EArenaUpgrades Type = EArenaUpgrades::NONE;
+
+	if (CreateRandomUpgrade(index, Type))
+	{
+		switch (index)
+		{
+		case 0:
+			SetArenaTextUpgradeValue(txt_UpgradeName1, Type);
+			Btn_Upgrade1->OnClicked.AddUniqueDynamic(this, &UUpgradeSelection::SelectArenaUpgradeOne);
+			break;
+		case 1:
+			SetArenaTextUpgradeValue(txt_UpgradeName2, Type);
+			Btn_Upgrade2->OnClicked.AddUniqueDynamic(this, &UUpgradeSelection::SelectArenaUpgradeTwo);
+			break;
+		case 2:
+			SetArenaTextUpgradeValue(txt_UpgradeName3, Type);
+			Btn_Upgrade3->OnClicked.AddUniqueDynamic(this, &UUpgradeSelection::SelectArenaUpgradeThree);
+			break;
+		case 3:
+			SetArenaTextUpgradeValue(txt_UpgradeName4, Type);
+			Btn_Upgrade4->OnClicked.AddUniqueDynamic(this, &UUpgradeSelection::SelectArenaUpgradeFour);
+			VB_Upgrade4->SetVisibility(ESlateVisibility::Visible);
+			break;
+		case 4:
+			SetArenaTextUpgradeValue(txt_UpgradeName5, Type);
+			Btn_Upgrade5->OnClicked.AddUniqueDynamic(this, &UUpgradeSelection::SelectArenaUpgradeFive);
+			VB_Upgrade5->SetVisibility(ESlateVisibility::Visible);
+			break;
+		default:
+			break;
+		}
+	}
+	else
+	{
+		switch (index)
+		{
+		case 0:
+			VB_Upgrade1->SetVisibility(ESlateVisibility::Collapsed);
+			break;
+		case 1:
+			VB_Upgrade2->SetVisibility(ESlateVisibility::Collapsed);
+			break;
+		case 2:
+			VB_Upgrade3->SetVisibility(ESlateVisibility::Collapsed);
+			break;
+		case 3:
+			VB_Upgrade4->SetVisibility(ESlateVisibility::Collapsed);
+			break;
+		case 4:
+			VB_Upgrade5->SetVisibility(ESlateVisibility::Collapsed);
+			break;
+		default:
+			break;
+		}
+	}
+
+	if (VB_Upgrade1->GetVisibility() == ESlateVisibility::Collapsed && VB_Upgrade2->GetVisibility() == ESlateVisibility::Collapsed && VB_Upgrade3->GetVisibility() == ESlateVisibility::Collapsed && VB_Upgrade4->GetVisibility() == ESlateVisibility::Collapsed && VB_Upgrade5->GetVisibility() == ESlateVisibility::Collapsed)
+	{
+		ApplyArenaUpgrade(EArenaUpgrades::NONE);
+	}
+}
+
+
+bool UUpgradeSelection::CreateRandomUpgrade(int32 index, EArenaUpgrades& OutType)
 {
 	///This might be THE worst way of doing this
-	EArenaUpgrades Type = EArenaUpgrades::NONE;
 	float Value = 69420;
 	int32 AttemptNum = 0;
-	do
+
+	for (AttemptNum; AttemptNum < MAX_ATTEMPTS; AttemptNum++)
 	{
-		++AttemptNum;
 		switch (FMath::RandRange(0, 8))
 		{
 		case 0:
 			if (auto FoundValue = UpgradeValues.Find(EArenaUpgrades::Ammo))
 			{
-				Value = FMath::RandRange((int32)FoundValue->MinValue, (int32)FoundValue->MaxValue);
-				Type = EArenaUpgrades::Ammo;
+				auto DigitMultiplier = FMath::Pow(10, FoundValue->MaxDigits);
+				int32 HighRandom = FMath::RandRange(FoundValue->MinValue * DigitMultiplier, FoundValue->MaxValue * DigitMultiplier);
+				Value = (float)HighRandom / DigitMultiplier;
+				OutType = EArenaUpgrades::Ammo;
 			}
 			break;
 		case 1:
 			if (auto FoundValue = UpgradeValues.Find(EArenaUpgrades::Damage))
 			{
-				Value = FMath::RandRange(FoundValue->MinValue, FoundValue->MaxValue);
-				Type = EArenaUpgrades::Damage;
+				auto DigitMultiplier = FMath::Pow(10, FoundValue->MaxDigits);
+				int32 HighRandom = FMath::RandRange(FoundValue->MinValue * DigitMultiplier, FoundValue->MaxValue * DigitMultiplier);
+				Value = (float)HighRandom / DigitMultiplier;
+				OutType = EArenaUpgrades::Damage;
 			}
 			break;
 		case 2:
 			if (auto FoundValue = UpgradeValues.Find(EArenaUpgrades::ProjectileSpeed))
 			{
-				Value = FMath::RandRange(FoundValue->MinValue, FoundValue->MaxValue);
-				Type = EArenaUpgrades::ProjectileSpeed;
+				auto DigitMultiplier = FMath::Pow(10, FoundValue->MaxDigits);
+				int32 HighRandom = FMath::RandRange(FoundValue->MinValue * DigitMultiplier, FoundValue->MaxValue * DigitMultiplier);
+				Value = (float)HighRandom / DigitMultiplier;
+				OutType = EArenaUpgrades::ProjectileSpeed;
 			}
 			break;
 		case 3:
 			if (auto FoundValue = UpgradeValues.Find(EArenaUpgrades::ReloadSpeed))
 			{
-				Value = FMath::RandRange(FoundValue->MinValue, FoundValue->MaxValue);
-				Type = EArenaUpgrades::ReloadSpeed;
+				auto DigitMultiplier = FMath::Pow(10, FoundValue->MaxDigits);
+				int32 HighRandom = FMath::RandRange(FoundValue->MinValue * DigitMultiplier, FoundValue->MaxValue * DigitMultiplier);
+				Value = (float)HighRandom / DigitMultiplier;
+				OutType = EArenaUpgrades::ReloadSpeed;
 			}
 			break;
 		case 4:
 			if (auto FoundValue = UpgradeValues.Find(EArenaUpgrades::FireRate))
 			{
-				Value = FMath::RandRange(FoundValue->MinValue, FoundValue->MaxValue);
-				Type = EArenaUpgrades::FireRate;
+				auto DigitMultiplier = FMath::Pow(10, FoundValue->MaxDigits);
+				int32 HighRandom = FMath::RandRange(FoundValue->MinValue * DigitMultiplier, FoundValue->MaxValue * DigitMultiplier);
+				Value = (float)HighRandom / DigitMultiplier;
+				OutType = EArenaUpgrades::FireRate;
 			}
 			break;
 		case 5:
@@ -410,8 +442,10 @@ void UUpgradeSelection::CreateRandomUpgrade()
 			{
 				if (PlayerCurrentWeapon == EWeapons::Pistol)
 				{
-					Value = FMath::RandRange((int32)FoundValue->MinValue, (int32)FoundValue->MaxValue);
-					Type = EArenaUpgrades::MaxJumps;
+					auto DigitMultiplier = FMath::Pow(10, FoundValue->MaxDigits);
+					int32 HighRandom = FMath::RandRange(FoundValue->MinValue * DigitMultiplier, FoundValue->MaxValue * DigitMultiplier);
+					Value = (float)HighRandom / DigitMultiplier;
+					OutType = EArenaUpgrades::MaxJumps;
 				}
 			}
 			break;
@@ -420,8 +454,10 @@ void UUpgradeSelection::CreateRandomUpgrade()
 			{
 				if (PlayerCurrentWeapon == EWeapons::Shotgun)
 				{
-					Value = FMath::RandRange((int32)FoundValue->MinValue, (int32)FoundValue->MaxValue);
-					Type = EArenaUpgrades::BulletNum;
+					auto DigitMultiplier = FMath::Pow(10, FoundValue->MaxDigits);
+					int32 HighRandom = FMath::RandRange(FoundValue->MinValue * DigitMultiplier, FoundValue->MaxValue * DigitMultiplier);
+					Value = (float)HighRandom / DigitMultiplier;
+					OutType = EArenaUpgrades::BulletNum;
 				}
 			}
 			break;
@@ -430,8 +466,10 @@ void UUpgradeSelection::CreateRandomUpgrade()
 			{
 				if (PlayerCurrentWeapon == EWeapons::Shotgun)
 				{
-					Value = FMath::RandRange((int32)FoundValue->MinValue, (int32)FoundValue->MaxValue);
-					Type = EArenaUpgrades::BulletSpread;
+					auto DigitMultiplier = FMath::Pow(10, FoundValue->MaxDigits);
+					int32 HighRandom = FMath::RandRange(FoundValue->MinValue * DigitMultiplier, FoundValue->MaxValue * DigitMultiplier);
+					Value = (float)HighRandom / DigitMultiplier;
+					OutType = EArenaUpgrades::BulletSpread;
 				}
 			}
 			break;
@@ -440,70 +478,133 @@ void UUpgradeSelection::CreateRandomUpgrade()
 			{
 				if (PlayerCurrentWeapon == EWeapons::Bow)
 				{
-					Value = FMath::RandRange(FoundValue->MinValue, FoundValue->MaxValue);
-					Type = EArenaUpgrades::BowDrawSpeed;
+					auto DigitMultiplier = FMath::Pow(10, FoundValue->MaxDigits);
+					int32 HighRandom = FMath::RandRange(FoundValue->MinValue * DigitMultiplier, FoundValue->MaxValue * DigitMultiplier);
+					Value = (float)HighRandom / DigitMultiplier;
+					OutType = EArenaUpgrades::BowDrawSpeed;
 				}
 			}
 			break;
 		default:
 			break;
 		}
-	} while (Type == EArenaUpgrades::NONE || ArenaUpgradeValues.Find(Type) || AttemptNum > MAX_ATTEMPTS);
+		if (OutType != EArenaUpgrades::NONE && !ArenaUpgradeValues.Find(OutType))
+		{
+			break;
+		}
+	}
 
-	ArenaUpgradeValues.Add(Type, Value);
+	if (AttemptNum >= MAX_ATTEMPTS)
+	{
+		return false;
+	}
+	else
+	{
+		switch (index)
+		{
+		case 0:
+			OneUpgrade = OutType;
+			break;
+		case 1:
+			TwoUpgrade = OutType;
+			break;
+		case 2:
+			ThreeUpgrade = OutType;
+			break;
+		case 3:
+			FourUpgrade = OutType;
+			break;
+		case 4:
+			FiveUpgrade = OutType;
+			break;
+		default:
+			break;
+		}
+
+		ArenaUpgradeValues.Add(OutType, Value);
+		return true;
+	}
+
 }
-void UUpgradeSelection::CreateRandomBossUpgrade()
+bool UUpgradeSelection::CreateRandomBossUpgrade(int32 index, EBosssUpgrades& OutType)
 {
-	if (!ensure(PlayerUpgrades != nullptr)) { return; }
+	if (!ensure(PlayerUpgrades != nullptr)) { return false; }
 
 	///This might be THE worst way of doing this
-	EBosssUpgrades Type = EBosssUpgrades::NONE;
 	int32 AttemptNum = 0;
-	do
+
+	for (AttemptNum; AttemptNum < MAX_ATTEMPTS; AttemptNum++)
 	{
-		++AttemptNum;
 		switch (FMath::RandRange(0, 5))
 		{
 		case 0:
 			if (!PlayerUpgrades->bIsPiercing)
 			{
-				Type = EBosssUpgrades::IsPiercing;
+				OutType = EBosssUpgrades::IsPiercing;
 			}
 			break;
 		case 1:
-			if (!PlayerUpgrades->bIsHoming)
+			if (!PlayerUpgrades->bIsBouncing)
 			{
-				Type = EBosssUpgrades::IsHoming;
+				OutType = EBosssUpgrades::IsBouncing;
 			}
 			break;
 		case 2:
-			if (!PlayerUpgrades->bIsBouncing)
+			if (!PlayerUpgrades->bExplodingBullets)
 			{
-				Type = EBosssUpgrades::IsBouncing;
+				OutType = EBosssUpgrades::ExplodingBullets;
 			}
 			break;
 		case 3:
-			if (!PlayerUpgrades->bExplodingBullets)
+			if (!PlayerUpgrades->bHasExtraLife)
 			{
-				Type = EBosssUpgrades::ExplodingBullets;
+				OutType = EBosssUpgrades::ExtraLife;
 			}
 			break;
 		case 4:
-			if (!PlayerUpgrades->bHasExtraLife)
+			if (!PlayerUpgrades->bIsHoming)
 			{
-				Type = EBosssUpgrades::ExtraLife;
+				OutType = EBosssUpgrades::IsHoming;
 			}
 			break;
 		case 5:
 			if (!PlayerUpgrades->bCanThrowGun)
 			{
-				Type = EBosssUpgrades::CanThrowGun;
+				OutType = EBosssUpgrades::CanThrowGun;
 			}
 			break;
 		default:
 			break;
 		}
-	} while (Type == EBosssUpgrades::NONE || BossUpgradeValues.Find(Type) || AttemptNum > MAX_ATTEMPTS);
 
-	BossUpgradeValues.Add(Type, true);
+		if (OutType != EBosssUpgrades::NONE && !BossUpgradeValues.Find(OutType))
+		{
+			break;
+		}
+	}
+
+	if (AttemptNum >= MAX_ATTEMPTS)
+	{
+		return false;
+	}
+	else
+	{
+		switch (index)
+		{
+		case 0:
+			OneUpgradeBoss = OutType;
+			break;
+		case 1:
+			TwoUpgradeBoss = OutType;
+			break;
+		case 2:
+			ThreeUpgradeBoss = OutType;
+			break;
+		default:
+			break;
+		}
+
+		BossUpgradeValues.Add(OutType, true);
+		return true;
+	}
 }
