@@ -60,8 +60,11 @@ void ASuper_AI_Character::Tick(float DeltaTime)
     {
         if (auto Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0))
         {
-            auto TargetRotation = FMath::RInterpTo(GetActorRotation(), UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Player->GetActorLocation()), DeltaTime, RotationSpeed);
-            SetActorRelativeRotation(FRotator(0, TargetRotation.Yaw, 0));
+            auto Yaw = FMath::FInterpTo(GetActorRotation().Yaw, UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Player->GetActorLocation()).Yaw + 15, DeltaTime, RotationSpeed);
+
+            UE_LOG(LogTemp, Warning, TEXT("%f"), Yaw);
+
+            SetActorRelativeRotation(FRotator(0, Yaw, 0));
         }
     }
 }

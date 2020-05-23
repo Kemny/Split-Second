@@ -15,7 +15,7 @@ void AAIPistol::FireGun()
         UWorld* const World = GetWorld();
         if (World != NULL)
         {
-            const FRotator SpawnRotation = GetActorRotation();
+            const FRotator SpawnRotation = GunMesh->GetSocketRotation(FName("MuzzleLocation"));
             const FVector SpawnLocation = GunMesh->GetSocketLocation(FName("MuzzleLocation"));
 
             //Set Spawn Collision Handling Override
