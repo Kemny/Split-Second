@@ -106,6 +106,7 @@ private:
     bool bIsSlowed = false;
 
     void SpawnGun();
+    FRotator GetNewRot(FVector TargetPosition, FVector WorldUp = FVector::UpVector);
 
     UFUNCTION() virtual void OnTakeDamage();
     UFUNCTION() void DestroyAfterDeath();

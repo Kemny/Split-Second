@@ -60,9 +60,10 @@ void ASuper_AI_Character::Tick(float DeltaTime)
     {
         if (auto Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0))
         {
-            auto Yaw = FMath::FInterpTo(GetActorRotation().Yaw, UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Player->GetActorLocation()).Yaw + 15, DeltaTime, RotationSpeed);
+            auto LookAt = GetNewRot(Player->GetActorLocation());
+            auto Yaw = FMath::FInterpTo(GetActorRotation().Yaw, LookAt.Yaw, DeltaTime, RotationSpeed);
 
-            UE_LOG(LogTemp, Warning, TEXT("%f"), Yaw);
+            UE_LOG(LogTemp, Warning, TEXT("%f"), LookAt.Yaw);
 
             SetActorRelativeRotation(FRotator(0, Yaw, 0));
         }
@@ -95,6 +96,13 @@ void ASuper_AI_Character::SpawnGun()
             CurrentGun->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), GunSocket);
         }
     }
+}
+
+FRotator ASuper_AI_Character::GetNewRot(FVector TargetPosition, FVector WorldUp /*= FVector::UpVector*/)
+{
+	FVector Forward = TargetPosition - this->GetActorLocation();
+	FRotator Rot = UKismetMathLibrary::MakeRotFromXZ(Forward, WorldUp);
+    return Rot;
 }
 
 void ASuper_AI_Character::Highlight(EHighlightType HighlightType)
