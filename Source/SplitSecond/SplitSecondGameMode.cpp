@@ -102,32 +102,36 @@ void ASplitSecondGameMode::SpawnNextArena()
 
 	if (!ensure(PossibleArenas.Num() > 0)) { return; }
 
-	if (ArenaNum % 10 != 0)
+	if (ArenaNum % 10 != 0 || ArenaNum == 0)
 	{
+		UE_LOG(LogTemp, Log, TEXT("Spawning Normal Arena"));
+
 		auto RoomIndex = FMath::RandRange(0, PossibleArenas.Num() - 1);
 		CurrentArena = GetWorld()->SpawnActor<AArena>(PossibleArenas[RoomIndex]);
-		if (CurrentArena)
-		{
-			CurrentArena->OnArenaFinished.BindUFunction(this, TEXT("SpawnUpgradeScreen"));
-			CurrentArena->SpawnActors();
-			UNavigationSystemV1::GetNavigationSystem(GetWorld())->Build();
-		}
+		if (!ensure(CurrentArena != nullptr)) { return; }
+		CurrentArena->OnArenaFinished.BindUFunction(this, TEXT("SpawnUpgradeScreen"));
+		CurrentArena->SpawnActors();
+		UNavigationSystemV1::GetNavigationSystem(GetWorld())->Build();
 	}
 	else
 	{
+		UE_LOG(LogTemp, Log, TEXT("Spawning Boss Arena"));
+
 		CurrentArena = GetWorld()->SpawnActor<AArena>(BossArena);
-		if(CurrentArena)
-		{
-			CurrentArena->OnArenaFinished.BindUFunction(this, TEXT("SpawnBossUpgradeScreen"));
-			CurrentArena->SpawnActors();
-			UNavigationSystemV1::GetNavigationSystem(GetWorld())->Build();
-		}
+		if (!ensure(CurrentArena != nullptr)) { return; }
+		CurrentArena->OnArenaFinished.BindUFunction(this, TEXT("SpawnBossUpgradeScreen"));
+		CurrentArena->SpawnActors();
+		UNavigationSystemV1::GetNavigationSystem(GetWorld())->Build();
 	}
+
 	++ArenaNum;
+	UE_LOG(LogTemp, Log, TEXT("Arena Num: %i"), ArenaNum);
 }
 
 void ASplitSecondGameMode::SpawnUpgradeScreen()
 {
+	UE_LOG(LogTemp, Log, TEXT("Showing Arena Upgrade Screen"), ArenaNum);
+
 	if (!ensure(SplitSecondPlayerState != nullptr)) { return; }
 	if (!ensure(SplitSecondPlayerCharacter != nullptr)) { return; }
 	if (auto Created = CreateWidget<UUpgradeSelection>(GetWorld(), UpgradeSelectionClass))
@@ -138,6 +142,8 @@ void ASplitSecondGameMode::SpawnUpgradeScreen()
 }
 void ASplitSecondGameMode::SpawnBossUpgradeScreen()
 {
+	UE_LOG(LogTemp, Log, TEXT("Showing Boss Upgrade Screen"), ArenaNum);
+
 	if (!ensure(SplitSecondPlayerState != nullptr)) { return; }
 	if (!ensure(SplitSecondPlayerCharacter != nullptr)) { return; }
 

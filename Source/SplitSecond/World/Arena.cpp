@@ -35,20 +35,17 @@ AArena::AArena()
 	PlayerStartLocation = CreateDefaultSubobject<USceneComponent>(TEXT("Player Start Location"));
 	PlayerStartLocation->SetupAttachment(Root);
 
-	FlagMesh = CreateDefaultSubobject<UChildActorComponent>(TEXT("Flag"));
-	FlagMesh->SetupAttachment(Root);
-	FlagMesh->SetHiddenInGame(true);
-	if (auto ChildActor = FlagMesh->GetChildActor()) ChildActor->SetActorEnableCollision(false);
+	Flag = CreateDefaultSubobject<USceneComponent>(TEXT("Flag"));
+	Flag->SetupAttachment(Root);
+	Flag->SetHiddenInGame(true);
 	
-	FlagTargetMesh = CreateDefaultSubobject<UChildActorComponent>(TEXT("FlagTarget"));
-	FlagTargetMesh->SetupAttachment(Root);
-	FlagTargetMesh->SetHiddenInGame(true);
-	if (auto ChildActor = FlagTargetMesh->GetChildActor()) ChildActor->SetActorEnableCollision(false);
+	FlagTarget = CreateDefaultSubobject<USceneComponent>(TEXT("FlagTarget"));
+	FlagTarget->SetupAttachment(Root);
+	FlagTarget->SetHiddenInGame(true);
 
-	LocationTargetMesh = CreateDefaultSubobject<UChildActorComponent>(TEXT("LocationTarget"));
-	LocationTargetMesh->SetupAttachment(Root);
-	LocationTargetMesh->SetHiddenInGame(true);
-	if (auto ChildActor = LocationTargetMesh->GetChildActor()) ChildActor->SetActorEnableCollision(false);
+	LocationTarget = CreateDefaultSubobject<USceneComponent>(TEXT("LocationTarget"));
+	LocationTarget->SetupAttachment(Root);
+	LocationTarget->SetHiddenInGame(true);
 }
 
 void AArena::SpawnActors()
@@ -109,41 +106,39 @@ void AArena::SpawnNextEnemyWave()
 }
 void AArena::SetupFlag()
 {
-	FlagMesh->SetHiddenInGame(false);
-	if (auto ChildActor = FlagMesh->GetChildActor())
+	if (auto Spawned = GetWorld()->SpawnActor<AFlag>(Flag->GetComponentLocation(), FRotator(0)))
 	{
-		auto Objective = Cast<AFlag>(ChildActor);
-		if (!ensure(Objective != nullptr)) { return; }
-		Objective->SetActorEnableCollision(true);
-		Objective->OnFlagCollision.BindUFunction(this, FName("AquireFlag"));
+		Spawned->OnFlagCollision.BindUFunction(this, FName("AquireFlag"));
+		Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 	}
+	SpawnedFlagTarget = GetWorld()->SpawnActor<AFlagTarget>(FlagTarget->GetComponentLocation(), FRotator(0));
+	if (!ensure(SpawnedFlagTarget != nullptr)) { return; }
+	SpawnedFlagTarget->OnFlagTargetCollision.BindUFunction(this, FName("TryDeliverFlag"));
+	SpawnedFlagTarget->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 
-	FlagTargetMesh->SetHiddenInGame(false);
-	if (auto ChildActor = LocationTargetMesh->GetChildActor())
-	{
-		auto Objective = Cast<AFlagTarget>(ChildActor);
-		if (!ensure(Objective != nullptr)) { return; }
-		Objective->SetActorEnableCollision(true);
-		Objective->OnFlagTargetCollision.BindUFunction(this, FName("TryDeliverFlag"));
-	}
+	UE_LOG(LogTemp, Log, TEXT("Capture The Flag Setup Finished"));
 }
 void AArena::TryDeliverFlag()
 {
 	if (bHasFlag)
 	{
+		UE_LOG(LogTemp, Log, TEXT("Flag Delivered"));
 		FinishObjective();
+		if (SpawnedFlagTarget)
+		{
+			SpawnedFlagTarget->Destroy();
+		}
 	}
 }
 void AArena::SetupObjective()
 {
-	LocationTargetMesh->SetHiddenInGame(false);
-	auto ChildActor = LocationTargetMesh->GetChildActor();
-	if (!ensure(ChildActor != nullptr)) { return; }
-	
-	auto Objective = Cast<ATargetLocation>(ChildActor);
-	if (!ensure(Objective != nullptr)) { return; }
-	Objective->SetActorEnableCollision(true);
-	Objective->OnTargetLocationCollision.BindUFunction(this, TEXT("FinishObjective"));
+	if (auto Spawned = GetWorld()->SpawnActor<ATargetLocation>(LocationTarget->GetComponentLocation(), FRotator(0)))
+	{
+		Spawned->OnTargetLocationCollision.BindUFunction(this, FName("FinishObjective"));
+		Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("Reach Objective Setup Finished"));
 }
 void AArena::SetupKillAll()
 {
@@ -209,6 +204,8 @@ void AArena::SpawnBoss(int32 SpawnNum, TArray<UActorComponent*> SpawnLocations)
 			SpawnedEnemies.Add(Spawned);
 		}
 	}
+
+	UE_LOG(LogTemp, Log, TEXT("Spawn Boss"));
 }
 
 void AArena::SpawnBossAdds(int32 SpawnNum, TArray<UActorComponent*> SpawnLocations)
@@ -235,6 +232,8 @@ void AArena::SpawnBossAdds(int32 SpawnNum, TArray<UActorComponent*> SpawnLocatio
 			SpawnedEnemies.Add(Spawned);
 		}
 	}
+
+	UE_LOG(LogTemp, Log, TEXT("Spawn Boss Adds"));
 }
 
 void AArena::FinishObjective()
@@ -269,9 +268,12 @@ void AArena::FinishObjective()
 		Spawned->ShowPopupMessage(FKey("F"), FText::FromString("PRESS F TO CONTINUE"));
 		Spawned->OnConditionFufilled.BindUFunction(this, TEXT("FinishArena"));
 	}
+
+	UE_LOG(LogTemp, Log, TEXT("Objective Finished"));
 }
 void AArena::FinishArena()
 {
+	UE_LOG(LogTemp, Log, TEXT("Arena Finished"));
 	OnArenaFinished.ExecuteIfBound();
 }
 

@@ -45,12 +45,15 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 	USceneComponent* PlayerStartLocation;
 
+	//Should Be 100 - 200 Unit Above Ground
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-	UChildActorComponent* FlagMesh;
+	USceneComponent* Flag;
+	//Should Be 100 - 200 Unit Above Ground
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-	UChildActorComponent* FlagTargetMesh;
+	USceneComponent* FlagTarget;
+	//Should Be 1 Unit Above Ground
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-	UChildActorComponent* LocationTargetMesh;
+	USceneComponent* LocationTarget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Arena")
 	TMap<TEnumAsByte<EObjectives>, FArenaSettings> Objectives;
@@ -70,6 +73,7 @@ public:
 private:
 	TArray<class ASuper_AI_Character*> SpawnedEnemies;
 	TMap<class UEnemySpawnLocation* , class ASuper_AI_Character*> SpawnedTurrets;
+	class AFlagTarget* SpawnedFlagTarget;
 
 	EObjectives CurrentObjective;
 	FTimerHandle SpawnEnemiesHandle;

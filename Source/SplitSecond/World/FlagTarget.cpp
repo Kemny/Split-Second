@@ -45,7 +45,6 @@ void AFlagTarget::OnCollision(UPrimitiveComponent* OverlappedComponent, AActor* 
 {
 	if (OtherActor == GetWorld()->GetFirstPlayerController()->GetPawn())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("OnOverlap"));
 		OnFlagTargetCollision.ExecuteIfBound();
 	}
 }
