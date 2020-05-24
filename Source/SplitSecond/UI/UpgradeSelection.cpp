@@ -83,9 +83,9 @@ void UUpgradeSelection::SetBossTextUpgradeValue(UTextBlock* TextToSet, EBosssUpg
 	case EBosssUpgrades::IsPiercing:
 		TextToSet->SetText(FText::FromString("Piercing Bullets"));
 		break;
-	case EBosssUpgrades::IsHoming:
+	/*case EBosssUpgrades::IsHoming:
 		TextToSet->SetText(FText::FromString("Homing Bullets"));
-		break;
+		break;*/
 	case EBosssUpgrades::IsBouncing:
 		TextToSet->SetText(FText::FromString("Bouncing Bullets"));
 		break;
@@ -95,9 +95,9 @@ void UUpgradeSelection::SetBossTextUpgradeValue(UTextBlock* TextToSet, EBosssUpg
 	case EBosssUpgrades::ExtraLife:
 		TextToSet->SetText(FText::FromString("Extra Life"));
 		break;
-	case EBosssUpgrades::CanThrowGun:
+	/*case EBosssUpgrades::CanThrowGun:
 		TextToSet->SetText(FText::FromString("Throwable Gun"));
-		break;
+		break;*/
 	default:
 		break;
 	}
@@ -561,7 +561,7 @@ bool UUpgradeSelection::CreateRandomBossUpgrade(int32 index, EBosssUpgrades& Out
 				OutType = EBosssUpgrades::ExtraLife;
 			}
 			break;
-		case 4:
+		/*case 4:
 			if (!PlayerUpgrades->bIsHoming)
 			{
 				OutType = EBosssUpgrades::IsHoming;
@@ -572,7 +572,7 @@ bool UUpgradeSelection::CreateRandomBossUpgrade(int32 index, EBosssUpgrades& Out
 			{
 				OutType = EBosssUpgrades::CanThrowGun;
 			}
-			break;
+			break;*/
 		default:
 			break;
 		}
