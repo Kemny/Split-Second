@@ -85,7 +85,7 @@ void AArena::SpawnActors()
 			SetupFlag();
 			break;
 		case KillAllEnemies:
-			SetupKillAll();
+			SpawnKillAllWave();
 			PlayerPawn->GetPlayerUI()->SetObjectiveName(FString("Kill All Enemies"));
 			break;
 		case KillBoss:
@@ -97,18 +97,6 @@ void AArena::SpawnActors()
 	}
 }
 
-void AArena::SpawnNextEnemyWave()
-{
-	auto Settings = Objectives.Find(CurrentObjective);
-	if (!ensure(Settings != nullptr)) { return; }
-
-	auto EnemySpawnLocations = GetComponentsByClass(UEnemySpawnLocation::StaticClass());
-	if (!ensure(EnemySpawnLocations.Num() >= Settings->EnemiesPerWaveMin)) { return; }
-
-
-	auto SpawnNum = FMath::RandRange(Settings->EnemiesPerWaveMin, Settings->EnemiesPerWaveMax);
-	SpawnEnemies(SpawnNum, EnemySpawnLocations);
-}
 void AArena::SetupFlag()
 {
 	if (auto Spawned = GetWorld()->SpawnActor<AFlag>(FlagScene->GetComponentLocation(), FRotator(0)))
@@ -145,10 +133,27 @@ void AArena::SetupObjective()
 
 	UE_LOG(LogTemp, Log, TEXT("Reach Objective Setup Finished"));
 }
-void AArena::SetupKillAll()
+void AArena::SpawnKillAllWave()
 {
-	UE_LOG(LogTemp, Error, TEXT("Kill All Enemis Not Yet Implemented"));
-	///TODO This cannot be implemented before we have enemy death state
+	if (auto Settings = Objectives.Find(EObjectives::KillAllEnemies))
+	{
+		if (Settings->EnemyTotal <= 0) FinishObjective();
+		if (Settings->EnemyTotal < Settings->EnemiesPerWaveMax)
+		{
+			Settings->EnemiesPerWaveMax = Settings->EnemyTotal;
+			if (Settings->EnemiesPerWaveMin > Settings->EnemiesPerWaveMax)
+			{
+				Settings->EnemiesPerWaveMin = Settings->EnemiesPerWaveMax;
+			}
+		}
+
+		auto EnemySpawnLocations = GetComponentsByClass(UEnemySpawnLocation::StaticClass());
+		if (!ensure(EnemySpawnLocations.Num() >= Settings->EnemiesPerWaveMin)) { return; }
+
+		auto SpawnNum = FMath::RandRange(Settings->EnemiesPerWaveMin, Settings->EnemiesPerWaveMax);
+		SpawnEnemies(SpawnNum, EnemySpawnLocations);
+		Settings->EnemyTotal -= SpawnNum;
+	}
 }
 void AArena::SetupKillBoss()
 {
@@ -164,6 +169,18 @@ void AArena::SetupKillBoss()
 	}
 }
 
+void AArena::SpawnNextEnemyWave()
+{
+	auto Settings = Objectives.Find(CurrentObjective);
+	if (!ensure(Settings != nullptr)) { return; }
+
+	auto EnemySpawnLocations = GetComponentsByClass(UEnemySpawnLocation::StaticClass());
+	if (!ensure(EnemySpawnLocations.Num() >= Settings->EnemiesPerWaveMin)) { return; }
+
+
+	auto SpawnNum = FMath::RandRange(Settings->EnemiesPerWaveMin, Settings->EnemiesPerWaveMax);
+	SpawnEnemies(SpawnNum, EnemySpawnLocations);
+}
 void AArena::SpawnEnemies(int32 SpawnNum, TArray<UActorComponent*> SpawnLocations)
 {
 	TArray<int32> SpawnedIndexes;
@@ -242,6 +259,17 @@ void AArena::FinishArena()
 void AArena::OnEnemyDeath(ASuper_AI_Character* KilledAI)
 {
 	SpawnedEnemies.Remove(KilledAI);
+	if (SpawnedEnemies.Num() <= 0)
+	{
+		if (CurrentObjective == EObjectives::KillAllEnemies)
+		{
+			SpawnKillAllWave();
+		}
+		else
+		{
+			SpawnNextEnemyWave();
+		}
+	}
 }
 
 void AArena::OnBossDeath(ASuper_AI_Character* KilledAI)

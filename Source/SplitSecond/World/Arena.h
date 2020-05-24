@@ -33,6 +33,9 @@ public:
 	UPROPERTY(EditAnywhere)int32 WaveInterval = 60;
 	UPROPERTY(EditAnywhere, meta = (UIMin = '1'))int32 EnemiesPerWaveMin = 1;
 	UPROPERTY(EditAnywhere, meta = (UIMin = '1'))int32 EnemiesPerWaveMax = 1;
+	/*KILL ALL ENEMIES ONLY*/
+	UPROPERTY(EditAnywhere)int32 EnemyTotal = 10;
+
 };
 
 UCLASS()
@@ -78,7 +81,7 @@ private:
 
 	void SetupFlag();
 	void SetupObjective();
-	void SetupKillAll();
+	UFUNCTION() void SpawnKillAllWave();
 	void SetupKillBoss();
 
 	void SpawnEnemies(int32 NumberToSpawn, TArray<UActorComponent*> SpawnLocations);

@@ -136,9 +136,8 @@ void ASplitSecondGameMode::SpawnNextArena()
 		CurrentArena->SpawnActors();
 		UNavigationSystemV1::GetNavigationSystem(GetWorld())->Build();
 	}
-
-	++ArenaNum;
 	UE_LOG(LogTemp, Log, TEXT("Arena Num: %i"), ArenaNum);
+	++ArenaNum;
 }
 
 void ASplitSecondGameMode::SpawnUpgradeScreen()
