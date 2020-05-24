@@ -56,6 +56,7 @@ public:
 	float BounceSpeedLoss = 1;
 
 protected:
+	UPROPERTY(EditAnywhere, Category = "FX")
 	class UNiagaraSystem* NiagaraSystem;
 	FTimerHandle SlowTimerHandle;
 };

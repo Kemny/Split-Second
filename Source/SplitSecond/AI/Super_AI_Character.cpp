@@ -63,8 +63,6 @@ void ASuper_AI_Character::Tick(float DeltaTime)
             auto LookAt = GetNewRot(Player->GetActorLocation());
             auto Yaw = FMath::FInterpTo(GetActorRotation().Yaw, LookAt.Yaw, DeltaTime, RotationSpeed);
 
-            UE_LOG(LogTemp, Warning, TEXT("%f"), LookAt.Yaw);
-
             SetActorRelativeRotation(FRotator(0, Yaw, 0));
         }
     }
