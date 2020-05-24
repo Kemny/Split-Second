@@ -88,6 +88,9 @@ void AArena::SpawnActors()
 			SetupKillAll();
 			PlayerPawn->GetPlayerUI()->SetObjectiveName(FString("Kill All Enemies"));
 			break;
+		case KillBoss:
+			SetupKillBoss();
+			PlayerPawn->GetPlayerUI()->SetObjectiveName(FString("Kill Boss"));
 		default:
 			break;
 		}
@@ -147,6 +150,19 @@ void AArena::SetupKillAll()
 	UE_LOG(LogTemp, Error, TEXT("Kill All Enemis Not Yet Implemented"));
 	///TODO This cannot be implemented before we have enemy death state
 }
+void AArena::SetupKillBoss()
+{
+	if (auto SpawnLocation = GetComponentByClass(UBossSpawnLocation::StaticClass()))
+	{
+		auto BossSpawnLocationComponent = Cast<UBossSpawnLocation>(SpawnLocation);
+		if (auto Spawned = GetWorld()->SpawnActor<ASuper_Boss>(BossSpawnLocationComponent->GetCurrentTypeClass(), FTransform(FRotator(0), BossSpawnLocationComponent->GetBoxCenter(), FVector(1))))
+		{
+			Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+			Spawned->OnDeath.AddUniqueDynamic(this, &AArena::OnBossDeath);
+			SpawnedEnemies.Add(Spawned);
+		}
+	}
+}
 
 void AArena::SpawnEnemies(int32 SpawnNum, TArray<UActorComponent*> SpawnLocations)
 {
@@ -178,32 +194,6 @@ void AArena::SpawnEnemies(int32 SpawnNum, TArray<UActorComponent*> SpawnLocation
 					SpawnedTurrets.Add(EnemySpawnLocationComponent, Spawned);
 				}
 			}
-		}
-	}
-}
-
-void AArena::SpawnBoss(int32 SpawnNum, TArray<UActorComponent*> SpawnLocations)
-{
-	TArray<int32> SpawnedIndexes;
-	for (size_t i = 0; i < SpawnNum; i++)
-	{
-		int32 SpawnIndex;
-		do
-		{
-			SpawnIndex = FMath::RandRange(0, SpawnLocations.Num() - 1);
-		} while (SpawnedIndexes.Contains(SpawnIndex));
-
-		SpawnedIndexes.Add(SpawnIndex);
-	}
-
-	for (size_t i = 0; i < SpawnedIndexes.Num(); i++)
-	{
-		auto BossSpawnLocationComponent = Cast<UBossSpawnLocation>(SpawnLocations[SpawnedIndexes[i]]);
-		if (auto Spawned = GetWorld()->SpawnActor<ASuper_Boss>(BossSpawnLocationComponent->GetCurrentTypeClass(), FTransform(FRotator(0), BossSpawnLocationComponent->GetBoxCenter(), FVector(1))))
-		{
-			Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-			Spawned->OnDeath.AddUniqueDynamic(this, &AArena::OnBossDeath);
-			SpawnedEnemies.Add(Spawned);
 		}
 	}
 }

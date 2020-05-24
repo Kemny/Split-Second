@@ -15,6 +15,7 @@ enum EObjectives
 	ReachObjective,
 	CaptureTheFlag,
 	KillAllEnemies,
+	KillBoss
 };
 
 /*
@@ -62,9 +63,6 @@ public:
 	AArena();
 	void SpawnActors();
 
-	UFUNCTION(BlueprintCallable, Category = "Arean Functions")
-	void SpawnBoss(int32 SpawnNum, TArray<UActorComponent*> SpawnLocations);
-
 	FArenaDelegate OnArenaFinished;
 	
 private:
@@ -81,6 +79,7 @@ private:
 	void SetupFlag();
 	void SetupObjective();
 	void SetupKillAll();
+	void SetupKillBoss();
 
 	void SpawnEnemies(int32 NumberToSpawn, TArray<UActorComponent*> SpawnLocations);
 
