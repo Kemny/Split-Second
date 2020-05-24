@@ -5,6 +5,8 @@
 #include "GameFramework/RotatingMovementComponent.h"
 #include "Engine/World.h"
 #include "../Health/HealthComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "../Weapons/SplitSecondProjectile.h"
 
@@ -62,6 +64,8 @@ void AAI_TurretBase::OnTakeDamage()
 		DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		DetachFromControllerPendingDestroy();
 		OnDeath.Broadcast(this);
+
+        UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NiagaraSystem, GetActorLocation(), GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
 
         Destroy();
 	}

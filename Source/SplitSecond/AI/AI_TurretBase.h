@@ -47,6 +47,8 @@ public:
 
   void OnTakeDamage() override;
 
+  UPROPERTY(EditAnywhere, Category = "FX")
+  class UNiagaraSystem* NiagaraSystem;
 
 protected:
   
