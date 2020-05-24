@@ -53,23 +53,6 @@ void ASplitSecondProjectile::OnOverlapBegin(class UPrimitiveComponent* Overlappe
 	OnBulletOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 }
 
-void ASplitSecondProjectile::GetSlowed(float SlowTime, float SlowAmmount)
-{
-	if (GetWorldTimerManager().IsTimerActive(SlowTimerHandle)) return;
-
-	BulletMesh->CreateAndSetMaterialInstanceDynamic(0)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0, 0, 1, 1));
-	BulletMesh->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor(0, 0, 1, 1));
-
-	CustomTimeDilation = SlowAmmount;
-	GetWorldTimerManager().SetTimer(SlowTimerHandle, this, &ASplitSecondProjectile::StopBeingSlowed, SlowTime, false);
-}
-void ASplitSecondProjectile::StopBeingSlowed()
-{ 
-	CustomTimeDilation = 1;
-	BulletMesh->CreateAndSetMaterialInstanceDynamic(0)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor::Red);
-	BulletMesh->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(FName(TEXT("Color")), FLinearColor::Red);
-}
-
 void ASplitSecondProjectile::OnBulletHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
   APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();

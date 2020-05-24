@@ -4,6 +4,24 @@
 #include "../../../Player/PlayerCharacter.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "../../../SplitSecondGameMode.h"
+#include "TimerManager.h"
+
+void AAIProjectile::BeginPlay()
+{
+	Super::BeginPlay();
+
+	auto Gamemode = GetWorld()->GetAuthGameMode<ASplitSecondGameMode>();
+	if (!ensure(Gamemode != nullptr)) { return; }
+
+	if (Gamemode->GetIsGameSlowed())
+	{
+		CustomTimeDilation = Gamemode->GetCurrentSlowValue();
+
+		FTimerHandle Handle;
+		GetWorldTimerManager().SetTimer(Handle, this, &AAIProjectile::StopBeingSlowed, FMath::Abs(Gamemode->GetSlowEndTime() - GetWorld()->GetTimeSeconds()), false);
+	}
+}
 
 void AAIProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
@@ -20,4 +38,9 @@ void AAIProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 
 		Destroy();
 	}
+}
+
+void AAIProjectile::StopBeingSlowed()
+{
+	CustomTimeDilation = 1;
 }

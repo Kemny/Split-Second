@@ -61,6 +61,9 @@ private:
 
 	class AArena* CurrentArena;
 	TArray<AActor*> SlowedActors;
+	float SlowEndTime;
+	float CurrentSlowValue;
+	bool bGameIsSlowed = false;
 
 	TSubclassOf<class ASuper_Gun> PistolClass;
 	TSubclassOf<class ASuper_Gun> ShotgunClass;
@@ -78,6 +81,9 @@ public:
 	int32 GetArenaNum() const { return ArenaNum; }
 	int32 GetHighscore() const { return ArenaHighscore; }
 	int32 GetKills() const { return Kills; }
+	float GetSlowEndTime() const { return SlowEndTime ; }
+	bool GetIsGameSlowed() const { return bGameIsSlowed; }
+	float GetCurrentSlowValue() const { return CurrentSlowValue; }
 
 };
 

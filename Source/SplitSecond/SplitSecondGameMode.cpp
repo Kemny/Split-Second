@@ -174,12 +174,15 @@ void ASplitSecondGameMode::PlayerSlowGame()
 {
 	if (!ensure(SplitSecondPlayerState != nullptr)) { return; }
 
+	bGameIsSlowed = true;
+	CurrentSlowValue = SplitSecondPlayerState->CurrentStats.GameSlowValue;
+
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ASuper_AI_Character::StaticClass(), FoundActors);
 
 	for (auto FoundActor : FoundActors)
 	{
-		FoundActor->CustomTimeDilation = SplitSecondPlayerState->CurrentStats.GameSlowValue;
+		FoundActor->CustomTimeDilation = CurrentSlowValue;
 		SlowedActors.Add(FoundActor);
 	}
 
@@ -188,7 +191,7 @@ void ASplitSecondGameMode::PlayerSlowGame()
 
 	for (auto FoundProjectile : FoundProjectiles)
 	{
-		FoundProjectile->CustomTimeDilation = SplitSecondPlayerState->CurrentStats.GameSlowValue;
+		FoundProjectile->CustomTimeDilation = CurrentSlowValue;
 		SlowedActors.Add(FoundProjectile);
 	}
 
@@ -197,12 +200,13 @@ void ASplitSecondGameMode::PlayerSlowGame()
 
 	for (auto FoundTrap : FoundTraps)
 	{
-		FoundTrap->CustomTimeDilation = SplitSecondPlayerState->CurrentStats.GameSlowValue;
+		FoundTrap->CustomTimeDilation = CurrentSlowValue;
 		SlowedActors.Add(FoundTrap);
 	}
 
 	FTimerHandle Handle;
 	GetWorldTimerManager().SetTimer(Handle, this, &ASplitSecondGameMode::StopPlayerSlowGame, SplitSecondPlayerState->CurrentStats.GameSlowDuration, false);
+	SlowEndTime = SplitSecondPlayerState->CurrentStats.GameSlowDuration + GetWorld()->GetTimeSeconds();
 }
 
 void ASplitSecondGameMode::StopPlayerSlowGame()
@@ -214,6 +218,8 @@ void ASplitSecondGameMode::StopPlayerSlowGame()
 			SlowedActor->CustomTimeDilation = 1;
 		}
 	}
+
+	bGameIsSlowed = false;
 }
 
 void ASplitSecondGameMode::OnPlayerDeath()

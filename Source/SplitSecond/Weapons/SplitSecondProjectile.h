@@ -35,9 +35,6 @@ public:
 	FORCEINLINE class UBulletMovementComponent* GetProjectileMovement() const { return BulletMovement; }
 	FORCEINLINE class UStaticMeshComponent* GetBulletMesh() const { return BulletMesh; }
 
-	void GetSlowed(float SlowTime, float SlowAmmount);
-	UFUNCTION() void StopBeingSlowed();
-
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Bullet Events")
 	void OnBulletHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	virtual void OnBulletHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
