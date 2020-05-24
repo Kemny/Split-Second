@@ -21,6 +21,10 @@ ATargetLocation::ATargetLocation()
 	Sphere->SetupAttachment(Root);
 	Sphere->OnComponentBeginOverlap.AddUniqueDynamic(this, &ATargetLocation::OnCollision);
 	Sphere->SetSphereRadius(200);
+	Sphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+	Sphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel2, ECollisionResponse::ECR_Ignore);
+	Sphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel3, ECollisionResponse::ECR_Ignore);
+	Sphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel4, ECollisionResponse::ECR_Ignore);
 
 	ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleSystem_Class(TEXT("/Game/Particles/P_Objective_Circle"));
 	if (ParticleSystem_Class.Object) ParticleSystem = ParticleSystem_Class.Object;

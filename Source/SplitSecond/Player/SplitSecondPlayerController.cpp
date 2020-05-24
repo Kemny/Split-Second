@@ -88,7 +88,7 @@ void ASplitSecondPlayerController::SlowTarget()
 {
 	auto SplitSecondPlayerState = GetPawn()->GetPlayerState<ASplitSecondPlayerState>();
 	if (!ensure(PlayerState != nullptr)) { return; }
-	if (HoveredEnemy)
+	if (HoveredEnemy && !HoveredEnemy->GetIsSlowed())
 	{
 		HoveredEnemy->GetSlowed(SplitSecondPlayerState->CurrentStats.ActorSlowDuration, SplitSecondPlayerState->CurrentStats.ActorSlowValue);
 
