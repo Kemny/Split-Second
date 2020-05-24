@@ -65,6 +65,12 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Gun Functions")
     void FireGun();
 
+    UFUNCTION(BlueprintCallable, Category = "AI Functions")
+    virtual void ScaleEnemyHealth(float BaseValue);
+
+	UFUNCTION(BlueprintCallable, Category = "AI Functions")
+	virtual void ScaleEnemyDamage(float BaseValue);
+
 	/* Damage the AI applies to the player */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun Vars")
 	float Damage;
@@ -106,6 +112,8 @@ protected:
     UPROPERTY(EditAnywhere, Category = "Health")
     float DeathDespawnTime = 5;
 
+	class ASplitSecondGameMode* Gamemode;
+
 private:
     bool bIsSlowed = false;
 
@@ -113,5 +121,4 @@ private:
 
     UFUNCTION() virtual void OnTakeDamage();
     UFUNCTION() void DestroyAfterDeath();
-
 };

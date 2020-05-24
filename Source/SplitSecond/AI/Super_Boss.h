@@ -19,4 +19,7 @@ public:
     /* Resets time dilation back to 1 */
     UFUNCTION(BlueprintCallable, Category = "Boss Functions")
     void ResetTimeDilation();
+
+	void ScaleEnemyHealth(float BaseValue) override;
+	void ScaleEnemyDamage(float BaseValue) override;
 };

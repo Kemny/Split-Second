@@ -49,8 +49,6 @@ void UHealthComponent::Heal(float HealAmount)
 	float NewHealth = Health + HealAmount;
 	Health = FMath::Clamp(NewHealth, 0.0f, MaxHealth);
 
-	UE_LOG(LogTemp, Log, TEXT("%s 's Current HP is: %f Amount: %f"), *GetOwner()->GetName(), Health, HealAmount);
-
 	OnHealthChanged.ExecuteIfBound();
 }
 

@@ -49,6 +49,10 @@ public:
 	UFUNCTION() void OnPlayerDeath();
 	UFUNCTION() void OnConfirmedPlayerDeath();
 
+	UPROPERTY(EditDefaultsOnly, Category = "Game Scaling") float EnemyDamageScaler = 2;
+	UPROPERTY(EditDefaultsOnly, Category = "Game Scaling") float EnemyHealthScaler = 2;
+	UPROPERTY(EditDefaultsOnly, Category = "Game Scaling") float BossDamageScaler = 1.5;
+	UPROPERTY(EditDefaultsOnly, Category = "Game Scaling") float BossHealthScaler = 4;
 
 private:
 	int32 ArenaNum = 0;

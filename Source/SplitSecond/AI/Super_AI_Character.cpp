@@ -8,10 +8,12 @@
 #include "SplitSecond_AI_Controller.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Math/UnrealMathUtility.h"
+#include "../AI/Super_Boss.h"
 #include "Components/BoxComponent.h"
 #include "TimerManager.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "../SplitSecondGameMode.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -50,6 +52,12 @@ void ASuper_AI_Character::BeginPlay()
 
 	SpawnGun();
 
+    Gamemode = Cast<ASplitSecondGameMode>(UGameplayStatics::GetGameMode(this));
+
+    ScaleEnemyDamage(Damage);
+
+    if (!ensure(HealthComponent != nullptr)) { return; }
+    ScaleEnemyHealth(HealthComponent->GetMaxHealth());
 }
 
 void ASuper_AI_Character::Tick(float DeltaTime)
@@ -174,4 +182,18 @@ void ASuper_AI_Character::OnTakeDamage()
 void ASuper_AI_Character::DestroyAfterDeath()
 {
     Destroy();
+}
+
+void ASuper_AI_Character::ScaleEnemyHealth(float BaseValue)
+{
+    if (!ensure(Gamemode != nullptr)) { return; }
+    float NewValue = (Gamemode->GetArenaNum() / 10 * BaseValue * Gamemode->EnemyHealthScaler) + BaseValue;
+    HealthComponent->ChangeMaxHealth(NewValue);
+}
+
+void ASuper_AI_Character::ScaleEnemyDamage(float BaseValue)
+{
+    if (!ensure(Gamemode != nullptr)) { return; }
+    float NewValue = (Gamemode->GetArenaNum() / 10 * BaseValue * Gamemode->EnemyDamageScaler) + BaseValue;
+    Damage = NewValue;
 }
