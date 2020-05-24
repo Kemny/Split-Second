@@ -15,6 +15,8 @@
 #include "../AI/Super_AI_Character.h"
 #include "../UI/PopupMessage.h"
 #include "../AI/AI_TurretBase.h"
+#include "../Weapons/Guns/AI/AIProjectile.h"
+#include "Kismet/GameplayStatics.h"
 #include "BossSpawnLocation.h"
 #include "UObject/ConstructorHelpers.h"
 #include "TimerManager.h"
@@ -246,6 +248,13 @@ void AArena::FinishObjective()
 	{
 		Spawned->ShowPopupMessage(FKey("F"), FText::FromString("PRESS F TO CONTINUE"));
 		Spawned->OnConditionFufilled.BindUFunction(this, TEXT("FinishArena"));
+	}
+
+	TArray<AActor*> OutActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAIProjectile::StaticClass(), OutActors);
+	for (auto Projectile : OutActors)
+	{
+		Projectile->Destroy();
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("Objective Finished"));
