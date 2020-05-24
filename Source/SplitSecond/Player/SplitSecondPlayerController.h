@@ -56,6 +56,11 @@ public:
   void HandlePlayerConfirmedDeath();
 
 protected:
+	UPROPERTY(EditAnywhere, Category = "Time Slow")
+	FPostProcessSettings NormalPostProcess;
+	UPROPERTY(EditAnywhere, Category = "Time Slow")
+	FPostProcessSettings SlowedPostProcess;
+
   /** Common logic needed in both `InputAxis()` and `InputKey()` */
   FORCEINLINE void _UpdateGamepad(bool bGamepad)
   {
@@ -72,6 +77,7 @@ protected:
   float LastGamepadInputTime;
 
 private:
+	class APlayerCharacter* PlayerCharacter;
 	bool GameSlowOnCooldown = false;
 
 	void BeginPlay() override;
@@ -87,6 +93,7 @@ private:
 	class ASuper_AI_Character* HoveredEnemy;
 
 	UFUNCTION() void OnGameSlowCooldownFinished();
+	UFUNCTION() void OnGameSlowFinished();
 
 };
 

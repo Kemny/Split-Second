@@ -26,6 +26,9 @@ void ASplitSecondPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	PlayerCharacter = GetPawn<APlayerCharacter>();
+	if (!ensure(PlayerCharacter != nullptr)) { return; }
+	PlayerCharacter->GetFirstPersonCameraComponent()->PostProcessSettings = NormalPostProcess;
 }
 
 void ASplitSecondPlayerController::SetupInputComponent()
@@ -104,21 +107,29 @@ void ASplitSecondPlayerController::SlowGame()
 	GameSlowOnCooldown = true;
 
 	auto SplitSecondPlayerState = GetPawn()->GetPlayerState<ASplitSecondPlayerState>();
-	if (!ensure(PlayerState != nullptr)) { return; }
-
-	auto PlayerPawn = GetPawn<APlayerCharacter>();
-	if (!ensure(PlayerPawn != nullptr)) { return; }
-	PlayerPawn->GetPlayerUI()->ActivateTimeSlow(SplitSecondPlayerState->CurrentStats.GameSlowCooldown);
+	if (!ensure(SplitSecondPlayerState != nullptr)) { return; }
+	if (!ensure(PlayerCharacter != nullptr)) { return; }
+	PlayerCharacter->GetPlayerUI()->ActivateTimeSlow(SplitSecondPlayerState->CurrentStats.GameSlowCooldown);
 
 	FTimerHandle Handle;
+	FTimerHandle Handle2;
 	GetWorldTimerManager().SetTimer(Handle, this, &ASplitSecondPlayerController::OnGameSlowCooldownFinished, SplitSecondPlayerState->CurrentStats.GameSlowCooldown, false);
+	GetWorldTimerManager().SetTimer(Handle2, this, &ASplitSecondPlayerController::OnGameSlowFinished, SplitSecondPlayerState->CurrentStats.GameSlowDuration, false);
 
 	OnPlayerSlowGame.ExecuteIfBound();
+
+	PlayerCharacter->GetFirstPersonCameraComponent()->PostProcessSettings = SlowedPostProcess;
 }
 void ASplitSecondPlayerController::OnGameSlowCooldownFinished()
 {
 	GameSlowOnCooldown = false;
 }
+void ASplitSecondPlayerController::OnGameSlowFinished()
+{
+	if (!ensure(PlayerCharacter != nullptr)) { return; }
+	PlayerCharacter->GetFirstPersonCameraComponent()->PostProcessSettings = NormalPostProcess;
+}
+
 FHitResult ASplitSecondPlayerController::LineTraceFromCamera(ECollisionChannel Collision)
 {
 	FHitResult HitResult;
