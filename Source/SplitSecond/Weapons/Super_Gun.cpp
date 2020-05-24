@@ -15,6 +15,7 @@
 #include "Guns/Player/PlayerProjectile.h"
 #include "BulletMovementComponent.h"
 #include "../SplitSecondPlayerState.h"
+#include "UObject/ConstructorHelpers.h"
 
 // Sets default values
 ASuper_Gun::ASuper_Gun()
@@ -30,6 +31,9 @@ ASuper_Gun::ASuper_Gun()
 
     GunMesh->bCastDynamicShadow = false;
     GunMesh->CastShadow = false;
+
+    ConstructorHelpers::FObjectFinder<UStaticMesh> BP_KnifeMesh(TEXT("/Game/Meshes/SM_Knife"));
+    if (BP_KnifeMesh.Object) KnifeMesh = BP_KnifeMesh.Object;
 }
 
 void ASuper_Gun::BeginPlay()
@@ -67,6 +71,8 @@ void ASuper_Gun::SetupPiercingCollison()
     if (CurrentProjectile->bIsPiercing)
     {
         CurrentProjectile->GetCollisionComp()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+        CurrentProjectile->GetBulletMesh()->SetStaticMesh(KnifeMesh);
+        CurrentProjectile->GetBulletMesh()->SetWorldScale3D(FVector(2));
     }
 }
 
@@ -81,12 +87,12 @@ APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector con
             auto Upgrades = PlayerCharacter->GetPlayerState<ASplitSecondPlayerState>()->CurrentStats;
 
             CurrentProjectile->DamageValue = Upgrades.Damage;
-            CurrentProjectile->GetProjectileMovement()->InitialSpeed = Upgrades.ProjectileSpeed;
+            CurrentProjectile->GetProjectileMovement()->Velocity = CurrentProjectile->GetProjectileMovement()->Velocity.GetSafeNormal()* Upgrades.ProjectileSpeed;
 
-            CurrentProjectile->bIsPiercing = Upgrades.bIsPiercing;
             if (CurrentProjectile->bIsPiercing)
             {
                 SetupPiercingCollison();
+                CurrentProjectile->bIsPiercing = true;
             }
 
             CurrentProjectile->bIsExplosive = Upgrades.bExplodingBullets;
@@ -100,10 +106,9 @@ APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector con
                 CurrentProjectile->GetProjectileMovement()->bIsHomingProjectile = true;
             }
         }
-        return CurrentProjectile;
     }
 
-    return nullptr;
+    return CurrentProjectile;
 }
 
 void ASuper_Gun::AfterPlayerFireGun(UMeshComponent* GunMeshToEdit)

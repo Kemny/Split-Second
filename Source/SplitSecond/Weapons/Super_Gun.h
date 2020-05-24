@@ -75,7 +75,7 @@ protected:
   float ReloadSpeed;
 
   class UMeshComponent* LocalGunMeshToEdit;
-
+  UStaticMesh* KnifeMesh;
   class APlayerProjectile* Player_SpawnProjectile(UClass* Class, FVector const& Location, FRotator const& Rotation, const FActorSpawnParameters& SpawnParameters);
   void AfterPlayerFireGun(class UMeshComponent* GunMeshToEdit);
 

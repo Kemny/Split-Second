@@ -19,6 +19,7 @@
 #include "World/Traps/SuperTrap.h"
 #include "UI/PlayerUI.h"
 #include "SplitSecondGameInstance.h"
+#include "Health/HealthComponent.h"
 
 ASplitSecondGameMode::ASplitSecondGameMode()
 	: Super()
@@ -155,6 +156,11 @@ void ASplitSecondGameMode::SpawnUpgradeScreen()
 		Created->ShowUpgradeSelection(&SplitSecondPlayerState->CurrentStats, PlayerGun, false, SplitSecondPlayerCharacter->GetHealthComponent());
 		Created->OnUpgradeSelected.BindUFunction(this, TEXT("SpawnNextArena"));
 	}
+
+	if (SplitSecondPlayerCharacter)
+	{
+		SplitSecondPlayerCharacter->GetHealthComponent()->Heal(SplitSecondPlayerCharacter->GetHealthComponent()->GetMaxHealth() * 0.1);
+	}
 }
 void ASplitSecondGameMode::SpawnBossUpgradeScreen()
 {
@@ -167,6 +173,11 @@ void ASplitSecondGameMode::SpawnBossUpgradeScreen()
 	{
 		Created->ShowUpgradeSelection(&SplitSecondPlayerState->CurrentStats, PlayerGun, true, SplitSecondPlayerCharacter->GetHealthComponent());
 		Created->OnUpgradeSelected.BindUFunction(this, TEXT("SpawnNextArena"));
+	}
+
+	if (SplitSecondPlayerCharacter)
+	{
+		SplitSecondPlayerCharacter->GetHealthComponent()->Heal(SplitSecondPlayerCharacter->GetHealthComponent()->GetMaxHealth() * 0.1);
 	}
 }
 
