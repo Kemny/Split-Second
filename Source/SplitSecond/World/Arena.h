@@ -67,7 +67,8 @@ public:
 	void SpawnActors();
 
 	FArenaDelegate OnArenaFinished;
-	
+	FArenaDelegate OnEnemyDeath;
+
 private:
 	TArray<class ASuper_AI_Character*> SpawnedEnemies;
 	TMap<class UEnemySpawnLocation* , class ASuper_AI_Character*> SpawnedTurrets;
@@ -96,7 +97,7 @@ private:
 	UFUNCTION() void FinishArena();
 
 	UFUNCTION() void OnTurretDeath(ASuper_AI_Character* KilledAI);
-	UFUNCTION() void OnEnemyDeath(ASuper_AI_Character* KilledAI);
+	UFUNCTION() void HandleEnemyDeath(ASuper_AI_Character* KilledAI);
 	UFUNCTION() void OnBossDeath(ASuper_AI_Character* KilledAI);
 
 	TSubclassOf<class UPopupMessage> PopupMessageClass;

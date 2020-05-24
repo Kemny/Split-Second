@@ -49,8 +49,11 @@ public:
 	UFUNCTION() void OnPlayerDeath();
 	UFUNCTION() void OnConfirmedPlayerDeath();
 
+
 private:
 	int32 ArenaNum = 0;
+	int32 Kills = 0;
+	int32 ArenaHighscore = 0;
 
 	class ASplitSecondPlayerController* SplitSecondPlayerController;
 	class ASplitSecondPlayerState* SplitSecondPlayerState;
@@ -68,6 +71,14 @@ private:
 
 	UFUNCTION() void PlayerSlowGame();
 	UFUNCTION() void StopPlayerSlowGame();
+
+	UFUNCTION() void HandleEnemyDeath();
+
+public:
+	int32 GetArenaNum() const { return ArenaNum; }
+	int32 GetHighscore() const { return ArenaHighscore; }
+	int32 GetKills() const { return Kills; }
+
 };
 
 

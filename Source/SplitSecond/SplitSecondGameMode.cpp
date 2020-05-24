@@ -123,6 +123,7 @@ void ASplitSecondGameMode::SpawnNextArena()
 		CurrentArena = GetWorld()->SpawnActor<AArena>(PossibleArenas[RoomIndex]);
 		if (!ensure(CurrentArena != nullptr)) { return; }
 		CurrentArena->OnArenaFinished.BindUFunction(this, TEXT("SpawnUpgradeScreen"));
+		CurrentArena->OnEnemyDeath.BindUFunction(this, TEXT("HandleEnemyDeath"));
 		CurrentArena->SpawnActors();
 		UNavigationSystemV1::GetNavigationSystem(GetWorld())->Build();
 	}
@@ -139,7 +140,10 @@ void ASplitSecondGameMode::SpawnNextArena()
 	UE_LOG(LogTemp, Log, TEXT("Arena Num: %i"), ArenaNum);
 	++ArenaNum;
 }
-
+void ASplitSecondGameMode::HandleEnemyDeath()
+{
+	++Kills;
+}
 void ASplitSecondGameMode::SpawnUpgradeScreen()
 {
 	UE_LOG(LogTemp, Log, TEXT("Showing Arena Upgrade Screen"), ArenaNum);

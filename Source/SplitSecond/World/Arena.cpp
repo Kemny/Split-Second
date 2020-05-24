@@ -203,7 +203,7 @@ void AArena::SpawnEnemies(int32 SpawnNum, TArray<UActorComponent*> SpawnLocation
 			if (auto Spawned = GetWorld()->SpawnActor<ASuper_AI_Character>(EnemySpawnLocationComponent->GetCurrentTypeClass(), FTransform(FRotator(0), EnemySpawnLocationComponent->GetBoxCenter(), FVector(1))))
 			{
 				Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
-				Spawned->OnDeath.AddUniqueDynamic(this, &AArena::OnEnemyDeath);
+				Spawned->OnDeath.AddUniqueDynamic(this, &AArena::HandleEnemyDeath);
 				SpawnedEnemies.Add(Spawned);
 				if (Spawned->IsA<AAI_TurretBase>())
 				{
@@ -256,8 +256,9 @@ void AArena::FinishArena()
 	OnArenaFinished.ExecuteIfBound();
 }
 
-void AArena::OnEnemyDeath(ASuper_AI_Character* KilledAI)
+void AArena::HandleEnemyDeath(ASuper_AI_Character* KilledAI)
 {
+	OnEnemyDeath.ExecuteIfBound();
 	SpawnedEnemies.Remove(KilledAI);
 	if (SpawnedEnemies.Num() <= 0)
 	{
