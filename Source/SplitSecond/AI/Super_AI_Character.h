@@ -65,6 +65,10 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Gun Functions")
     void FireGun();
 
+	/* Damage the AI applies to the player */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun Vars")
+	float Damage;
+
 public:
 
     UFUNCTION(BlueprintCallable, Category = "Health")

@@ -6,6 +6,7 @@
 #include "../../../Player/SplitSecondPlayerController.h"
 #include "../../../AI/Super_AI_Character.h"
 #include "Engine/World.h"
+#include "AIProjectile.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/StaticMeshComponent.h"
 
@@ -24,7 +25,15 @@ void AAIRifle::FireGun()
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
 			// spawn the projectile at the muzzle
-			World->SpawnActor<ASplitSecondProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+			auto LocalCurrentProjectile = World->SpawnActor<ASplitSecondProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+
+			auto LocalCurrentAIProjectile = Cast<AAIProjectile>(LocalCurrentProjectile);
+
+			if (LocalCurrentAIProjectile)
+			{
+				LocalCurrentAIProjectile->SetCurrentAI(GetCurrentPawn());
+				LocalCurrentAIProjectile->ConstructEnemyProjectile();
+			}
 		}
 	}
 }

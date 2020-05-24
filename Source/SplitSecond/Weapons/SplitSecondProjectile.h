@@ -45,7 +45,7 @@ public:
 
 	void CalcReflection(const FHitResult& Hit);
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DamageValue = 10;
 
 	/* How much speed is lost when projectile bounces off a surface */

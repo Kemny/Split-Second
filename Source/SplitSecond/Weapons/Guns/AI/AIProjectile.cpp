@@ -4,6 +4,7 @@
 #include "../../../Player/PlayerCharacter.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "../../../AI/Super_AI_Character.h"
 #include "../../../SplitSecondGameMode.h"
 #include "TimerManager.h"
 
@@ -38,6 +39,17 @@ void AAIProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPri
 
 		Destroy();
 	}
+}
+
+void AAIProjectile::SetCurrentAI(AActor* AI)
+{
+	if (!ensure(AI != nullptr)) { return; }
+
+	auto AIChar = Cast<ASuper_AI_Character>(AI);
+
+	if (!ensure(AIChar != nullptr)) { return; }
+
+	AICharacter = AIChar;
 }
 
 void AAIProjectile::StopBeingSlowed()

@@ -7,6 +7,7 @@
 #include "../Health/HealthComponent.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "../Weapons/Guns/AI/AIProjectile.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "../Weapons/SplitSecondProjectile.h"
 
@@ -33,15 +34,31 @@ void AAI_TurretBase::ShootTurret()
       FActorSpawnParameters ActorSpawnParams;
       ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-      // spawn the projectile at the muzzle
-      World->SpawnActor<ASplitSecondProjectile>(ProjectileClass, RightSpawnLocation, RightSpawnRotation, ActorSpawnParams);
+	  // spawn the projectile at the muzzle
+	  auto LocalCurrentProjectile = World->SpawnActor<ASplitSecondProjectile>(ProjectileClass, RightSpawnLocation, RightSpawnRotation, ActorSpawnParams);
+
+	  auto LocalCurrentAIProjectile = Cast<AAIProjectile>(LocalCurrentProjectile);
+
+	  if (LocalCurrentAIProjectile)
+	  {
+		  LocalCurrentAIProjectile->SetCurrentAI(this);
+          LocalCurrentAIProjectile->ConstructEnemyProjectile();
+	  }
 
       // Shoot bullet out of left turret barrel
       const FRotator LeftSpawnRotation = GetMesh()->GetSocketRotation(FName("Left Turret"));
       const FVector LeftSpawnLocation = GetMesh()->GetSocketLocation(FName("Left Turret"));
 
-      // spawn the projectile at the muzzle
-      World->SpawnActor<ASplitSecondProjectile>(ProjectileClass, LeftSpawnLocation, LeftSpawnRotation, ActorSpawnParams);
+	  // spawn the projectile at the muzzle
+	  LocalCurrentProjectile = World->SpawnActor<ASplitSecondProjectile>(ProjectileClass, LeftSpawnLocation, LeftSpawnRotation, ActorSpawnParams);
+
+      LocalCurrentAIProjectile = Cast<AAIProjectile>(LocalCurrentProjectile);
+
+	  if (LocalCurrentAIProjectile)
+	  {
+		  LocalCurrentAIProjectile->SetCurrentAI(this);
+          LocalCurrentAIProjectile->ConstructEnemyProjectile();
+	  }
     }
   }
 }
