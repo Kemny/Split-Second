@@ -5,7 +5,6 @@
 #include "Engine/World.h"
 #include "TrapPlacer.h"
 #include "Engine/EngineTypes.h"
-#include "BossAddsSpawnLocation.h"
 #include "GameFramework/PlayerController.h"
 #include "Flag.h"
 #include "FlagTarget.h"
