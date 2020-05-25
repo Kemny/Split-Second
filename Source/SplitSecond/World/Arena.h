@@ -73,6 +73,7 @@ private:
 	TArray<class ASuper_AI_Character*> SpawnedEnemies;
 	TMap<class UEnemySpawnLocation* , class ASuper_AI_Character*> SpawnedTurrets;
 	class AFlagTarget* SpawnedFlagTarget;
+	class APlayerCharacter* PlayerPawn;
 
 	EObjectives CurrentObjective;
 	FTimerHandle SpawnEnemiesHandle;

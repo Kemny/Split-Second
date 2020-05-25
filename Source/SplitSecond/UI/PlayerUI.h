@@ -20,6 +20,12 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	UTextBlock* txt_Objective;
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	UTextBlock* txt_WaveTimer;
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	UTextBlock* txt_SurviveTimer;
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	UTextBlock* txt_RemainingEnemies;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	UImage* TimeSlowCooldown;
@@ -35,6 +41,9 @@ private:
 	float EnemySlowProgress = 1;
 	float EnemySlowProgressSpeed = 1;
 
+	float SurviveTargetTime = 0;
+	float WaveTargetTime = 0;
+
 public:
 	FORCEINLINE void UpdateHealth(float Health, float MaxHealth) { ProgressHealthBar->SetPercent(Health / MaxHealth); }
 	FORCEINLINE void SetObjectiveName(FString ObjectiveName) { txt_Objective->SetText(FText::FromString(FString("Current Objective:\n" + ObjectiveName))); }
@@ -42,4 +51,9 @@ public:
 	void ActivateTimeSlow(float Cooldown);
 	void ActivateEnemySlow(float Cooldown);
 	
+	void SetSurviveTime(float Duration);
+	void SetNextWaveTime(float Duration);
+	void SetRemainingEnemies(int32 Enemies);
+
+	void HandleArenaFinished();
 };
