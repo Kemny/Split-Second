@@ -11,7 +11,6 @@ UENUM()
 enum EEnemySpawnType
 {
   Enemy_Charger,
-  Enemy_Healer,
   Enemy_Shooter,
   Enemy_Turret,
 };

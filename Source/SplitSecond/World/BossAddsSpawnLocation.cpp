@@ -22,9 +22,6 @@ UBossAddsSpawnLocation::UBossAddsSpawnLocation()
 	ConstructorHelpers::FClassFinder<AActor> BP_Enemy_Charger_Class(TEXT("/Game/Blueprint/NPC/BP_Charger"));
 	if (BP_Enemy_Charger_Class.Class) Enemy_Charger_Class = BP_Enemy_Charger_Class.Class;
 
-	ConstructorHelpers::FClassFinder<AActor> BP_Enemy_Healer_Class(TEXT("/Game/Blueprint/NPC/BP_Healer"));
-	if (BP_Enemy_Healer_Class.Class) Enemy_Healer_Class = BP_Enemy_Healer_Class.Class;
-
 	ConstructorHelpers::FClassFinder<AActor> BP_Enemy_Shooter_Class(TEXT("/Game/Blueprint/NPC/BP_Shooter"));
 	if (BP_Enemy_Shooter_Class.Class) Enemy_Shooter_Class = BP_Enemy_Shooter_Class.Class;
 }
