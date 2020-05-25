@@ -14,31 +14,9 @@
 
 void AAIShotgun::FireGun()
 {
-    if (ProjectileClass != NULL)
+    for (size_t i = 0; i < BulletNum; i++)
     {
-        UWorld* const World = GetWorld();
-        if (World != NULL)
-        {
-            for (size_t i = 0; i < DefaultBulletNum; i++)
-            {
-                const FRotator SpawnRotation = GunMesh->GetSocketRotation(FName("MuzzleLocation"));
-                const FVector SpawnLocation = GunMesh->GetSocketLocation(FName("MuzzleLocation"));
-
-                //Set Spawn Collision Handling Override
-                FActorSpawnParameters ActorSpawnParams;
-                ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-                // spawn the projectile at the muzzle
-                auto LocalCurrentProjectile = World->SpawnActor<ASplitSecondProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
-
-				auto LocalCurrentAIProjectile = Cast<AAIProjectile>(LocalCurrentProjectile);
-
-				if (LocalCurrentAIProjectile)
-				{
-					LocalCurrentAIProjectile->SetCurrentAI(GetCurrentPawn());
-					LocalCurrentAIProjectile->ConstructEnemyProjectile();
-				}
-            }
-        }
+        const auto Offset = FVector(FMath::RandRange(-BulletSpread, BulletSpread), FMath::RandRange(-BulletSpread, BulletSpread), FMath::RandRange(-BulletSpread, BulletSpread));
+        AI_SpawnProjectile(Offset);
     }
 }

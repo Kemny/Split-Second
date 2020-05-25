@@ -77,6 +77,7 @@ protected:
   class UMeshComponent* LocalGunMeshToEdit;
   UStaticMesh* KnifeMesh;
   class APlayerProjectile* Player_SpawnProjectile(UClass* Class, FVector const& Location, FRotator const& Rotation, const FActorSpawnParameters& SpawnParameters);
+  class AAIProjectile* AI_SpawnProjectile(FVector Offset = FVector::ZeroVector);
   void AfterPlayerFireGun(class UMeshComponent* GunMeshToEdit);
 
   void StartRegen();

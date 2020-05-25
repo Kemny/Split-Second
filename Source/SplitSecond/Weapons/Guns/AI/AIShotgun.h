@@ -18,6 +18,6 @@ public:
     void FireGun() override;
 
 protected:
-    UPROPERTY(EditAnywhere) int32 DefaultBulletNum = 5;
-    UPROPERTY(EditAnywhere) float DefaultBulletSpread = 200;
+    UPROPERTY(EditAnywhere) int32 BulletNum = 5;
+    UPROPERTY(EditAnywhere) float BulletSpread = 2000;
 };

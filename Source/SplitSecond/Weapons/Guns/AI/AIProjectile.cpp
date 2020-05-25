@@ -9,6 +9,7 @@
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "../../BulletMovementComponent.h"
 
 void AAIProjectile::BeginPlay()
 {
@@ -25,7 +26,8 @@ void AAIProjectile::BeginPlay()
 		GetWorldTimerManager().SetTimer(Handle, this, &AAIProjectile::StopBeingSlowed, FMath::Abs(Gamemode->GetSlowEndTime() - GetWorld()->GetTimeSeconds()), false);
 	}
 
-	SetActorRotation(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation()));
+	auto Rot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation());
+	SetActorRotation(Rot);
 }
 
 void AAIProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

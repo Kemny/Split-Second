@@ -16,6 +16,9 @@
 #include "BulletMovementComponent.h"
 #include "../SplitSecondPlayerState.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "Guns/AI/AIProjectile.h"
 
 // Sets default values
 ASuper_Gun::ASuper_Gun()
@@ -74,6 +77,30 @@ void ASuper_Gun::SetupPiercingCollison()
         CurrentProjectile->GetBulletMesh()->SetStaticMesh(KnifeMesh);
         CurrentProjectile->GetBulletMesh()->SetWorldScale3D(FVector(2));
     }
+}
+AAIProjectile* ASuper_Gun::AI_SpawnProjectile(FVector Offset)
+{
+    AAIProjectile* Projectile = nullptr;
+
+    if (ProjectileClass != NULL)
+    {
+        UWorld* const World = GetWorld();
+        if (World != NULL)
+        {
+            const FVector SpawnLocation = GunMesh->GetSocketLocation(FName("MuzzleLocation"));
+
+            auto SpawnTransform = FTransform(UKismetMathLibrary::FindLookAtRotation(SpawnLocation, UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation() + Offset), SpawnLocation);
+
+            Projectile = World->SpawnActorDeferred<AAIProjectile>(ProjectileClass, SpawnTransform);
+            if (Projectile)
+            {
+                Projectile->SetCurrentAI(GetCurrentPawn());
+                Projectile->ConstructEnemyProjectile();
+                Projectile->FinishSpawning(SpawnTransform);
+            }
+        }
+    }
+    return Projectile;
 }
 
 APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector const& Location, FRotator const& Rotation, const FActorSpawnParameters& SpawnParameters)
