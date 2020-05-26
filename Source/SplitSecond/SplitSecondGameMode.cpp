@@ -226,10 +226,17 @@ void ASplitSecondGameMode::StopPlayerSlowGame()
 	{
 		if (SlowedActor)
 		{
+			if (auto SlowedEnemy = Cast<ASuper_AI_Character>(SlowedActor))
+			{
+				if (SlowedEnemy->GetIsSlowed())
+				{
+					continue;
+				}
+			}
 			SlowedActor->CustomTimeDilation = 1;
 		}
 	}
-
+	
 	bGameIsSlowed = false;
 }
 
