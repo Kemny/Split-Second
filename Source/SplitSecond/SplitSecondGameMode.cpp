@@ -24,6 +24,8 @@
 ASplitSecondGameMode::ASplitSecondGameMode()
 	: Super()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	// set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/Blueprint/Player/BP_PlayerCharacter"));
 	if (PlayerPawnClassFinder.Class)DefaultPawnClass = PlayerPawnClassFinder.Class;
@@ -107,12 +109,42 @@ void ASplitSecondGameMode::SetPlayerDefaultWeapon(EWeapons NewWeapon, APlayerCha
 	
 }
 
+void ASplitSecondGameMode::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	CheckSlowGame();
+}
+void ASplitSecondGameMode::CheckSlowGame()
+{
+	if (bGameIsSlowed && GetWorld()->GetTimeSeconds() >= SlowEndTime)
+	{
+		for (auto SlowedActor : SlowedActors)
+		{
+			if (SlowedActor)
+			{
+				if (auto SlowedEnemy = Cast<ASuper_AI_Character>(SlowedActor))
+				{
+					if (SlowedEnemy->GetIsSlowed())
+					{
+						continue;
+					}
+				}
+				SlowedActor->CustomTimeDilation = 1;
+			}
+		}
+		SlowedActors.Empty();
+		bGameIsSlowed = false;
+	}
+}
+
 void ASplitSecondGameMode::SpawnNextArena()
 {
-	if (CurrentArena) CurrentArena->Destroy(); 
-
-	auto MyGameState = Cast<ASplitSecondGameState>(GameState);
-	if (!ensure(MyGameState != nullptr)) { return; }
+	if (CurrentArena)
+	{
+		CurrentArena->Destroy();
+		CurrentArena = nullptr;
+	}
 
 	if (!ensure(PossibleArenas.Num() > 0)) { return; }
 
@@ -124,7 +156,6 @@ void ASplitSecondGameMode::SpawnNextArena()
 		CurrentArena = GetWorld()->SpawnActor<AArena>(PossibleArenas[RoomIndex]);
 		if (!ensure(CurrentArena != nullptr)) { return; }
 		CurrentArena->OnArenaFinished.BindUFunction(this, TEXT("SpawnUpgradeScreen"));
-		CurrentArena->OnEnemyDeath.BindUFunction(this, TEXT("HandleEnemyDeath"));
 		CurrentArena->SpawnActors();
 		UNavigationSystemV1::GetNavigationSystem(GetWorld())->Build();
 	}
@@ -159,7 +190,7 @@ void ASplitSecondGameMode::SpawnUpgradeScreen()
 
 	if (SplitSecondPlayerCharacter)
 	{
-		SplitSecondPlayerCharacter->GetHealthComponent()->Heal(SplitSecondPlayerCharacter->GetHealthComponent()->GetMaxHealth() * 0.1);
+		SplitSecondPlayerCharacter->GetHealthComponent()->Heal(SplitSecondPlayerCharacter->GetHealthComponent()->GetMaxHealth() * 0.3);
 	}
 }
 void ASplitSecondGameMode::SpawnBossUpgradeScreen()
@@ -177,7 +208,7 @@ void ASplitSecondGameMode::SpawnBossUpgradeScreen()
 
 	if (SplitSecondPlayerCharacter)
 	{
-		SplitSecondPlayerCharacter->GetHealthComponent()->Heal(SplitSecondPlayerCharacter->GetHealthComponent()->GetMaxHealth() * 0.1);
+		SplitSecondPlayerCharacter->GetHealthComponent()->Heal(SplitSecondPlayerCharacter->GetHealthComponent()->GetMaxHealth());
 	}
 }
 
@@ -193,6 +224,13 @@ void ASplitSecondGameMode::PlayerSlowGame()
 
 	for (auto FoundActor : FoundActors)
 	{
+		if (auto SlowedEnemy = Cast<ASuper_AI_Character>(FoundActor))
+		{
+			if (SlowedEnemy->GetIsSlowed())
+			{
+				continue;
+			}
+		}
 		FoundActor->CustomTimeDilation = CurrentSlowValue;
 		SlowedActors.Add(FoundActor);
 	}
@@ -215,29 +253,7 @@ void ASplitSecondGameMode::PlayerSlowGame()
 		SlowedActors.Add(FoundTrap);
 	}
 
-	FTimerHandle Handle;
-	GetWorldTimerManager().SetTimer(Handle, this, &ASplitSecondGameMode::StopPlayerSlowGame, SplitSecondPlayerState->CurrentStats.GameSlowDuration, false);
-	SlowEndTime = SplitSecondPlayerState->CurrentStats.GameSlowDuration + GetWorld()->GetTimeSeconds();
-}
-
-void ASplitSecondGameMode::StopPlayerSlowGame()
-{
-	for (auto SlowedActor : SlowedActors)
-	{
-		if (SlowedActor)
-		{
-			if (auto SlowedEnemy = Cast<ASuper_AI_Character>(SlowedActor))
-			{
-				if (SlowedEnemy->GetIsSlowed())
-				{
-					continue;
-				}
-			}
-			SlowedActor->CustomTimeDilation = 1;
-		}
-	}
-	
-	bGameIsSlowed = false;
+	SlowEndTime = GetWorld()->GetTimeSeconds() + SplitSecondPlayerState->CurrentStats.GameSlowDuration;
 }
 
 void ASplitSecondGameMode::OnPlayerDeath()
@@ -250,5 +266,6 @@ void ASplitSecondGameMode::OnConfirmedPlayerDeath()
 	///This triggers after the player decides to confirm his death by hitting a button
 
 	//TODO Move player back to the main menu / Restart the game
-	UKismetSystemLibrary::QuitGame(GetWorld(), GetWorld()->GetFirstPlayerController(), EQuitPreference::Quit, true);
+	if (!ensure(SplitSecondPlayerController != nullptr)) { return; }
+	SplitSecondPlayerController->ClientTravel(FString("/Game/Maps/MainMenu"), ETravelType::TRAVEL_Absolute, false);
 }

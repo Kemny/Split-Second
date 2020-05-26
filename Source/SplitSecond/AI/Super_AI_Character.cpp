@@ -73,6 +73,30 @@ void ASuper_AI_Character::Tick(float DeltaTime)
             SetActorRelativeRotation(FRotator(0, Rotation.Yaw, 0));
         }
     }
+
+    CheckGameSlowTimers();
+}
+
+void ASuper_AI_Character::CheckGameSlowTimers()
+{
+    if (!ensure(Gamemode != nullptr)) { return; }
+
+    if (bIsSlowed && GetWorld()->GetTimeSeconds() >= SlowTimerTargetTime)
+    {
+        bIsSlowed = false;
+        Highlight(EHighlightType::NONE);
+
+        if (Gamemode->GetIsGameSlowed())
+        {
+            CustomTimeDilation = Gamemode->GetCurrentSlowValue();
+
+            SlowTimerTargetTime = GetWorld()->GetTimeSeconds() + FMath::Abs(Gamemode->GetSlowEndTime() - GetWorld()->GetTimeSeconds());
+        }
+        else
+        {
+            CustomTimeDilation = 1;
+        }
+    }
 }
 
 void ASuper_AI_Character::FireGun()
@@ -136,16 +160,8 @@ void ASuper_AI_Character::GetSlowed(float SlowTime, float SlowAmmount)
     float HealthPercentage = HealthComponent->GetHealth() / HealthComponent->GetMaxHealth();
     Highlight(EHighlightType::Slow);
 
-    FTimerHandle TimerHandle;
     CustomTimeDilation = SlowAmmount;
-    GetWorldTimerManager().SetTimer(TimerHandle, this, &ASuper_AI_Character::StopBeingSlowed, SlowTime, false);
-}
-void ASuper_AI_Character::StopBeingSlowed() 
-{ 
-    bIsSlowed = false;
-
-    Highlight(EHighlightType::NONE);
-    CustomTimeDilation = 1; 
+    SlowTimerTargetTime = GetWorld()->GetTimeSeconds() + SlowTime;
 }
 
 void ASuper_AI_Character::Destroyed()
@@ -156,9 +172,7 @@ void ASuper_AI_Character::Destroyed()
         CurrentGun->Destroy();
     }
 
-    OnDestroyed.Broadcast(this);
-
-    Super::Destroy();
+    Super::Destroyed();
 }
 
 void ASuper_AI_Character::OnTakeDamage()
@@ -167,20 +181,17 @@ void ASuper_AI_Character::OnTakeDamage()
 
     if (HealthComponent->GetHealth() <= 0)
     {
-        bIsDead = true;
-        SetActorEnableCollision(false);
-        DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-        DetachFromControllerPendingDestroy();
-
-        FTimerHandle DeathHandle;
-        GetWorldTimerManager().SetTimer(DeathHandle, this, &ASuper_AI_Character::DestroyAfterDeath, DeathDespawnTime, false);
-
-        OnDeath.Broadcast(this);
+        Die();
     }
 }
 
-void ASuper_AI_Character::DestroyAfterDeath()
+void ASuper_AI_Character::Die()
 {
+    bIsDead = true;
+    SetActorEnableCollision(false);
+    DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+    DetachFromControllerPendingDestroy();
+
     Destroy();
 }
 

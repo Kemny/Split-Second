@@ -535,7 +535,7 @@ bool UUpgradeSelection::CreateRandomBossUpgrade(int32 index, EBosssUpgrades& Out
 
 	for (AttemptNum; AttemptNum < MAX_ATTEMPTS; AttemptNum++)
 	{
-		switch (FMath::RandRange(0, 5))
+		switch (FMath::RandRange(0, 3))
 		{
 		case 0:
 			if (!PlayerUpgrades->bIsPiercing)
@@ -561,7 +561,7 @@ bool UUpgradeSelection::CreateRandomBossUpgrade(int32 index, EBosssUpgrades& Out
 				OutType = EBosssUpgrades::ExtraLife;
 			}
 			break;
-		/*case 4:
+		case 4:
 			if (!PlayerUpgrades->bIsHoming)
 			{
 				OutType = EBosssUpgrades::IsHoming;
@@ -572,7 +572,7 @@ bool UUpgradeSelection::CreateRandomBossUpgrade(int32 index, EBosssUpgrades& Out
 			{
 				OutType = EBosssUpgrades::CanThrowGun;
 			}
-			break;*/
+			break;
 		default:
 			break;
 		}

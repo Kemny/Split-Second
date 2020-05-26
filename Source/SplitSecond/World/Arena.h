@@ -61,25 +61,27 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Arena")
 	TMap<TEnumAsByte<EObjectives>, FArenaSettings> Objectives;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Random")
+	INT32 MAX_ATTEMPTS = 500;
 
 public:
 	AArena();
 	void SpawnActors();
+	void Tick(float DeltaTime) override;
 
 	FArenaDelegate OnArenaFinished;
-	FArenaDelegate OnEnemyDeath;
 
 private:
-	TArray<class ASuper_AI_Character*> SpawnedEnemies;
-	TMap<class UEnemySpawnLocation* , class ASuper_AI_Character*> SpawnedTurrets;
+	TArray<class AActor*> SpawnedEnemies;
+	TMap<class UEnemySpawnLocation* , class AActor*> SpawnedTurrets;
 	class AFlagTarget* SpawnedFlagTarget;
 	class APlayerCharacter* PlayerPawn;
 
 	EObjectives CurrentObjective;
-	FTimerHandle SpawnEnemiesHandle;
-	FTimerHandle SurviveHandle;
+	FArenaSettings* CurrentSettings;
 
 	bool bHasFlag = false;
+	bool ObjectiveFinished = false;
 
 	void SetupFlag();
 	void SetupObjective();
@@ -88,8 +90,6 @@ private:
 
 	void SpawnEnemies(int32 NumberToSpawn, TArray<UActorComponent*> SpawnLocations);
 
-	UFUNCTION() void SpawnNextEnemyWave();
-
 	UFUNCTION() void AquireFlag() { bHasFlag = true; }
 	UFUNCTION() void TryDeliverFlag();
 	/* Called when the arenas objective is completed, to give the player the option to continue to the next one*/
@@ -97,9 +97,19 @@ private:
 	/* Called when player gives the input to load the next level*/
 	UFUNCTION() void FinishArena();
 
-	UFUNCTION() void OnTurretDeath(ASuper_AI_Character* KilledAI);
-	UFUNCTION() void HandleEnemyDeath(ASuper_AI_Character* KilledAI);
-	UFUNCTION() void OnBossDeath(ASuper_AI_Character* KilledAI);
+	UFUNCTION() void OnTurretDeath(AActor* KilledAI);
+	UFUNCTION() void HandleEnemyDeath(AActor* KilledAI);
+	UFUNCTION() void OnBossDeath(AActor* KilledAI);
 
 	TSubclassOf<class UPopupMessage> PopupMessageClass;
+
+	// Enemy Wave
+	void CheckSpawnEnemyWaveTimer();
+	float WaveTimerTargetTime;
+	bool bSpawningEnemyWaves = false;
+
+	// Survival
+	void CheckSurviveTimer();
+	float SurviveTargetTime;
+	bool bSurviving = false;
 };

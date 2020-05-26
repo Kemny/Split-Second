@@ -80,7 +80,7 @@ void ASplitSecondPlayerController::TraceForActorsToSlow()
 		}
 	}
 }
-void ASplitSecondPlayerController::OnSlowingTargetDeath(ASuper_AI_Character* KilledAI)
+void ASplitSecondPlayerController::OnSlowingTargetDeath(AActor* KilledAI)
 {
 	if (HoveredEnemy == KilledAI)
 	{

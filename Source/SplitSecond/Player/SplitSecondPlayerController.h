@@ -87,7 +87,7 @@ private:
 	void TraceForActorsToSlow();
 
 	UFUNCTION() void SlowTarget();
-	UFUNCTION() void OnSlowingTargetDeath(class ASuper_AI_Character* KilledAI);
+	UFUNCTION() void OnSlowingTargetDeath(AActor* KilledAI);
 	UFUNCTION() void SlowGame();
 	
 	class ASuper_AI_Character* HoveredEnemy;

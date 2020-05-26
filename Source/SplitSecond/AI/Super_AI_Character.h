@@ -6,8 +6,6 @@
 #include "GameFramework/Character.h"
 #include "Super_AI_Character.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAIDeathDelegate, ASuper_AI_Character*, KilledAI);
-
 UENUM()
 enum class EHighlightType
 {
@@ -82,14 +80,12 @@ public:
 
     void Highlight(EHighlightType HighlightType);
     void GetSlowed(float SlowTime, float SlowAmmount);
-    UFUNCTION() void StopBeingSlowed();
     bool GetIsSlowed() const { return bIsSlowed; }
     
     UPROPERTY(BlueprintReadWrite)
     bool bIsDead = false;
 
-    FAIDeathDelegate OnDeath;
-    FAIDeathDelegate OnDestroyed;
+    float SlowTimerTargetTime;
 
 protected:
     // Called when the game starts or when spawned
@@ -114,11 +110,13 @@ protected:
 
 	class ASplitSecondGameMode* Gamemode;
 
+    void CheckGameSlowTimers();
+
 private:
     bool bIsSlowed = false;
 
     void SpawnGun();
 
     UFUNCTION() virtual void OnTakeDamage();
-    UFUNCTION() void DestroyAfterDeath();
+    void Die();
 };

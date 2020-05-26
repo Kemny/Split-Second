@@ -80,7 +80,6 @@ void AAI_TurretBase::OnTakeDamage()
 		SetActorEnableCollision(false);
 		DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		DetachFromControllerPendingDestroy();
-		OnDeath.Broadcast(this);
 
         UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NiagaraSystem, GetActorLocation(), GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
 

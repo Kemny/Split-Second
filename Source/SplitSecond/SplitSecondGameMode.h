@@ -36,6 +36,7 @@ protected:
 public:
 	ASplitSecondGameMode();
 	void BeginPlay() override;
+	void Tick(float DeltaTime) override;
 
 	UFUNCTION(BlueprintCallable, Category="Weapons")
     void SetPlayerDefaultWeapon(EWeapons NewWeapon, class APlayerCharacter* PlayerPawn);
@@ -63,11 +64,8 @@ private:
 	class ASplitSecondPlayerState* SplitSecondPlayerState;
 	class APlayerCharacter* SplitSecondPlayerCharacter;
 
-	class AArena* CurrentArena;
-	TArray<AActor*> SlowedActors;
-	float SlowEndTime;
-	float CurrentSlowValue;
-	bool bGameIsSlowed = false;
+	UPROPERTY() class AArena* CurrentArena;
+	UPROPERTY() TArray<AActor*> SlowedActors;
 
 	TSubclassOf<class ASuper_Gun> PistolClass;
 	TSubclassOf<class ASuper_Gun> ShotgunClass;
@@ -77,9 +75,11 @@ private:
 	TSubclassOf<class UUpgradeSelection> UpgradeSelectionClass;
 
 	UFUNCTION() void PlayerSlowGame();
-	UFUNCTION() void StopPlayerSlowGame();
 
-	UFUNCTION() void HandleEnemyDeath();
+	float CurrentSlowValue;
+	bool bGameIsSlowed = false;
+	float SlowEndTime;
+	void CheckSlowGame();
 
 public:
 	int32 GetArenaNum() const { return ArenaNum; }
@@ -88,6 +88,8 @@ public:
 	float GetSlowEndTime() const { return SlowEndTime ; }
 	bool GetIsGameSlowed() const { return bGameIsSlowed; }
 	float GetCurrentSlowValue() const { return CurrentSlowValue; }
+
+	void HandleEnemyDeath();
 
 };
 
