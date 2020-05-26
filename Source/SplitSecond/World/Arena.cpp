@@ -67,8 +67,9 @@ void AArena::CheckSpawnEnemyWaveTimer()
 			if (!ensure(PlayerPawn != nullptr)) { return; }
 			PlayerPawn->GetPlayerUI()->SetNextWaveTime(CurrentSettings->WaveInterval);
 		}
-
-		auto EnemySpawnLocations = GetComponentsByClass(UEnemySpawnLocation::StaticClass());
+		
+		TArray<UEnemySpawnLocation*> EnemySpawnLocations;
+		GetComponents<UEnemySpawnLocation>(EnemySpawnLocations);
 		if (!ensure(EnemySpawnLocations.Num() >= CurrentSettings->EnemiesPerWaveMin)) { return; }
 
 
@@ -196,7 +197,8 @@ void AArena::SpawnKillAllWave()
 		}
 	}
 
-	auto EnemySpawnLocations = GetComponentsByClass(UEnemySpawnLocation::StaticClass());
+	TArray<UEnemySpawnLocation*> EnemySpawnLocations;
+	GetComponents<UEnemySpawnLocation>(EnemySpawnLocations);
 	if (!ensure(EnemySpawnLocations.Num() >= CurrentSettings->EnemiesPerWaveMin)) { return; }
 
 	auto SpawnNum = FMath::RandRange(CurrentSettings->EnemiesPerWaveMin, CurrentSettings->EnemiesPerWaveMax);
@@ -216,7 +218,7 @@ void AArena::SetupKillBoss()
 	}
 }
 
-void AArena::SpawnEnemies(int32 SpawnNum, TArray<UActorComponent*> SpawnLocations)
+void AArena::SpawnEnemies(int32 SpawnNum, TArray<UEnemySpawnLocation*> SpawnLocations)
 {
 	TArray<int32> SpawnedIndexes;
 	for (size_t i = 0; i < SpawnNum; i++)

@@ -88,7 +88,7 @@ private:
 	UFUNCTION() void SpawnKillAllWave();
 	void SetupKillBoss();
 
-	void SpawnEnemies(int32 NumberToSpawn, TArray<UActorComponent*> SpawnLocations);
+	void SpawnEnemies(int32 NumberToSpawn, TArray<UEnemySpawnLocation*> SpawnLocations);
 
 	UFUNCTION() void AquireFlag() { bHasFlag = true; }
 	UFUNCTION() void TryDeliverFlag();
