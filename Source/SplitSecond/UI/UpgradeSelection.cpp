@@ -21,6 +21,8 @@ void UUpgradeSelection::ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const E
 	AddToPlayerScreen();
 	SetUserFocus(GetWorld()->GetFirstPlayerController());
 
+	if (!ensure(HealSound != nullptr)) { return; }
+	UGameplayStatics::PlaySound2D(GetWorld(), HealSound);
 
 	if (bBossUpgrades)
 	{
@@ -199,6 +201,9 @@ void UUpgradeSelection::ApplyArenaUpgrade(EArenaUpgrades TypeToApply)
 	GetWorld()->GetFirstPlayerController()->SetInputMode(InputMode);
 	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 
+	if (!ensure(SelectUpgradeSound != nullptr)) { return; }
+	UGameplayStatics::PlaySound2D(GetWorld(), SelectUpgradeSound);
+
 	RemoveFromParent();
 }
 #pragma endregion
@@ -246,6 +251,9 @@ void UUpgradeSelection::ApplyBossUpgrade(EBosssUpgrades TypeToApply)
 	FInputModeGameOnly InputMode;
 	GetWorld()->GetFirstPlayerController()->SetInputMode(InputMode);
 	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+
+	if (!ensure(SelectUpgradeSound != nullptr)) { return; }
+	UGameplayStatics::PlaySound2D(GetWorld(), SelectUpgradeSound);
 
 	RemoveFromParent();
 }

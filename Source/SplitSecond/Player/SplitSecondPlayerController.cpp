@@ -98,6 +98,9 @@ void ASplitSecondPlayerController::SlowTarget()
 		auto PlayerPawn = GetPawn<APlayerCharacter>();
 		if (!ensure(PlayerPawn != nullptr)) { return; }
 		PlayerPawn->GetPlayerUI()->ActivateEnemySlow(SplitSecondPlayerState->CurrentStats.ActorSlowDuration);
+
+		if (!ensure(EnemySlowSound != nullptr)) { return; }
+		UGameplayStatics::PlaySound2D(GetWorld(), EnemySlowSound);
 	}
 }
 void ASplitSecondPlayerController::SlowGame()
@@ -119,6 +122,9 @@ void ASplitSecondPlayerController::SlowGame()
 	OnPlayerSlowGame.ExecuteIfBound();
 
 	PlayerCharacter->GetFirstPersonCameraComponent()->PostProcessSettings = SlowedPostProcess;
+
+	if (!ensure(GameSlowSound != nullptr)) { return; }
+	UGameplayStatics::PlaySound2D(GetWorld(), GameSlowSound);
 }
 void ASplitSecondPlayerController::OnGameSlowCooldownFinished()
 {

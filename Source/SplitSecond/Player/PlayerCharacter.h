@@ -53,6 +53,11 @@ protected:
     /* The player's current gun */
     UPROPERTY(BlueprintReadWrite, Category = "Gun Var's")
     ASuper_Gun* CurrentGun;
+    
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* ExtraLifeSound;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* PlayerHitSound;
 
 	/* If player has a gun this calls the gun's input pressed function */
 	void OnFirePressed();

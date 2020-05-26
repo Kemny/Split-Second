@@ -186,10 +186,16 @@ void APlayerCharacter::OnTakeDamage()
     if (!ensure(PlayerState != nullptr)) { return; }
 
     PlayerUI->UpdateHealth(HealthComponent->GetHealth(), HealthComponent->GetMaxHealth());
+
+    if (!ensure(PlayerHitSound != nullptr)) { return; }
+    UGameplayStatics::PlaySound2D(GetWorld(), PlayerHitSound);
+
     if (HealthComponent->GetHealth() <= 0 && !bIsInvinclible)
     {
         if (PlayerState->CurrentStats.bHasExtraLife)
         {
+            if (!ensure(ExtraLifeSound != nullptr)) { return; }
+            UGameplayStatics::PlaySound2D(GetWorld(), ExtraLifeSound);
             HealthComponent->Heal(HealthComponent->GetMaxHealth());
             PlayerState->CurrentStats.bHasExtraLife = false;
         }

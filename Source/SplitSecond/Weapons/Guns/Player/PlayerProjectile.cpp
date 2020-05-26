@@ -36,6 +36,8 @@ void APlayerProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 			auto CurrentExplosion = GetWorld()->SpawnActor<AProjectile_Explosion>(ExplosionToSpawn, SpawnLocation, SpawnParms);
 			CurrentExplosion->ApplyExplosionDamage(DamageValue, ExplosionUpTime);
 
+			if (!ensure(Explosion != nullptr)) { return; }
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), Explosion, GetActorLocation());
 			Destroy();
 		}
 
@@ -62,6 +64,9 @@ void APlayerProjectile::OnBulletHit_Implementation(UPrimitiveComponent* HitComp,
 		if (!ensure(PlayerController != nullptr)) { return; }
 
 		UGameplayStatics::ApplyDamage(OtherActor, DamageValue, PlayerController, this, UDamageType::StaticClass());
+
+		if (!ensure(Bounce != nullptr)) { return; }
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), Bounce, GetActorLocation());
 	}
 	else
 	{

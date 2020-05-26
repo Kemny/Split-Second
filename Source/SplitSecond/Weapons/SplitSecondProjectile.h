@@ -56,5 +56,14 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "FX")
 	class UNiagaraSystem* NiagaraSystem;
 	FTimerHandle SlowTimerHandle;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* Bounce;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* Explosion;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* Homing;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* Piercing;
 };
 

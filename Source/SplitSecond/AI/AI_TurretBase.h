@@ -50,6 +50,8 @@ public:
   UPROPERTY(EditAnywhere, Category = "FX")
   class UNiagaraSystem* NiagaraSystem;
 
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* ShootSound;
 protected:
   
   virtual void BeginPlay() override;

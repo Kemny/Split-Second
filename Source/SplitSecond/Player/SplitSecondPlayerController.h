@@ -61,6 +61,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Time Slow")
 	FPostProcessSettings SlowedPostProcess;
 
+	UPROPERTY(EditAnywhere, Category = "Time Slow")
+	USoundBase* EnemySlowSound;
+	UPROPERTY(EditAnywhere, Category = "Time Slow")
+	USoundBase* GameSlowSound;
+
   /** Common logic needed in both `InputAxis()` and `InputKey()` */
   FORCEINLINE void _UpdateGamepad(bool bGamepad)
   {

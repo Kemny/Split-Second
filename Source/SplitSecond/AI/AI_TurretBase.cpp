@@ -10,6 +10,7 @@
 #include "../Weapons/Guns/AI/AIProjectile.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "../Weapons/SplitSecondProjectile.h"
+#include "Kismet/GameplayStatics.h"
 
 AAI_TurretBase::AAI_TurretBase()
 {
@@ -56,6 +57,8 @@ void AAI_TurretBase::ShootTurret()
 
 	  if (LocalCurrentAIProjectile)
 	  {
+		  if (!ensure(ShootSound != nullptr)) { return; }
+		  UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShootSound, GetActorLocation());
 		  LocalCurrentAIProjectile->SetCurrentAI(this);
           LocalCurrentAIProjectile->ConstructEnemyProjectile();
 	  }

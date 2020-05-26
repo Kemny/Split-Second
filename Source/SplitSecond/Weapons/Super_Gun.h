@@ -31,10 +31,6 @@ public:
   UPROPERTY(EditDefaultsOnly, Category = "Projectile")
   TSubclassOf<ASplitSecondProjectile> ProjectileClass;
 
-  /** Sound to play each time we fire */
-  UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
-  class USoundBase* FireSound;
-
   /* Function called to fire the gun */
   UFUNCTION(BlueprintCallable, Category = "Gun Functions")
   virtual void FireGun() { return; }
@@ -60,29 +56,32 @@ protected:
     ACharacter* CurrentPawn;
     class ASplitSecondPlayerState* PlayerState;
 
-  bool bCanFire;
+	bool bCanFire;
 
-  FTimerHandle FireRateTimer;
+	FTimerHandle FireRateTimer;
 
-  FTimerHandle ReloadTimer;
+	FTimerHandle ReloadTimer;
 
-  float LastTimeFired;
+	float LastTimeFired;
 
-  float ReloadSpeed;
+	float ReloadSpeed;
 
-  class UMeshComponent* LocalGunMeshToEdit;
-  UStaticMesh* KnifeMesh;
-  class APlayerProjectile* Player_SpawnProjectile(UClass* Class, FVector const& Location, FRotator const& Rotation);
-  class AAIProjectile* AI_SpawnProjectile(FVector Offset = FVector::ZeroVector);
-  void AfterPlayerFireGun(class UMeshComponent* GunMeshToEdit);
+	class UMeshComponent* LocalGunMeshToEdit;
+	UStaticMesh* KnifeMesh;
+	class APlayerProjectile* Player_SpawnProjectile(UClass* Class, FVector const& Location, FRotator const& Rotation);
+	class AAIProjectile* AI_SpawnProjectile(FVector Offset = FVector::ZeroVector);
+	void AfterPlayerFireGun(class UMeshComponent* GunMeshToEdit);
 
-  void StartRegen();
+	void StartRegen();
 
-  void RegenAmmo();
+	void RegenAmmo();
 
-  // Returns true if player is out of ammo 
-  bool IsOutOfAmmo();
+	// Returns true if player is out of ammo 
+	bool IsOutOfAmmo();
 
-  bool bReloadActive;
+	bool bReloadActive;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* ShootSound;
 };
 

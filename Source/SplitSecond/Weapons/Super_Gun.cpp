@@ -85,6 +85,10 @@ AAIProjectile* ASuper_Gun::AI_SpawnProjectile(FVector Offset)
             {
                 Projectile->SetCurrentAI(GetCurrentPawn());
                 Projectile->ConstructEnemyProjectile();
+
+                if (!ensure(ShootSound != nullptr)) { return nullptr; }
+                UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShootSound, Projectile->GetActorLocation());
+
                 Projectile->FinishSpawning(SpawnTransform);
             }
         }
@@ -126,6 +130,9 @@ APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector con
                 CurrentProjectile->GetProjectileMovement()->bIsHomingProjectile = true;
             }
         }
+        if (!ensure(ShootSound != nullptr)) { return nullptr; }
+        UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
+
         CurrentProjectile->FinishSpawning(SpawnTransform);
     }
 

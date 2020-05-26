@@ -67,6 +67,11 @@ protected:
 	UPROPERTY(EditAnywhere)
 	int32 MAX_ATTEMPTS = 500;
 
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* HealSound;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* SelectUpgradeSound;
+
 #pragma region Upgrade Selection
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	UVerticalBox* VB_Upgrade1;

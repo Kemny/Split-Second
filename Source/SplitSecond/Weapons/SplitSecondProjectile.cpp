@@ -68,6 +68,9 @@ void ASplitSecondProjectile::OnBulletOverlap_Implementation(class UPrimitiveComp
 
 	UGameplayStatics::ApplyDamage(OtherActor, DamageValue, PlayerController, this, UDamageType::StaticClass());
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NiagaraSystem, GetActorLocation(), GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
+
+	if (!ensure(Piercing != nullptr)) { return; }
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), Piercing, GetActorLocation());
 }
 
 void ASplitSecondProjectile::CalcReflection(const FHitResult& Hit)
