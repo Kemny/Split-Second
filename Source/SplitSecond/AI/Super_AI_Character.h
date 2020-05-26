@@ -73,6 +73,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun Vars")
 	float Damage;
 
+	UPROPERTY(EditAnywhere, Category = "FX")
+	class UNiagaraSystem* NiagaraSystem;
+
 public:
 
     UFUNCTION(BlueprintCallable, Category = "Health")

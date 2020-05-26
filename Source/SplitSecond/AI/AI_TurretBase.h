@@ -45,13 +45,8 @@ public:
   UPROPERTY(BlueprintReadOnly, Category = "Turret Settings")
   bool bCurrentlyRotating;
 
-  void OnTakeDamage() override;
-
-  UPROPERTY(EditAnywhere, Category = "FX")
-  class UNiagaraSystem* NiagaraSystem;
-
-	UPROPERTY(EditAnywhere, Category = "Sound")
-	USoundBase* ShootSound;
+  UPROPERTY(EditAnywhere, Category = "Sound")
+  USoundBase* ShootSound;
 protected:
   
   virtual void BeginPlay() override;

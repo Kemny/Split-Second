@@ -5,6 +5,8 @@
 #include "../Weapons/Super_Gun.h"
 #include "../Health/HealthComponent.h"
 #include "Engine/World.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "SplitSecond_AI_Controller.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Math/UnrealMathUtility.h"
@@ -191,6 +193,8 @@ void ASuper_AI_Character::Die()
     SetActorEnableCollision(false);
     DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
     DetachFromControllerPendingDestroy();
+
+    UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NiagaraSystem, GetActorLocation(), GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
 
     Destroy();
 }

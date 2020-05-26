@@ -5,8 +5,6 @@
 #include "GameFramework/RotatingMovementComponent.h"
 #include "Engine/World.h"
 #include "../Health/HealthComponent.h"
-#include "NiagaraSystem.h"
-#include "NiagaraFunctionLibrary.h"
 #include "../Weapons/Guns/AI/AIProjectile.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "../Weapons/SplitSecondProjectile.h"
@@ -71,23 +69,6 @@ void AAI_TurretBase::EnableRotationMovement(bool bEnable)
   RotatingMovement->SetActive(bEnable);
 
   bCurrentlyRotating = bEnable;
-}
-
-void AAI_TurretBase::OnTakeDamage()
-{
-	Highlight(EHighlightType::NONE);
-
-	if (HealthComponent->GetHealth() <= 0)
-	{
-		bIsDead = true;
-		SetActorEnableCollision(false);
-		DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		DetachFromControllerPendingDestroy();
-
-        UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NiagaraSystem, GetActorLocation(), GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
-
-        Destroy();
-	}
 }
 
 void AAI_TurretBase::BeginPlay()
