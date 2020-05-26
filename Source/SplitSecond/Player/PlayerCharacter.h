@@ -22,7 +22,10 @@ class APlayerCharacter : public ACharacter
     class UHealthComponent* HealthComponent;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-    class USceneComponent* BossTeleportPoint;
+    class USceneComponent* BossLookAtRight;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	class USceneComponent* BossLookAtLeft;
 
 public:
 	APlayerCharacter(const FObjectInitializer& ObjectInitializer);
@@ -75,6 +78,7 @@ private:
 	class UPlayerMovementComponent* PlayerMovementComponent;
     TSubclassOf<class UPopupMessage> PopupMessageClass;
     class UPlayerUI* PlayerUI;
+    class UPauseMenu* PauseMenu;
 
 public:
 	/** Returns FirstPersonCameraComponent subobject **/
