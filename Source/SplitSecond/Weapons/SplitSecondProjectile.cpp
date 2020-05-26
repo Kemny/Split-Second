@@ -67,6 +67,7 @@ void ASplitSecondProjectile::OnBulletOverlap_Implementation(class UPrimitiveComp
 	if (!ensure(PlayerController != nullptr)) { return; }
 
 	UGameplayStatics::ApplyDamage(OtherActor, DamageValue, PlayerController, this, UDamageType::StaticClass());
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NiagaraSystem, GetActorLocation(), GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
 }
 
 void ASplitSecondProjectile::CalcReflection(const FHitResult& Hit)

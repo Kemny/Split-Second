@@ -37,11 +37,7 @@ void APlayerShotgun::FireGun()
 
                     const FVector SpawnLocation = GunMesh->GetSocketLocation(FName("MuzzleLocation"));
 
-                    //Set Spawn Collision Handling Override
-                    FActorSpawnParameters ActorSpawnParams;
-                    ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-                    Player_SpawnProjectile(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
+                    Player_SpawnProjectile(ProjectileClass, SpawnLocation, SpawnRotation);
                     AfterPlayerFireGun(GunMesh);
                 }
             }

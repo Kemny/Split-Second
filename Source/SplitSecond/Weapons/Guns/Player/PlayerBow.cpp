@@ -79,12 +79,8 @@ void APlayerBow::FireGun()
             }
             const FVector SpawnLocation = BowMesh->GetSocketLocation(FName("MuzzleLocation"));
 
-            //Set Spawn Collision Handling Override
-            FActorSpawnParameters ActorSpawnParams;
-            ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
             // spawn the projectile at the muzzle
-            if (auto Spawned = Player_SpawnProjectile(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams))
+            if (auto Spawned = Player_SpawnProjectile(ProjectileClass, SpawnLocation, SpawnRotation))
             {
                 Spawned->GetProjectileMovement()->ProjectileGravityScale = FMath::Abs(BowDrawPrecentage - 1);
                 AfterPlayerFireGun(BowMesh);

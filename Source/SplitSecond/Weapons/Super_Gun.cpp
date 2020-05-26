@@ -67,17 +67,6 @@ ACharacter* ASuper_Gun::GetCurrentPawn() const
   return CurrentPawn;
 }
 
-void ASuper_Gun::SetupPiercingCollison()
-{
-    if (!ensure(CurrentProjectile != nullptr)) { return; }
-
-    if (CurrentProjectile->bIsPiercing)
-    {
-        CurrentProjectile->GetCollisionComp()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-        CurrentProjectile->GetBulletMesh()->SetStaticMesh(KnifeMesh);
-        CurrentProjectile->GetBulletMesh()->SetWorldScale3D(FVector(2));
-    }
-}
 AAIProjectile* ASuper_Gun::AI_SpawnProjectile(FVector Offset)
 {
     AAIProjectile* Projectile = nullptr;
@@ -103,9 +92,10 @@ AAIProjectile* ASuper_Gun::AI_SpawnProjectile(FVector Offset)
     return Projectile;
 }
 
-APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector const& Location, FRotator const& Rotation, const FActorSpawnParameters& SpawnParameters)
+APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector const& Location, FRotator const& Rotation)
 {
-    CurrentProjectile = GetWorld()->SpawnActor<APlayerProjectile>(ProjectileClass, Location, Rotation, SpawnParameters);
+    FTransform SpawnTransform = FTransform(Rotation, Location, FVector(1));
+    auto CurrentProjectile = GetWorld()->SpawnActorDeferred<APlayerProjectile>(ProjectileClass, SpawnTransform);
 
     if (CurrentProjectile)
     {
@@ -116,9 +106,12 @@ APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector con
             CurrentProjectile->DamageValue = Upgrades.Damage;
             CurrentProjectile->GetProjectileMovement()->Velocity = CurrentProjectile->GetProjectileMovement()->Velocity.GetSafeNormal()* Upgrades.ProjectileSpeed;
 
-            if (CurrentProjectile->bIsPiercing)
+            if (Upgrades.bIsPiercing)
             {
-                SetupPiercingCollison();
+                CurrentProjectile->GetCollisionComp()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+                CurrentProjectile->GetBulletMesh()->SetStaticMesh(KnifeMesh);
+                CurrentProjectile->GetBulletMesh()->SetWorldScale3D(FVector(2));
+
                 CurrentProjectile->bIsPiercing = true;
             }
 
@@ -133,6 +126,7 @@ APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector con
                 CurrentProjectile->GetProjectileMovement()->bIsHomingProjectile = true;
             }
         }
+        CurrentProjectile->FinishSpawning(SpawnTransform);
     }
 
     return CurrentProjectile;

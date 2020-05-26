@@ -56,10 +56,6 @@ public:
 
   virtual class UStaticMeshComponent* GetGunMesh() const { return GunMesh; }
 
-  void SetupPiercingCollison();
-
-  class APlayerProjectile* CurrentProjectile;
-
 protected:
     ACharacter* CurrentPawn;
     class ASplitSecondPlayerState* PlayerState;
@@ -76,7 +72,7 @@ protected:
 
   class UMeshComponent* LocalGunMeshToEdit;
   UStaticMesh* KnifeMesh;
-  class APlayerProjectile* Player_SpawnProjectile(UClass* Class, FVector const& Location, FRotator const& Rotation, const FActorSpawnParameters& SpawnParameters);
+  class APlayerProjectile* Player_SpawnProjectile(UClass* Class, FVector const& Location, FRotator const& Rotation);
   class AAIProjectile* AI_SpawnProjectile(FVector Offset = FVector::ZeroVector);
   void AfterPlayerFireGun(class UMeshComponent* GunMeshToEdit);
 
