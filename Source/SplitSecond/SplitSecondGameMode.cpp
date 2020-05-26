@@ -190,7 +190,7 @@ void ASplitSecondGameMode::SpawnUpgradeScreen()
 
 	if (SplitSecondPlayerCharacter)
 	{
-		SplitSecondPlayerCharacter->GetHealthComponent()->Heal(SplitSecondPlayerCharacter->GetHealthComponent()->GetMaxHealth() * 0.3);
+		SplitSecondPlayerCharacter->GetHealthComponent()->Heal(SplitSecondPlayerCharacter->GetHealthComponent()->GetMaxHealth() * 0.1);
 	}
 }
 void ASplitSecondGameMode::SpawnBossUpgradeScreen()

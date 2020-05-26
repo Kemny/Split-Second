@@ -135,7 +135,7 @@ public:
     UPROPERTY(EditAnywhere)float FireRate = 999;
 
     ///Pistol Specific
-    UPROPERTY(EditAnywhere)int32 MaxJumps = 1;
+    UPROPERTY(EditAnywhere)int32 MaxJumps = 2;
 
     ///Shotgun Specific
     UPROPERTY(EditAnywhere)int32 BulletNum = 5;

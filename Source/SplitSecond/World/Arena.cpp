@@ -332,10 +332,6 @@ void AArena::HandleEnemyDeath(AActor* KilledAI)
 		{
 			SpawnKillAllWave();
 		}
-		else if (bSpawningEnemyWaves)
-		{
-			WaveTimerTargetTime = GetWorld()->GetTimeSeconds();
-		}
 	}
 }
 
