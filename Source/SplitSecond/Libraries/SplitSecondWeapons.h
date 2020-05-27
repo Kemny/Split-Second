@@ -137,8 +137,8 @@ public:
 
     ///Shotgun Specific
     UPROPERTY(EditAnywhere, BlueprintReadWrite)int32 BulletNum = 5;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)float BulletSpread = 200;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)float BulletSpreadDefault = 200;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)int32 BulletSpread = 200;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)int32 BulletSpreadDefault = 200;
 
     ///Bow Specific
     /*Will fire at 1 and add this value every tick*/

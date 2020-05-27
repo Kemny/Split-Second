@@ -58,7 +58,7 @@ void UUpgradeSelection::ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const E
 		Name_ShotgunSpecificBox->SetVisibility(ESlateVisibility::Visible);
 		Upgrades_ShotgunSpecificBox->SetVisibility(ESlateVisibility::Visible);
 		txt_ShotgunBulletNum->SetText(IntToText(PlayerUpgrades->BulletNum));
-		txt_ShotgunBulletSpread->SetText(FText::FromString(FloatToString(100 * PlayerUpgrades->BulletSpread / PlayerUpgrades->BulletSpreadDefault, 1) + "%"));
+		txt_ShotgunBulletSpread->SetText(FText::FromString(FString::FromInt(100 * (int32)PlayerUpgrades->BulletSpread / (int32)PlayerUpgrades->BulletSpreadDefault) + "%"));
 		break;
 	case Bow:
 		txt_FireRateName->SetVisibility(ESlateVisibility::Hidden);
@@ -124,7 +124,7 @@ void UUpgradeSelection::SetArenaTextUpgradeValue(UTextBlock* TextToSet, EArenaUp
 		break;
 	case EArenaUpgrades::BulletSpread:
 		if (!ensure(PlayerUpgrades != nullptr)) { return; }
-		TextToSet->SetText(FText::FromString("Bullet\nSpread\n" + FloatToString(100* (*ArenaUpgradeValues.Find(TypeToApply)) / PlayerUpgrades->BulletSpreadDefault, 1) + "%"));
+		TextToSet->SetText(FText::FromString("Bullet\nSpread\n" + FString::FromInt(100* (int32)(*ArenaUpgradeValues.Find(TypeToApply)) / (int32)PlayerUpgrades->BulletSpreadDefault) + "%"));
 		break;
 	case EArenaUpgrades::BowDrawSpeed:
 		TextToSet->SetText(FText::FromString("Bow Draw\nSpeed\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 3)));
@@ -327,7 +327,7 @@ bool UUpgradeSelection::CreateRandomUpgrade(int32 index, EArenaUpgrades& OutType
 		case 5:
 			if (auto FoundValue = UpgradeValues.Find(EArenaUpgrades::BulletNum))
 			{
-				if (PlayerCurrentWeapon == EWeapons::Shotgun && PlayerUpgrades->BulletSpread > 0)
+				if (PlayerCurrentWeapon == EWeapons::Shotgun)
 				{
 					auto DigitMultiplier = FMath::Pow(10, FoundValue->MaxDigits);
 					int32 HighRandom = FMath::RandRange(FoundValue->MinValue * DigitMultiplier, FoundValue->MaxValue * DigitMultiplier);
@@ -339,11 +339,9 @@ bool UUpgradeSelection::CreateRandomUpgrade(int32 index, EArenaUpgrades& OutType
 		case 6:
 			if (auto FoundValue = UpgradeValues.Find(EArenaUpgrades::BulletSpread))
 			{
-				if (PlayerCurrentWeapon == EWeapons::Shotgun)
+				if (PlayerCurrentWeapon == EWeapons::Shotgun && PlayerUpgrades->BulletSpread > 0)
 				{
-					auto DigitMultiplier = FMath::Pow(10, FoundValue->MaxDigits);
-					int32 HighRandom = FMath::RandRange(FoundValue->MinValue * DigitMultiplier, FoundValue->MaxValue * DigitMultiplier);
-					Value = (float)HighRandom / DigitMultiplier;
+					Value = FMath::RandRange(FoundValue->MinValue, FoundValue->MaxValue);
 					OutType = EArenaUpgrades::BulletSpread;
 				}
 			}
@@ -530,7 +528,8 @@ void UUpgradeSelection::ApplyArenaUpgrade(EArenaUpgrades TypeToApply)
 		PlayerUpgrades->BulletNum += *ArenaUpgradeValues.Find(TypeToApply);
 		break;
 	case EArenaUpgrades::BulletSpread:
-		PlayerUpgrades->BulletSpread += FMath::Clamp<float>(*ArenaUpgradeValues.Find(TypeToApply), 0, PlayerUpgrades->BulletSpreadDefault);
+		PlayerUpgrades->BulletSpread += *ArenaUpgradeValues.Find(TypeToApply);
+		PlayerUpgrades->BulletSpread = FMath::Clamp<int32>(PlayerUpgrades->BulletSpread, 0, PlayerUpgrades->BulletSpreadDefault);
 		break;
 	case EArenaUpgrades::BowDrawSpeed:
 		PlayerUpgrades->BowDrawSpeed += *ArenaUpgradeValues.Find(TypeToApply);
