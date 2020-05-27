@@ -29,8 +29,6 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	UImage* TimeSlowCooldown;
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	UImage* EnemySlowCooldown;
 
 	void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
@@ -38,18 +36,13 @@ private:
 	float TimeSlowProgress = 1;
 	float TimeSlowProgressSpeed = 1;
 
-	float EnemySlowProgress = 1;
-	float EnemySlowProgressSpeed = 1;
-
 	float SurviveTargetTime = 0;
 	float WaveTargetTime = 0;
 
 public:
-	FORCEINLINE void UpdateHealth(float Health, float MaxHealth) { ProgressHealthBar->SetPercent(Health / MaxHealth); }
 	FORCEINLINE void SetObjectiveName(FString ObjectiveName) { txt_Objective->SetText(FText::FromString(FString("Current Objective:\n" + ObjectiveName))); }
 
 	void ActivateTimeSlow(float Cooldown);
-	void ActivateEnemySlow(float Cooldown);
 	
 	void SetSurviveTime(float Duration);
 	void SetNextWaveTime(float Duration);

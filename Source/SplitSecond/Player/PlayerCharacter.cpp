@@ -12,7 +12,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "PlayerMovementComponent.h"
 #include "../SplitSecondPlayerState.h"
-#include "../Health/HealthComponent.h"
 #include "../UI/PlayerUI.h"
 #include "UObject/ConstructorHelpers.h"
 #include "../UI/PopupMessage.h"
@@ -36,11 +35,13 @@ APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	GunAttachMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("GunAttachMesh"));
 	GunAttachMesh->SetupAttachment(FirstPersonCameraComponent);
 
-    HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
-    HealthComponent->OnHealthChanged.BindUFunction(this, FName("OnTakeDamage"));
+    OnTakeAnyDamage.AddUniqueDynamic(this, &APlayerCharacter::OnTakeDamage);
 
-    BossTeleportPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Boss Teleport Point"));
-    BossTeleportPoint->SetupAttachment(RootComponent);
+    BossLookAtRight = CreateDefaultSubobject<USceneComponent>(TEXT("BossLookAtPointRight"));
+    BossLookAtRight->SetupAttachment(RootComponent);
+
+    BossLookAtLeft = CreateDefaultSubobject<USceneComponent>(TEXT("BossLookAtPointLeft"));
+    BossLookAtLeft->SetupAttachment(RootComponent);
 
     DashMultiplier = 400.f;
     DashInputDelay = 0.3f;
@@ -54,8 +55,6 @@ void APlayerCharacter::BeginPlay()
     if (!ensure(PlayerController != nullptr)) { return; }
     PlayerState = GetPlayerState<ASplitSecondPlayerState>();
     if (!ensure(PlayerState != nullptr)) { return; }
-    if (!ensure(PlayerUI != nullptr)) { return; }
-    PlayerUI->UpdateHealth(HealthComponent->GetHealth(), HealthComponent->GetMaxHealth());
 }
 void APlayerCharacter::SpawnPlayerUI(TSubclassOf<class UPlayerUI> UIToSpawn)
 {
@@ -180,23 +179,23 @@ void APlayerCharacter::ResetDash()
     bDashOffCooldown = true;
 }
 
-void APlayerCharacter::OnTakeDamage()
+void APlayerCharacter::OnTakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
     if (!ensure(PlayerUI != nullptr)) { return; }
     if (!ensure(PlayerState != nullptr)) { return; }
 
-    PlayerUI->UpdateHealth(HealthComponent->GetHealth(), HealthComponent->GetMaxHealth());
-
     if (!ensure(PlayerHitSound != nullptr)) { return; }
     UGameplayStatics::PlaySound2D(GetWorld(), PlayerHitSound);
 
-    if (HealthComponent->GetHealth() <= 0 && !bIsInvinclible)
+    PlayerState->CurrentStats.Health -= Damage;
+
+    if (PlayerState->CurrentStats.Health <= 0 && !bIsInvinclible)
     {
         if (PlayerState->CurrentStats.bHasExtraLife)
         {
             if (!ensure(ExtraLifeSound != nullptr)) { return; }
             UGameplayStatics::PlaySound2D(GetWorld(), ExtraLifeSound);
-            HealthComponent->Heal(HealthComponent->GetMaxHealth());
+            PlayerState->CurrentStats.Health = PlayerState->CurrentStats.MaxHealth;
             PlayerState->CurrentStats.bHasExtraLife = false;
         }
         else

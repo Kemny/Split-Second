@@ -28,20 +28,20 @@ public:
     UPROPERTY(EditAnywhere)bool bExtraLife = false;
 
     ///Guns
-    UPROPERTY(EditAnywhere)int32 MaxAmmo = 10;
     UPROPERTY(EditAnywhere)float Damage = 10;
     UPROPERTY(EditAnywhere)float ProjectileSpeed = 1500;
-    UPROPERTY(EditAnywhere)float ReloadSpeed = 0.6;
     UPROPERTY(EditAnywhere)float FireRate = 0.3;
 
     ///Player
+    UPROPERTY(EditAnywhere)float MaxHealth = 100;
+    UPROPERTY(EditAnywhere)float Health = 100;
     UPROPERTY(EditAnywhere)bool bCanThrowGun = false;
     UPROPERTY(EditAnywhere)float ActorSlowValue = 0.1;
     UPROPERTY(EditAnywhere)float ActorSlowDuration = 3;
     UPROPERTY(EditAnywhere)float GameSlowDuration = 3;
     UPROPERTY(EditAnywhere)float GameSlowValue = 0.4;
     UPROPERTY(EditAnywhere)float GameSlowCooldown = 10;
-    UPROPERTY(EditAnywhere, meta = (UIMin = '1'))int32 MaxJumps = 1;
+    UPROPERTY(EditAnywhere, meta = (UIMin = '1'))int32 MaxJumps = 2;
 };
 USTRUCT(BlueprintType)
 struct FShotgunDefault
@@ -57,13 +57,13 @@ public:
     UPROPERTY(EditAnywhere)bool bExtraLife = false;
 
     ///Guns
-    UPROPERTY(EditAnywhere)int32 MaxAmmo = 10;
     UPROPERTY(EditAnywhere)float Damage = 10;
     UPROPERTY(EditAnywhere)float ProjectileSpeed = 1500;
-    UPROPERTY(EditAnywhere)float ReloadSpeed = 0.6;
     UPROPERTY(EditAnywhere)float FireRate = 0.3;
 
     ///Player
+    UPROPERTY(EditAnywhere)float MaxHealth = 100;
+    UPROPERTY(EditAnywhere)float Health = 100;
     UPROPERTY(EditAnywhere)bool bCanThrowGun = false;
     UPROPERTY(EditAnywhere)float ActorSlowValue = 0.1;
     UPROPERTY(EditAnywhere)float ActorSlowDuration = 3;
@@ -72,7 +72,7 @@ public:
     UPROPERTY(EditAnywhere)float GameSlowCooldown = 10;
 
     UPROPERTY(EditAnywhere)int32 BulletNum = 5;
-    UPROPERTY(EditAnywhere)float BulletSpread = 200;
+    UPROPERTY(EditAnywhere)float BulletSpread = 2000;
 };
 USTRUCT(BlueprintType)
 struct FBowDefault
@@ -81,20 +81,19 @@ struct FBowDefault
 
 public:
     ///Bullets
-    UPROPERTY(EditAnywhere)bool bIsPiercing = false;
-    UPROPERTY(EditAnywhere)bool bIsHoming = false;
+    UPROPERTY(EditAnywhere)bool bIsPiercing = true;
+    UPROPERTY(EditAnywhere)bool bIsHoming = true;
     UPROPERTY(EditAnywhere)bool bIsBouncing = false;
     UPROPERTY(EditAnywhere)bool bExplodingBullets = false;
     UPROPERTY(EditAnywhere)bool bExtraLife = false;
 
     ///Guns
-    UPROPERTY(EditAnywhere)int32 MaxAmmo = 10;
     UPROPERTY(EditAnywhere)float Damage = 10;
     UPROPERTY(EditAnywhere)float ProjectileSpeed = 1500;
-    UPROPERTY(EditAnywhere)float ReloadSpeed = 0.6;
-    UPROPERTY(EditAnywhere)float FireRate = 0.3;
 
     ///Player
+    UPROPERTY(EditAnywhere)float MaxHealth = 100;
+    UPROPERTY(EditAnywhere)float Health = 100;
     UPROPERTY(EditAnywhere)bool bCanThrowGun = false;
     UPROPERTY(EditAnywhere)float ActorSlowValue = 0.1;
     UPROPERTY(EditAnywhere)float ActorSlowDuration = 3;
@@ -113,39 +112,39 @@ struct FUpgrades
 
 public:
     ///Bullets
-    UPROPERTY(EditAnywhere)bool bIsPiercing = false;
-    UPROPERTY(EditAnywhere)bool bIsHoming = false;
-    UPROPERTY(EditAnywhere)bool bIsBouncing = false;
-    UPROPERTY(EditAnywhere)bool bExplodingBullets = false;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)bool bIsPiercing = false;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)bool bIsHoming = false;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)bool bIsBouncing = false;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)bool bExplodingBullets = false;
 
     ///Player
-    UPROPERTY(EditAnywhere)bool bHasExtraLife = false;
-    UPROPERTY(EditAnywhere)bool bCanThrowGun = false;
-    UPROPERTY(EditAnywhere)float ActorSlowValue = 0.1;
-    UPROPERTY(EditAnywhere)float ActorSlowDuration = 3;
-    UPROPERTY(EditAnywhere)float GameSlowDuration = 3;
-    UPROPERTY(EditAnywhere)float GameSlowValue = 0.4;
-    UPROPERTY(EditAnywhere)float GameSlowCooldown = 10;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)float MaxHealth = 100;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)float Health = 100;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)bool bHasExtraLife = false;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)bool bCanThrowGun = false;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)float ActorSlowValue = 0.1;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)float ActorSlowDuration = 3;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)float GameSlowDuration = 3;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)float GameSlowValue = 0.4;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)float GameSlowCooldown = 10;
 
-    UPROPERTY(EditAnywhere)int32 Ammo = 999;
-    UPROPERTY(EditAnywhere)int32 MaxAmmo = 999;
-    UPROPERTY(EditAnywhere)float Damage = 999;
-    UPROPERTY(EditAnywhere)float ProjectileSpeed = 999;
-    UPROPERTY(EditAnywhere)float ReloadSpeed = 999;
-    UPROPERTY(EditAnywhere)float FireRate = 999;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)float Damage = 999;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)float ProjectileSpeed = 999;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)float FireRate = 999;
 
     ///Pistol Specific
-    UPROPERTY(EditAnywhere)int32 MaxJumps = 2;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)int32 MaxJumps = 2;
 
     ///Shotgun Specific
-    UPROPERTY(EditAnywhere)int32 BulletNum = 5;
-    UPROPERTY(EditAnywhere)float BulletSpread = 200;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)int32 BulletNum = 5;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)int32 BulletSpread = 200;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)int32 BulletSpreadDefault = 200;
 
     ///Bow Specific
     /*Will fire at 1 and add this value every tick*/
-    UPROPERTY(EditAnywhere)float BowDrawSpeed = 0.01;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)float BowDrawSpeed = 0.01;
     /*Minimal needed draw value to fire*/
-    UPROPERTY(EditAnywhere)float MinimalDrawValue = 0.3;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)float MinimalDrawValue = 0.3;
 
     FUpgrades()
     {
@@ -159,6 +158,8 @@ public:
         bExplodingBullets = Defaults.bExplodingBullets;
         bHasExtraLife = Defaults.bExtraLife;
 
+        MaxHealth = Defaults.MaxHealth;
+        Health = Defaults.MaxHealth;
         bCanThrowGun = Defaults.bCanThrowGun;
         ActorSlowValue = Defaults.ActorSlowValue;
         ActorSlowDuration = Defaults.ActorSlowDuration;
@@ -166,11 +167,8 @@ public:
         GameSlowValue = Defaults.GameSlowValue;
         GameSlowCooldown = Defaults.GameSlowCooldown;
 
-        MaxAmmo = Defaults.MaxAmmo;
-        Ammo = MaxAmmo;
         Damage = Defaults.Damage;
         ProjectileSpeed = Defaults.ProjectileSpeed;
-        ReloadSpeed = Defaults.ReloadSpeed;
         FireRate = Defaults.FireRate;
 
         MaxJumps = Defaults.MaxJumps;
@@ -183,6 +181,8 @@ public:
         bExplodingBullets = Defaults.bExplodingBullets;
         bHasExtraLife = Defaults.bExtraLife;
 
+        MaxHealth = Defaults.MaxHealth;
+        Health = Defaults.MaxHealth;
         bCanThrowGun = Defaults.bCanThrowGun;
         ActorSlowValue = Defaults.ActorSlowValue;
         ActorSlowDuration = Defaults.ActorSlowDuration;
@@ -190,14 +190,12 @@ public:
         GameSlowValue = Defaults.GameSlowValue;
         GameSlowCooldown = Defaults.GameSlowCooldown;
 
-        MaxAmmo = Defaults.MaxAmmo;
-        Ammo = MaxAmmo;
         Damage = Defaults.Damage;
         ProjectileSpeed = Defaults.ProjectileSpeed;
-        ReloadSpeed = Defaults.ReloadSpeed;
         FireRate = Defaults.FireRate;
 
         BulletNum = Defaults.BulletNum;
+        BulletSpreadDefault = Defaults.BulletSpread;
         BulletSpread = Defaults.BulletSpread;
     }
     FUpgrades(FBowDefault Defaults)
@@ -208,6 +206,8 @@ public:
         bExplodingBullets = Defaults.bExplodingBullets;
         bHasExtraLife = Defaults.bExtraLife;
 
+        MaxHealth = Defaults.MaxHealth;
+        Health = Defaults.MaxHealth;
         bCanThrowGun = Defaults.bCanThrowGun;
         ActorSlowValue = Defaults.ActorSlowValue;
         ActorSlowDuration = Defaults.ActorSlowDuration;
@@ -215,12 +215,8 @@ public:
         GameSlowValue = Defaults.GameSlowValue;
         GameSlowCooldown = Defaults.GameSlowCooldown;
 
-        MaxAmmo = Defaults.MaxAmmo;
-        Ammo = MaxAmmo;
         Damage = Defaults.Damage;
         ProjectileSpeed = Defaults.ProjectileSpeed;
-        ReloadSpeed = Defaults.ReloadSpeed;
-        FireRate = Defaults.FireRate;
 
         BowDrawSpeed = Defaults.BowDrawSpeed;
         MinimalDrawValue = Defaults.MinimalDrawValue;

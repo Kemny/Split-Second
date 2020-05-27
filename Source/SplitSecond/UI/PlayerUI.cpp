@@ -9,9 +9,6 @@ void UPlayerUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	TimeSlowProgress = FMath::Clamp<float>(TimeSlowProgress + TimeSlowProgressSpeed, 0, 1);
 	TimeSlowCooldown->GetDynamicMaterial()->SetScalarParameterValue(TEXT("Progress"), TimeSlowProgress);
 
-	EnemySlowProgress = FMath::Clamp<float>(EnemySlowProgress + EnemySlowProgressSpeed, 0, 1);
-	EnemySlowCooldown->GetDynamicMaterial()->SetScalarParameterValue(TEXT("Progress"), EnemySlowProgress);
-
 	txt_WaveTimer->SetText(FText::FromString(FString("next wave:\n") + FString::FromInt(FMath::Abs(WaveTargetTime - GetWorld()->GetTimeSeconds()))));
 	txt_SurviveTimer->SetText(FText::FromString(FString("Survive Time:\n") + FString::FromInt(FMath::Abs(SurviveTargetTime - GetWorld()->GetTimeSeconds()))));
 }
@@ -38,12 +35,6 @@ void UPlayerUI::ActivateTimeSlow(float Cooldown)
 	TimeSlowProgress = 0;
 	//Not exactly accurate
 	TimeSlowProgressSpeed = Cooldown * FApp::GetDeltaTime() * 0.01;
-}
-void UPlayerUI::ActivateEnemySlow(float Cooldown)
-{
-	EnemySlowProgress = 0;
-	//Not exactly accurate
-	EnemySlowProgressSpeed = Cooldown * FApp::GetDeltaTime() * 0.1;
 }
 
 void UPlayerUI::HandleArenaFinished()
