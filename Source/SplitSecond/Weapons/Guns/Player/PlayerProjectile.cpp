@@ -36,6 +36,8 @@ void APlayerProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 			auto CurrentExplosion = GetWorld()->SpawnActor<AProjectile_Explosion>(ExplosionToSpawn, SpawnLocation, SpawnParms);
 			CurrentExplosion->ApplyExplosionDamage(DamageValue, ExplosionUpTime);
 
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ExploadingBulletFX, GetActorLocation(), GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
+
 			if (!ensure(Explosion != nullptr)) { return; }
 			UGameplayStatics::PlaySoundAtLocation(GetWorld(), Explosion, GetActorLocation());
 			Destroy();

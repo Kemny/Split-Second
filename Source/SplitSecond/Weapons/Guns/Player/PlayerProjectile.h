@@ -26,6 +26,9 @@ public:
 
 	APlayerProjectile();
 
+	UPROPERTY(EditAnywhere, Category = "FX")
+	class UNiagaraSystem* ExploadingBulletFX;
+
 	/* If explosion upgrade is active this determines how long the effect is up for */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Upgrade Settings")
 	float ExplosionUpTime = 1;
