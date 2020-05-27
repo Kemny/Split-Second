@@ -47,8 +47,20 @@ public:
     UPROPERTY(BlueprintReadWrite)
     bool bAbleToRotate;
 
+    /* If true AI will randomize it's gun fire delay between a min and max value */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Settings")
+    bool bUseRandomGunDelay = true;
+
+	/* If UseRandomGunDelay is true this is the lowest value the gun fire delay can be  */
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Settings", meta = (EditCondition = "bUseRandomGunDelay"))
+    float MinGunFireDelay = 0.1;
+
+    /* If UseRandomGunDelay is true this is the Highest value the gun fire delay can be  */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "AI Settings", meta = (EditCondition = "bUseRandomGunDelay"))
+	float MaxGunFireDelay = 2;
+
     /* Enemies gun fire delay */
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Settings")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Settings", meta = (EditCondition = "!bUseRandomGunDelay"))
     float GunFireDelay;
 
     /* Socket to to attach gun to */
