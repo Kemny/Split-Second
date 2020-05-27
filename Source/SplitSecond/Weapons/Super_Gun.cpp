@@ -49,6 +49,14 @@ void ASuper_Gun::BeginPlay()
     if (!ensure(PlayerState != nullptr)) { return; }
 }
 
+void ASuper_Gun::FireGun()
+{
+    if (!ensure(ShootSound != nullptr)) { return; }
+    UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShootSound, GetActorLocation());
+
+    AI_SpawnProjectile();
+}
+
 void ASuper_Gun::OnInputPressed_Implementation()
 {
     if (!ensure(PlayerState != nullptr)) { return; }
@@ -86,14 +94,24 @@ AAIProjectile* ASuper_Gun::AI_SpawnProjectile(FVector Offset)
                 Projectile->SetCurrentAI(GetCurrentPawn());
                 Projectile->ConstructEnemyProjectile();
 
-                if (!ensure(ShootSound != nullptr)) { return nullptr; }
-                UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShootSound, Projectile->GetActorLocation());
-
                 Projectile->FinishSpawning(SpawnTransform);
             }
         }
     }
     return Projectile;
+}
+
+FRotator ASuper_Gun::FindPlayerBulletRotation(UMeshComponent* GunMeshToEdit, FVector Offset)
+{
+    const auto HitResult = GetWorld()->GetFirstPlayerController<ASplitSecondPlayerController>()->LineTraceFromCamera(ECC_Camera, Offset);
+    if (HitResult.GetActor())
+    {
+        return UKismetMathLibrary::FindLookAtRotation(GunMeshToEdit->GetSocketLocation(FName("MuzzleLocation")), HitResult.Location);
+    }
+    else
+    {
+        return FRotator();
+    }
 }
 
 APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector const& Location, FRotator const& Rotation)
@@ -130,8 +148,6 @@ APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector con
                 CurrentProjectile->GetProjectileMovement()->bIsHomingProjectile = true;
             }
         }
-        if (!ensure(ShootSound != nullptr)) { return nullptr; }
-        UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
 
         CurrentProjectile->FinishSpawning(SpawnTransform);
     }
@@ -139,57 +155,10 @@ APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector con
     return CurrentProjectile;
 }
 
-void ASuper_Gun::AfterPlayerFireGun(UMeshComponent* GunMeshToEdit)
+void ASuper_Gun::AfterPlayerFireGun()
 {
-    if (!ensure(GunMeshToEdit != nullptr)) { return; }
-    if (!ensure(PlayerState != nullptr)) { return; }
-
-    PlayerState->CurrentStats.Ammo--;
-
-    float AmmoPercentage = (float)PlayerState->CurrentStats.Ammo / (float)PlayerState->CurrentStats.MaxAmmo;
-    GunMeshToEdit->CreateAndSetMaterialInstanceDynamic(1)->SetScalarParameterValue(TEXT("Emission Multiplier"), AmmoPercentage);
-    GunMeshToEdit->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(TEXT("Color"), FLinearColor(AmmoPercentage, 0, 0, 1));
-    LocalGunMeshToEdit = GunMeshToEdit;
+    if (!ensure(ShootSound != nullptr)) { return; }
+    UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
 
     LastTimeFired = GetWorld()->TimeSeconds;
-
-    // if gun is current regenerating ammo stop regeneration
-    if (bReloadActive)
-    {
-        GetWorldTimerManager().ClearTimer(ReloadTimer);
-        bReloadActive = false;
-    }
-
-    StartRegen();
-}
-
-void ASuper_Gun::StartRegen()
-{
-    ReloadSpeed = PlayerState->CurrentStats.ReloadSpeed;
-
-    GetWorldTimerManager().SetTimer(ReloadTimer, this, &ASuper_Gun::RegenAmmo, 1/ReloadSpeed, true);
-}
-
-void ASuper_Gun::RegenAmmo()
-{
-    if (!ensure(LocalGunMeshToEdit != nullptr)) { return; }
-
-    PlayerState->CurrentStats.Ammo = FMath::Clamp(PlayerState->CurrentStats.Ammo + 1, 0, PlayerState->CurrentStats.MaxAmmo);
-    bReloadActive = true;
-
-    float AmmoPercentage = (float)PlayerState->CurrentStats.Ammo / (float)PlayerState->CurrentStats.MaxAmmo;
-    LocalGunMeshToEdit->CreateAndSetMaterialInstanceDynamic(1)->SetScalarParameterValue(TEXT("Emission Multiplier"), AmmoPercentage);
-    LocalGunMeshToEdit->CreateAndSetMaterialInstanceDynamic(1)->SetVectorParameterValue(TEXT("Color"), FLinearColor(AmmoPercentage, 0, 0, 1));
-
-    if (PlayerState->CurrentStats.Ammo >= PlayerState->CurrentStats.MaxAmmo)
-    {
-      GetWorldTimerManager().ClearTimer(ReloadTimer);
-
-      bReloadActive = false;
-    }
-}
-
-bool ASuper_Gun::IsOutOfAmmo()
-{
-    return PlayerState->CurrentStats.Ammo <= 0;
 }

@@ -95,10 +95,6 @@ void ASplitSecondPlayerController::SlowTarget()
 	{
 		HoveredEnemy->GetSlowed(SplitSecondPlayerState->CurrentStats.ActorSlowDuration, SplitSecondPlayerState->CurrentStats.ActorSlowValue);
 
-		auto PlayerPawn = GetPawn<APlayerCharacter>();
-		if (!ensure(PlayerPawn != nullptr)) { return; }
-		PlayerPawn->GetPlayerUI()->ActivateEnemySlow(SplitSecondPlayerState->CurrentStats.ActorSlowDuration);
-
 		if (!ensure(EnemySlowSound != nullptr)) { return; }
 		UGameplayStatics::PlaySound2D(GetWorld(), EnemySlowSound);
 	}
@@ -136,14 +132,6 @@ void ASplitSecondPlayerController::OnGameSlowFinished()
 	PlayerCharacter->GetFirstPersonCameraComponent()->PostProcessSettings = NormalPostProcess;
 }
 
-FHitResult ASplitSecondPlayerController::LineTraceFromCamera(ECollisionChannel Collision)
-{
-	FHitResult HitResult;
-	auto CameraLocation = PlayerCameraManager->GetCameraLocation();
-
-	GetWorld()->LineTraceSingleByChannel(HitResult, CameraLocation, (UKismetMathLibrary::Conv_RotatorToVector(PlayerCameraManager->GetCameraRotation()) * 50000) + CameraLocation, ECollisionChannel::ECC_Camera);
-	return HitResult;
-}
 FHitResult ASplitSecondPlayerController::LineTraceFromCamera(ECollisionChannel Collision, FVector EndOffset)
 {
 	FHitResult HitResult;

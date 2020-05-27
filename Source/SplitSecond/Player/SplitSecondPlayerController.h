@@ -49,8 +49,7 @@ public:
   UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "Controller Events")
   void ControllerDisconnected();
 
-  FHitResult LineTraceFromCamera(ECollisionChannel Collision);
-  FHitResult LineTraceFromCamera(ECollisionChannel Collision, FVector EndOffset);
+  FHitResult LineTraceFromCamera(ECollisionChannel Collision, FVector EndOffset = FVector::ZeroVector);
 
   void HandlePlayerDeath();
   void HandlePlayerConfirmedDeath();

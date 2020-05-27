@@ -24,33 +24,33 @@ public:
 
     void BeginPlay() override;
 
-  UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
-  class UStaticMeshComponent* GunMesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Components")
+	class UStaticMeshComponent* GunMesh;
 
-  /** Projectile class to spawn */
-  UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-  TSubclassOf<ASplitSecondProjectile> ProjectileClass;
+	/** Projectile class to spawn */
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TSubclassOf<ASplitSecondProjectile> ProjectileClass;
 
-  /* Function called to fire the gun */
-  UFUNCTION(BlueprintCallable, Category = "Gun Functions")
-  virtual void FireGun() { return; }
+	/* Function called to fire the gun */
+	UFUNCTION(BlueprintCallable, Category = "Gun Functions")
+	virtual void FireGun();
 
-  /* Called when player fire key is pressed */
-  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Gun Events")
-  void OnInputPressed();
-  virtual void OnInputPressed_Implementation();
+	/* Called when player fire key is pressed */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Gun Events")
+	void OnInputPressed();
+	virtual void OnInputPressed_Implementation();
 
-  /* Called when player fire key is released */
-  UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Gun Events")
-  void OnInputReleased();
-  virtual void OnInputReleased_Implementation();
+	/* Called when player fire key is released */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Gun Events")
+	void OnInputReleased();
+	virtual void OnInputReleased_Implementation();
 
-  /* Returns the pawn that currently has the gun */
-  UFUNCTION(BlueprintPure, Category = "Gun Functions")
-  ACharacter* GetCurrentPawn() const ;
-  void SetCurrentPawn(ACharacter* NewPawn) { CurrentPawn = NewPawn; }
+	/* Returns the pawn that currently has the gun */
+	UFUNCTION(BlueprintPure, Category = "Gun Functions")
+	ACharacter* GetCurrentPawn() const ;
+	void SetCurrentPawn(ACharacter* NewPawn) { CurrentPawn = NewPawn; }
 
-  virtual class UStaticMeshComponent* GetGunMesh() const { return GunMesh; }
+	virtual class UStaticMeshComponent* GetGunMesh() const { return GunMesh; }
 
 protected:
     ACharacter* CurrentPawn;
@@ -60,26 +60,15 @@ protected:
 
 	FTimerHandle FireRateTimer;
 
-	FTimerHandle ReloadTimer;
-
 	float LastTimeFired;
 
-	float ReloadSpeed;
-
-	class UMeshComponent* LocalGunMeshToEdit;
 	UStaticMesh* KnifeMesh;
+
+	FRotator FindPlayerBulletRotation(class UMeshComponent* GunMeshToEdit, FVector Offset = FVector::ZeroVector);
 	class APlayerProjectile* Player_SpawnProjectile(UClass* Class, FVector const& Location, FRotator const& Rotation);
+	void AfterPlayerFireGun();
+
 	class AAIProjectile* AI_SpawnProjectile(FVector Offset = FVector::ZeroVector);
-	void AfterPlayerFireGun(class UMeshComponent* GunMeshToEdit);
-
-	void StartRegen();
-
-	void RegenAmmo();
-
-	// Returns true if player is out of ammo 
-	bool IsOutOfAmmo();
-
-	bool bReloadActive;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundBase* ShootSound;

@@ -1,15 +1,8 @@
 // This project falls under CC-BY-SA lisence
 
 #include "PlayerBow.h"
-#include "PlayerProjectile.h"
-#include "GameFramework/Character.h"
-#include "../../../Player/SplitSecondPlayerController.h"
-#include "Engine/World.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "../../../SplitSecondPlayerState.h"
-#include "PlayerProjectile.h"
-#include "../../BulletMovementComponent.h"
 
 APlayerBow::APlayerBow()
 {
@@ -19,18 +12,14 @@ APlayerBow::APlayerBow()
 
 void APlayerBow::OnInputPressed_Implementation()
 {
-    if (!ensure(PlayerState != nullptr)) { return; }
-    if (PlayerState->CurrentStats.Ammo > 0)
-    {
-        bIsDrawingBow = true;
-    }
+    bIsDrawingBow = true;
 }
 
 void APlayerBow::OnInputReleased_Implementation()
 {
     if (!ensure(PlayerState != nullptr)) { return; }
 
-    if (PlayerState->CurrentStats.Ammo > 0 && BowDrawPrecentage > PlayerState->CurrentStats.MinimalDrawValue)
+    if (BowDrawPrecentage > PlayerState->CurrentStats.MinimalDrawValue)
     {
         FireGun();
     }
@@ -50,7 +39,6 @@ void APlayerBow::Tick(float DeltaTime)
 	{
 		if (BowDrawPrecentage >= 1)
 		{
-            UE_LOG(LogTemp, Log, TEXT("Bow Loaded"));
             BowDrawPrecentage = 1;
             bIsDrawingBow = false;
 			bIsHeld = true;
@@ -63,28 +51,10 @@ void APlayerBow::FireGun()
 {
     if (ProjectileClass != NULL)
     {
-        UWorld* const World = GetWorld();
-        if (World != NULL)
+        // spawn the projectile at the muzzle
+        if (auto Spawned = Player_SpawnProjectile(ProjectileClass, BowMesh->GetSocketLocation(FName("MuzzleLocation")), FindPlayerBulletRotation(BowMesh)))
         {
-            FRotator SpawnRotation;
-
-            const auto HitResult = World->GetFirstPlayerController<ASplitSecondPlayerController>()->LineTraceFromCamera(ECC_Camera);
-            if (HitResult.GetActor())
-            {
-                SpawnRotation = UKismetMathLibrary::FindLookAtRotation(BowMesh->GetSocketLocation(FName("MuzzleLocation")), HitResult.Location);
-            }
-            else
-            {
-                SpawnRotation = CurrentPawn->GetControlRotation();
-            }
-            const FVector SpawnLocation = BowMesh->GetSocketLocation(FName("MuzzleLocation"));
-
-            // spawn the projectile at the muzzle
-            if (auto Spawned = Player_SpawnProjectile(ProjectileClass, SpawnLocation, SpawnRotation))
-            {
-                Spawned->GetProjectileMovement()->ProjectileGravityScale = FMath::Abs(BowDrawPrecentage - 1);
-                AfterPlayerFireGun(BowMesh);
-            }
+            AfterPlayerFireGun();
         }
     }
 }

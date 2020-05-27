@@ -16,10 +16,9 @@ UENUM(BlueprintType)
 enum class EArenaUpgrades : uint8
 {
 	NONE,
-	Ammo,
 	Damage,
 	ProjectileSpeed,
-	ReloadSpeed,
+	Health,
 	FireRate,
 	MaxJumps,
 	BulletNum,
@@ -58,7 +57,7 @@ class SPLITSECOND_API UUpgradeSelection : public UUserWidget
 public:
 	FUpgradeSelectionDelegate OnUpgradeSelected;
 
-	void ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const EWeapons& CurrentWeapon, const bool& bBossUpgrades, class UHealthComponent* HealthComponent);
+	void ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const EWeapons& CurrentWeapon, const bool& bBossUpgrades);
 
 protected:
 	UPROPERTY(EditAnywhere)
@@ -128,13 +127,11 @@ protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	UTextBlock* txt_Damage;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	UTextBlock* txt_FireRateName;
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	UTextBlock* txt_FireRate;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	UTextBlock* txt_BulletSpeed;
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	UTextBlock* txt_ReloadSpeed;
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	UTextBlock* txt_MaxAmmo;
 #pragma endregion
 #pragma region Pistol
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
@@ -166,11 +163,9 @@ protected:
 
 private:
 	FUpgrades* PlayerUpgrades = nullptr;
-	class UHealthComponent* PlayerHealthComponent = nullptr;
 	EWeapons PlayerCurrentWeapon;
 	TMap<EArenaUpgrades, float> ArenaUpgradeValues;
 	TMap<EBosssUpgrades, bool> BossUpgradeValues;
-	float UpgradeValue;
 
 	EArenaUpgrades OneUpgrade;
 	EArenaUpgrades TwoUpgrade;
@@ -208,5 +203,7 @@ private:
 
 	void SetBossTextUpgradeValue(UTextBlock* TextToSet, EBosssUpgrades TypeToApply);
 	void SetArenaTextUpgradeValue(UTextBlock* TextToSet, EArenaUpgrades TypeToApply);
+
+	void FinishSelection();
 
 };

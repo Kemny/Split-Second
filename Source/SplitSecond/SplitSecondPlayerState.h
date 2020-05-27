@@ -15,7 +15,7 @@ class SPLITSECOND_API ASplitSecondPlayerState : public APlayerState
 	GENERATED_BODY()
 	
 public:
-    UPROPERTY(VisibleInstanceOnly)
+    UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite)
     FUpgrades CurrentStats; 
 
 };

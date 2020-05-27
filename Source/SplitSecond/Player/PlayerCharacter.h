@@ -19,9 +19,6 @@ class APlayerCharacter : public ACharacter
 	class UCameraComponent* FirstPersonCameraComponent;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
-    class UHealthComponent* HealthComponent;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
     class USceneComponent* BossLookAtRight;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components", meta = (AllowPrivateAccess = "true"))
@@ -86,7 +83,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	FORCEINLINE class UPlayerMovementComponent* GetMyMovementComponent() const { return PlayerMovementComponent; }
-	FORCEINLINE class UHealthComponent* GetHealthComponent() const { return HealthComponent; }
 	FORCEINLINE class UPlayerUI* GetPlayerUI() const { return PlayerUI; }
     void SpawnPlayerUI(TSubclassOf<class UPlayerUI> UIToSpawn);
 
@@ -109,7 +105,7 @@ private:
     void AllowDash() { bCanDash = true; }
     void ForbidDash() { bCanDash = false; }
 
-    UFUNCTION() void OnTakeDamage();
+    UFUNCTION() void OnTakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
     UFUNCTION() void OnConfirmedDeath();
 };
 

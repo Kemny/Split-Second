@@ -181,17 +181,14 @@ void ASplitSecondGameMode::SpawnUpgradeScreen()
 	UE_LOG(LogTemp, Log, TEXT("Showing Arena Upgrade Screen"), ArenaNum);
 
 	if (!ensure(SplitSecondPlayerState != nullptr)) { return; }
-	if (!ensure(SplitSecondPlayerCharacter != nullptr)) { return; }
+
 	if (auto Created = CreateWidget<UUpgradeSelection>(GetWorld(), UpgradeSelectionClass))
 	{
-		Created->ShowUpgradeSelection(&SplitSecondPlayerState->CurrentStats, PlayerGun, false, SplitSecondPlayerCharacter->GetHealthComponent());
+		Created->ShowUpgradeSelection(&SplitSecondPlayerState->CurrentStats, PlayerGun, false);
 		Created->OnUpgradeSelected.BindUFunction(this, TEXT("SpawnNextArena"));
 	}
 
-	if (SplitSecondPlayerCharacter)
-	{
-		SplitSecondPlayerCharacter->GetHealthComponent()->Heal(SplitSecondPlayerCharacter->GetHealthComponent()->GetMaxHealth() * 0.1);
-	}
+	SplitSecondPlayerState->CurrentStats.Health += SplitSecondPlayerState->CurrentStats.MaxHealth * 0.2;
 }
 void ASplitSecondGameMode::SpawnBossUpgradeScreen()
 {
@@ -202,14 +199,11 @@ void ASplitSecondGameMode::SpawnBossUpgradeScreen()
 
 	if (auto Created = CreateWidget<UUpgradeSelection>(GetWorld(), UpgradeSelectionClass))
 	{
-		Created->ShowUpgradeSelection(&SplitSecondPlayerState->CurrentStats, PlayerGun, true, SplitSecondPlayerCharacter->GetHealthComponent());
+		Created->ShowUpgradeSelection(&SplitSecondPlayerState->CurrentStats, PlayerGun, true);
 		Created->OnUpgradeSelected.BindUFunction(this, TEXT("SpawnNextArena"));
 	}
 
-	if (SplitSecondPlayerCharacter)
-	{
-		SplitSecondPlayerCharacter->GetHealthComponent()->Heal(SplitSecondPlayerCharacter->GetHealthComponent()->GetMaxHealth());
-	}
+	SplitSecondPlayerState->CurrentStats.Health += SplitSecondPlayerState->CurrentStats.MaxHealth;
 }
 
 void ASplitSecondGameMode::PlayerSlowGame()
