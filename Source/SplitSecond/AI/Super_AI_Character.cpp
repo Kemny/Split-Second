@@ -71,6 +71,14 @@ void ASuper_AI_Character::Tick(float DeltaTime)
         if (auto Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0))
         {
             auto Rotation = FMath::RInterpTo(GetActorRotation(), UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Player->GetActorLocation()), DeltaTime, RotationSpeed);
+            if (FMath::Abs(Rotation.Yaw - UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Player->GetActorLocation()).Yaw)  <= MinRotationToFacePlayer)
+            {
+                bIsFacingPlayer = true;
+            }
+            else
+            {
+                bIsFacingPlayer = false;
+            }
 
             SetActorRelativeRotation(FRotator(0, Rotation.Yaw, 0));
         }

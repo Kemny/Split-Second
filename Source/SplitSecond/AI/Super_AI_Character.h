@@ -110,6 +110,8 @@ protected:
 
     UPROPERTY(EditAnywhere, Category = "AI Settings")
     float RotationSpeed = 2;
+    UPROPERTY(EditAnywhere, Category = "AI Settings")
+    float MinRotationToFacePlayer = 2;
 
     UPROPERTY(EditAnywhere, Category = "Colors")
     FLinearColor DefaultColor = FLinearColor::Red;
@@ -129,9 +131,14 @@ protected:
 
 private:
     bool bIsSlowed = false;
+    bool bIsFacingPlayer = false;
 
     void SpawnGun();
 
     UFUNCTION() virtual void OnTakeDamage();
     void Die();
+
+public:
+    bool IsFacingPlayer() { return bIsFacingPlayer; }
+
 };

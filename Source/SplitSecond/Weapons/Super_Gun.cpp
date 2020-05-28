@@ -85,8 +85,17 @@ AAIProjectile* ASuper_Gun::AI_SpawnProjectile(FVector Offset)
         if (World != NULL)
         {
             const FVector SpawnLocation = GunMesh->GetSocketLocation(FName("MuzzleLocation"));
+            FRotator SpawnRotation;
+            if (Cast<ASuper_AI_Character>(CurrentPawn)->IsFacingPlayer())
+            {
+                SpawnRotation = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation() + Offset);
+            }
+            else
+            {
+                SpawnRotation = GunMesh->GetSocketRotation(FName("MuzzleLocation"));
+            }
 
-            auto SpawnTransform = FTransform(UKismetMathLibrary::FindLookAtRotation(SpawnLocation, UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation() + Offset), SpawnLocation);
+            auto SpawnTransform = FTransform(SpawnRotation, SpawnLocation);
 
             Projectile = World->SpawnActorDeferred<AAIProjectile>(ProjectileClass, SpawnTransform);
             if (Projectile)
