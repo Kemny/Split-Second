@@ -423,7 +423,7 @@ bool UUpgradeSelection::CreateRandomBossUpgrade(int32 index, EBosssUpgrades& Out
 			}
 			break;
 		case 2:
-			if (!PlayerUpgrades->bExplodingBullets)
+			if (!PlayerUpgrades->bExplodingBullets && PlayerCurrentWeapon != EWeapons::Shotgun)
 			{
 				OutType = EBosssUpgrades::ExplodingBullets;
 			}
@@ -590,9 +590,6 @@ void UUpgradeSelection::ApplyBossUpgrade(EBosssUpgrades TypeToApply)
 void UUpgradeSelection::FinishSelection()
 {
 	OnUpgradeSelected.ExecuteIfBound();
-	/*FInputModeGameOnly InputMode;
-	GetWorld()->GetFirstPlayerController()->SetInputMode(InputMode);
-	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;*/
 
 	if (!ensure(SelectUpgradeSound != nullptr)) { return; }
 	UGameplayStatics::PlaySound2D(GetWorld(), SelectUpgradeSound);
