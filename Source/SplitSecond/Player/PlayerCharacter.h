@@ -73,7 +73,6 @@ protected:
 
 private:
 	class UPlayerMovementComponent* PlayerMovementComponent;
-    TSubclassOf<class UPopupMessage> PopupMessageClass;
     class UPlayerUI* PlayerUI;
     class UPauseMenu* PauseMenu;
 

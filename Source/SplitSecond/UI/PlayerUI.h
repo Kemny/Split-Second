@@ -21,8 +21,6 @@ protected:
 	UProgressBar* ProgressHealthBar;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	UTextBlock* txt_Objective;
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	UTextBlock* txt_WaveTimer;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	UTextBlock* txt_SurviveTimer;
@@ -46,8 +44,6 @@ private:
 	float WaveTargetTime = 0;
 
 public:
-	FORCEINLINE void SetObjectiveName(FString ObjectiveName) { txt_Objective->SetText(FText::FromString(FString("Current Objective:\n" + ObjectiveName))); }
-
 	void ActivateTimeSlow(float Cooldown, float Duration);
 	
 	void SetSurviveTime(float Duration);

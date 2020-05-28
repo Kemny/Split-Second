@@ -19,7 +19,7 @@ FReply UPopupMessage::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEve
 	{
 		FInputModeGameOnly InputMode;
 		GetWorld()->GetFirstPlayerController()->SetInputMode(InputMode);
-
+		GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
 		OnConditionFufilled.ExecuteIfBound();
 		RemoveFromParent();
 		return FReply::Handled();

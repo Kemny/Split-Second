@@ -14,15 +14,10 @@
 #include "../SplitSecondPlayerState.h"
 #include "../UI/PlayerUI.h"
 #include "UObject/ConstructorHelpers.h"
-#include "../UI/PopupMessage.h"
 
 APlayerCharacter::APlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UPlayerMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
-
-    ConstructorHelpers::FClassFinder<UPopupMessage> BP_PopupMessageClass(TEXT("/Game/Blueprint/UI/WBP_PopupMessage"));
-    if (BP_PopupMessageClass.Class) PopupMessageClass = BP_PopupMessageClass.Class;
-
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 
@@ -204,12 +199,6 @@ void APlayerCharacter::OnTakeDamage(AActor* DamagedActor, float Damage, const UD
 
             PlayerUI->RemoveFromParent();
             PlayerController->HandlePlayerDeath();
-
-            if (auto Message = CreateWidget<UPopupMessage>(GetWorld(), PopupMessageClass))
-            {
-                Message->ShowPopupMessage(FKey("F"), FText::FromString("YOU DIED \n PRESS F TO RESTART"));
-                Message->OnConditionFufilled.BindUFunction(this, TEXT("OnConfirmedDeath"));
-            }
         }
     }
 }

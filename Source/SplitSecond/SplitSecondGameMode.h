@@ -46,6 +46,9 @@ public:
 	UFUNCTION() void SpawnUpgradeScreen();
 	UFUNCTION() void SpawnBossUpgradeScreen();
 
+	UFUNCTION() void HandleArenaFinished();
+	UFUNCTION() void HandleBossFinished();
+
 	void PostLogin(APlayerController* NewPlayer) override;
 	UFUNCTION() void OnPlayerDeath();
 	UFUNCTION() void OnConfirmedPlayerDeath();
@@ -67,12 +70,15 @@ private:
 	UPROPERTY() class AArena* CurrentArena;
 	UPROPERTY() TArray<AActor*> SlowedActors;
 
+	//Classes
 	TSubclassOf<class ASuper_Gun> PistolClass;
 	TSubclassOf<class ASuper_Gun> ShotgunClass;
 	TSubclassOf<class ASuper_Gun> BowClass;
 	TSubclassOf<class UPlayerUI> PlayerUIClass;
-
+	TSubclassOf<class UTransitionScreen> TransitionScreenClass;
 	TSubclassOf<class UUpgradeSelection> UpgradeSelectionClass;
+
+	class UUserWidget* CurrentTransitionWidget;
 
 	UFUNCTION() void PlayerSlowGame();
 

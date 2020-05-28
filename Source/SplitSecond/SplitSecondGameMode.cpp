@@ -20,6 +20,7 @@
 #include "UI/PlayerUI.h"
 #include "SplitSecondGameInstance.h"
 #include "Health/HealthComponent.h"
+#include "UI/TransitionScreen.h"
 
 ASplitSecondGameMode::ASplitSecondGameMode()
 	: Super()
@@ -41,6 +42,9 @@ ASplitSecondGameMode::ASplitSecondGameMode()
 
 	static ConstructorHelpers::FClassFinder<UUpgradeSelection> BP_UpgradeSelectionClass(TEXT("/Game/Blueprint/UI/WBP_UpgradeSelection"));
 	if (BP_UpgradeSelectionClass.Class) UpgradeSelectionClass = BP_UpgradeSelectionClass.Class;
+
+	static ConstructorHelpers::FClassFinder<UTransitionScreen> BP_TransitionScreenClass(TEXT("/Game/Blueprint/UI/WBP_TransitionScreen"));
+	if (BP_TransitionScreenClass.Class) TransitionScreenClass = BP_TransitionScreenClass.Class;
 }
 
 void ASplitSecondGameMode::BeginPlay()
@@ -140,6 +144,9 @@ void ASplitSecondGameMode::CheckSlowGame()
 
 void ASplitSecondGameMode::SpawnNextArena()
 {
+	++ArenaNum;
+	UE_LOG(LogTemp, Log, TEXT("Arena Num: %i"), ArenaNum);
+
 	if (CurrentArena)
 	{
 		CurrentArena->Destroy();
@@ -148,14 +155,14 @@ void ASplitSecondGameMode::SpawnNextArena()
 
 	if (!ensure(PossibleArenas.Num() > 0)) { return; }
 
-	if (ArenaNum % 10 != 0 || ArenaNum == 0)
+	if (ArenaNum % 10 != 0)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Spawning Normal Arena"));
 
 		auto RoomIndex = FMath::RandRange(0, PossibleArenas.Num() - 1);
 		CurrentArena = GetWorld()->SpawnActor<AArena>(PossibleArenas[RoomIndex]);
 		if (!ensure(CurrentArena != nullptr)) { return; }
-		CurrentArena->OnArenaFinished.BindUFunction(this, TEXT("SpawnUpgradeScreen"));
+		CurrentArena->OnArenaFinished.BindUFunction(this, TEXT("HandleArenaFinished"));
 		CurrentArena->SpawnActors();
 		UNavigationSystemV1::GetNavigationSystem(GetWorld())->Build();
 	}
@@ -165,21 +172,30 @@ void ASplitSecondGameMode::SpawnNextArena()
 
 		CurrentArena = GetWorld()->SpawnActor<AArena>(BossArena);
 		if (!ensure(CurrentArena != nullptr)) { return; }
-		CurrentArena->OnArenaFinished.BindUFunction(this, TEXT("SpawnBossUpgradeScreen"));
+		CurrentArena->OnArenaFinished.BindUFunction(this, TEXT("HandleBossFinished"));
 		CurrentArena->SpawnActors();
 		UNavigationSystemV1::GetNavigationSystem(GetWorld())->Build();
 	}
-	UE_LOG(LogTemp, Log, TEXT("Arena Num: %i"), ArenaNum);
-	++ArenaNum;
 }
-void ASplitSecondGameMode::HandleEnemyDeath()
+void ASplitSecondGameMode::HandleArenaFinished()
 {
-	++Kills;
+	if (auto Created = CreateWidget<UTransitionScreen>(GetWorld(), TransitionScreenClass))
+	{
+		Created->OnTransitionFinished.BindUFunction(this, TEXT("SpawnUpgradeScreen"));
+		Created->PlayWinAnimation(ArenaNum);
+	}
 }
+void ASplitSecondGameMode::HandleBossFinished()
+{
+	if (auto Created = CreateWidget<UTransitionScreen>(GetWorld(), TransitionScreenClass))
+	{
+		Created->OnTransitionFinished.BindUFunction(this, TEXT("SpawnBossUpgradeScreen"));
+		Created->PlayWinAnimation(ArenaNum);
+	}
+}
+
 void ASplitSecondGameMode::SpawnUpgradeScreen()
 {
-	UE_LOG(LogTemp, Log, TEXT("Showing Arena Upgrade Screen"), ArenaNum);
-
 	if (!ensure(SplitSecondPlayerState != nullptr)) { return; }
 
 	if (auto Created = CreateWidget<UUpgradeSelection>(GetWorld(), UpgradeSelectionClass))
@@ -192,10 +208,7 @@ void ASplitSecondGameMode::SpawnUpgradeScreen()
 }
 void ASplitSecondGameMode::SpawnBossUpgradeScreen()
 {
-	UE_LOG(LogTemp, Log, TEXT("Showing Boss Upgrade Screen"), ArenaNum);
-
 	if (!ensure(SplitSecondPlayerState != nullptr)) { return; }
-	if (!ensure(SplitSecondPlayerCharacter != nullptr)) { return; }
 
 	if (auto Created = CreateWidget<UUpgradeSelection>(GetWorld(), UpgradeSelectionClass))
 	{
@@ -204,6 +217,10 @@ void ASplitSecondGameMode::SpawnBossUpgradeScreen()
 	}
 
 	SplitSecondPlayerState->CurrentStats.Health += SplitSecondPlayerState->CurrentStats.MaxHealth;
+}
+void ASplitSecondGameMode::HandleEnemyDeath()
+{
+	++Kills;
 }
 
 void ASplitSecondGameMode::PlayerSlowGame()
@@ -263,6 +280,11 @@ void ASplitSecondGameMode::AddActorToSlowedArray(AActor* ActorToSlow)
 void ASplitSecondGameMode::OnPlayerDeath()
 {
 	///This triggers immediately after the player dies
+	if (auto Created = CreateWidget<UTransitionScreen>(GetWorld(), TransitionScreenClass))
+	{
+		Created->OnTransitionFinished.BindUFunction(this, TEXT("OnConfirmedPlayerDeath"));
+		Created->PlayFailAnimation(ArenaNum);
+	}
 
 }
 void ASplitSecondGameMode::OnConfirmedPlayerDeath()
