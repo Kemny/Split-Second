@@ -68,7 +68,7 @@ protected:
 	/** Handles stafing movement, left and right */
 	void MoveRight(float Val);
     
-    UPROPERTY(EditAnywhere, Category = "Health")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite , Category = "Health")
     bool bIsInvinclible = false;
 
 private:
