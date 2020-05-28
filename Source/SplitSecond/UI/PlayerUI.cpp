@@ -19,7 +19,7 @@ void UPlayerUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 		}
 		else
 		{
-			TimeSlowDurationProgress = FMath::Clamp<float>(TimeSlowDurationProgress + InDeltaTime / TimeSlowDurationTime, 0, 1);
+			TimeSlowDurationProgress = FMath::Clamp<float>(TimeSlowDurationProgress - InDeltaTime / TimeSlowDurationTime, 0, 1);
 			ProgressSlowBar->SetPercent(TimeSlowDurationProgress);
 		}
 	}
