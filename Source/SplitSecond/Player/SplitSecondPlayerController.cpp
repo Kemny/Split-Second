@@ -108,7 +108,7 @@ void ASplitSecondPlayerController::SlowGame()
 	auto SplitSecondPlayerState = GetPawn()->GetPlayerState<ASplitSecondPlayerState>();
 	if (!ensure(SplitSecondPlayerState != nullptr)) { return; }
 	if (!ensure(PlayerCharacter != nullptr)) { return; }
-	PlayerCharacter->GetPlayerUI()->ActivateTimeSlow(SplitSecondPlayerState->CurrentStats.GameSlowCooldown);
+	PlayerCharacter->GetPlayerUI()->ActivateTimeSlow(SplitSecondPlayerState->CurrentStats.GameSlowCooldown, SplitSecondPlayerState->CurrentStats.GameSlowDuration);
 
 	FTimerHandle Handle;
 	FTimerHandle Handle2;

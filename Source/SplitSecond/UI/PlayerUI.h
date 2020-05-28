@@ -15,6 +15,8 @@ class SPLITSECOND_API UPlayerUI : public UUserWidget
 	GENERATED_BODY()
 
 protected:
+	void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	UProgressBar* ProgressHealthBar;
 
@@ -28,13 +30,17 @@ protected:
 	UTextBlock* txt_RemainingEnemies;
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	UImage* TimeSlowCooldown;
+	UProgressBar* ProgressSlowBar;
 
-	void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 private:
-	float TimeSlowProgress = 1;
-	float TimeSlowProgressSpeed = 1;
+	bool bGameSlowAnimations = false;
+
+	float TimeSlowRefreshProgress = 1;
+	float TimeSlowRefreshTime = 1;
+
+	float TimeSlowDurationProgress = 1;
+	float TimeSlowDurationTime = 1;
 
 	float SurviveTargetTime = 0;
 	float WaveTargetTime = 0;
@@ -42,7 +48,7 @@ private:
 public:
 	FORCEINLINE void SetObjectiveName(FString ObjectiveName) { txt_Objective->SetText(FText::FromString(FString("Current Objective:\n" + ObjectiveName))); }
 
-	void ActivateTimeSlow(float Cooldown);
+	void ActivateTimeSlow(float Cooldown, float Duration);
 	
 	void SetSurviveTime(float Duration);
 	void SetNextWaveTime(float Duration);

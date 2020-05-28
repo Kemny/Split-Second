@@ -269,7 +269,6 @@ void ASplitSecondGameMode::OnConfirmedPlayerDeath()
 {
 	///This triggers after the player decides to confirm his death by hitting a button
 
-	//TODO Move player back to the main menu / Restart the game
 	if (!ensure(SplitSecondPlayerController != nullptr)) { return; }
 	SplitSecondPlayerController->ClientTravel(FString("/Game/Maps/MainMenu"), ETravelType::TRAVEL_Absolute, false);
 }

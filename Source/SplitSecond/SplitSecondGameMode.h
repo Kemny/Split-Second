@@ -82,9 +82,11 @@ private:
 	void CheckSlowGame();
 
 public:
+
 	int32 GetArenaNum() const { return ArenaNum; }
 	int32 GetHighscore() const { return ArenaHighscore; }
 	int32 GetKills() const { return Kills; }
+	UFUNCTION(BlueprintCallable)
 	float GetSlowEndTime() const { return SlowEndTime ; }
 	bool GetIsGameSlowed() const { return bGameIsSlowed; }
 	float GetCurrentSlowValue() const { return CurrentSlowValue; }

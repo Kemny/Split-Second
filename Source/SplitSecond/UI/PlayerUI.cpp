@@ -6,8 +6,24 @@ void UPlayerUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
-	TimeSlowProgress = FMath::Clamp<float>(TimeSlowProgress + TimeSlowProgressSpeed, 0, 1);
-	TimeSlowCooldown->GetDynamicMaterial()->SetScalarParameterValue(TEXT("Progress"), TimeSlowProgress);
+	if (bGameSlowAnimations)
+	{
+		if (TimeSlowDurationProgress == 0)
+		{
+			TimeSlowRefreshProgress = FMath::Clamp<float>(TimeSlowRefreshProgress + InDeltaTime / TimeSlowRefreshTime, 0, 1);
+			ProgressSlowBar->SetPercent(TimeSlowRefreshProgress);
+			if (TimeSlowRefreshProgress == 1)
+			{
+				bGameSlowAnimations = false;
+			}
+		}
+		else
+		{
+			TimeSlowDurationProgress = FMath::Clamp<float>(TimeSlowDurationProgress + InDeltaTime / TimeSlowDurationTime, 0, 1);
+			ProgressSlowBar->SetPercent(TimeSlowDurationProgress);
+		}
+	}
+	
 
 	txt_WaveTimer->SetText(FText::FromString(FString("next wave:\n") + FString::FromInt(FMath::Abs(WaveTargetTime - GetWorld()->GetTimeSeconds()))));
 	txt_SurviveTimer->SetText(FText::FromString(FString("Survive Time:\n") + FString::FromInt(FMath::Abs(SurviveTargetTime - GetWorld()->GetTimeSeconds()))));
@@ -30,11 +46,15 @@ void UPlayerUI::SetNextWaveTime(float Duration)
 	txt_WaveTimer->SetVisibility(ESlateVisibility::Visible);
 }
 
-void UPlayerUI::ActivateTimeSlow(float Cooldown)
+void UPlayerUI::ActivateTimeSlow(float Cooldown, float Duration)
 {
-	TimeSlowProgress = 0;
-	//Not exactly accurate
-	TimeSlowProgressSpeed = Cooldown * FApp::GetDeltaTime() * 0.01;
+	TimeSlowRefreshProgress = 0;
+	TimeSlowRefreshTime = Cooldown - Duration;
+
+	TimeSlowDurationProgress = 1;
+	TimeSlowDurationTime = Duration;
+
+	bGameSlowAnimations = true;
 }
 
 void UPlayerUI::HandleArenaFinished()
