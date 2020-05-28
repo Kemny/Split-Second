@@ -15,6 +15,11 @@ class ASplitSecondGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 protected:
+	UPROPERTY(EditAnywhere, Category = "Music")
+	USoundBase* ArenaMusic;
+	UPROPERTY(EditAnywhere, Category = "Music")
+	USoundBase* BossMusic;
+	
 	UPROPERTY(EditAnywhere)float MinTimeDilation = 0.01;
 	UPROPERTY(EditAnywhere)float MaxTimeDilation = 1;
 
@@ -79,6 +84,8 @@ private:
 	TSubclassOf<class UUpgradeSelection> UpgradeSelectionClass;
 
 	class UUserWidget* CurrentTransitionWidget;
+	UAudioComponent* ArenaMusicReference = nullptr;
+	UAudioComponent* BossMusicReference = nullptr;
 
 	UFUNCTION() void PlayerSlowGame();
 

@@ -5,8 +5,8 @@
 
 void AAIShotgun::FireGun()
 {
-    if (!ensure(ShootSound != nullptr)) { return; }
-    UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShootSound, GetActorLocation());
+    if (!ensure(FireSouns.Num() > 0)) { return; }
+    UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSouns[FMath::RandRange(0, FireSouns.Num() - 1)], GetActorLocation());
 
     for (size_t i = 0; i < BulletNum; i++)
     {

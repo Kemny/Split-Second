@@ -71,6 +71,6 @@ protected:
 	class AAIProjectile* AI_SpawnProjectile(FVector Offset = FVector::ZeroVector);
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
-	USoundBase* ShootSound;
+	TArray<USoundBase*> FireSouns;
 };
 
