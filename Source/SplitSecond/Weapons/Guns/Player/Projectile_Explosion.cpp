@@ -22,9 +22,11 @@ AProjectile_Explosion::AProjectile_Explosion()
 	ExplosionRadiusCollision->SetCollisionResponseToAllChannels(ECR_Overlap);
 }
 
-void AProjectile_Explosion::ApplyExplosionDamage(float Damage, float ExplosionUpTime)
+void AProjectile_Explosion::ApplyExplosionDamage(float Damage, float ExplosionUpTime, float Radius)
 {
 	SetLifeSpan(ExplosionUpTime);
+
+	ExplosionRadiusCollision->SetSphereRadius(Radius);
 
 	ExplosionRadiusCollision->GetOverlappingActors(ActorsToDamage, ASuper_AI_Character::StaticClass());
 

@@ -34,7 +34,7 @@ void APlayerProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 			FTransform SpawnLocation = FTransform(GetActorRotation(), Hit.ImpactPoint, FVector(1));
 
 			auto CurrentExplosion = GetWorld()->SpawnActor<AProjectile_Explosion>(ExplosionToSpawn, SpawnLocation, SpawnParms);
-			CurrentExplosion->ApplyExplosionDamage(DamageValue, ExplosionUpTime);
+			CurrentExplosion->ApplyExplosionDamage(DamageValue, ExplosionUpTime, ExplosionRadius);
 
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ExploadingBulletFX, GetActorLocation(), GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
 

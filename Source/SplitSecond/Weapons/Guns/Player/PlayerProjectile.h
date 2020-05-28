@@ -37,5 +37,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Upgrade Settings")
 	TSubclassOf<class AProjectile_Explosion> ExplosionToSpawn;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Upgrade Settings")
+	float ExplosionRadius = 300;
+
 	virtual void OnBulletHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 };

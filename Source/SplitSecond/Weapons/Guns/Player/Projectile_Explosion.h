@@ -19,7 +19,7 @@ public:
 	class USphereComponent* ExplosionRadiusCollision;
 
 	UFUNCTION(BlueprintCallable, Category = "Damage Functions")
-	void ApplyExplosionDamage(float Damage, float ExplosionUpTime);
+	void ApplyExplosionDamage(float Damage, float ExplosionUpTime, float Radius);
 
 	TArray<AActor*> ActorsToDamage;
 };
