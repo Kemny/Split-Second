@@ -83,15 +83,19 @@ private:
 	bool bHasFlag = false;
 	bool ObjectiveFinished = false;
 
-	void SetupFlag();
-	void SetupObjective();
-	UFUNCTION() void SpawnKillAllWave();
-	void SetupKillBoss();
+	UFUNCTION() void SetupSurvive();
+	UFUNCTION() void SetupFlag();
+	UFUNCTION() void SetupObjective();
+	UFUNCTION() void SetupKillAll();
+	UFUNCTION() void SetupKillBoss();
 
 	void SpawnEnemies(int32 NumberToSpawn, TArray<UEnemySpawnLocation*> SpawnLocations);
 
 	UFUNCTION() void AquireFlag() { bHasFlag = true; }
 	UFUNCTION() void TryDeliverFlag();
+
+	UFUNCTION() void SpawnKillAllWave();
+
 	/* Called when the arenas objective is completed, to give the player the option to continue to the next one*/
 	UFUNCTION() void FinishObjective();
 	/* Called when player gives the input to load the next level*/

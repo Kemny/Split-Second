@@ -590,9 +590,9 @@ void UUpgradeSelection::ApplyBossUpgrade(EBosssUpgrades TypeToApply)
 void UUpgradeSelection::FinishSelection()
 {
 	OnUpgradeSelected.ExecuteIfBound();
-	FInputModeGameOnly InputMode;
+	/*FInputModeGameOnly InputMode;
 	GetWorld()->GetFirstPlayerController()->SetInputMode(InputMode);
-	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;
+	GetWorld()->GetFirstPlayerController()->bShowMouseCursor = false;*/
 
 	if (!ensure(SelectUpgradeSound != nullptr)) { return; }
 	UGameplayStatics::PlaySound2D(GetWorld(), SelectUpgradeSound);

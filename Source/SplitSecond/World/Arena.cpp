@@ -99,56 +99,60 @@ void AArena::SpawnActors()
 	if (!ensure(PlayerPawn != nullptr)) { return; }
 
 	PlayerPawn->SetActorLocation(PlayerStartLocation->GetComponentLocation());
+	GetWorld()->GetFirstPlayerController()->SetControlRotation(PlayerStartLocation->GetComponentRotation());
+
 	TArray<TEnumAsByte<EObjectives>> OutKeys;
 	Objectives.GetKeys(OutKeys);
 	CurrentObjective = OutKeys[FMath::RandRange(0, OutKeys.Num() - 1)];
 
 	CurrentSettings = Objectives.Find(CurrentObjective);
 
-	if (CurrentSettings)
+	if (auto CreatedWidget = CreateWidget<UPopupMessage>(GetWorld(), PopupMessageClass))
 	{
-		switch (CurrentObjective)
+		if (CurrentSettings)
 		{
-		case Survive:
-			bSpawningEnemyWaves = true;
-			WaveTimerTargetTime = GetWorld()->GetTimeSeconds();
-
-			bSurviving = true;
-			SurviveTargetTime = GetWorld()->GetTimeSeconds() + CurrentSettings->SurviveTime;
-
-			PlayerPawn->GetPlayerUI()->SetSurviveTime(CurrentSettings->SurviveTime);
-			PlayerPawn->GetPlayerUI()->SetObjectiveName(FString("Survive"));
-			break;
-		case ReachObjective:
-			bSpawningEnemyWaves = true;
-			WaveTimerTargetTime = GetWorld()->GetTimeSeconds();
-
-			PlayerPawn->GetPlayerUI()->SetObjectiveName(FString("Reach the End"));
-			SetupObjective();
-			break;
-		case CaptureTheFlag:
-			bSpawningEnemyWaves = true;
-			WaveTimerTargetTime = GetWorld()->GetTimeSeconds();
-
-			PlayerPawn->GetPlayerUI()->SetObjectiveName(FString("Capture The Tablet"));
-			SetupFlag();
-			break;
-		case KillAllEnemies:
-			SpawnKillAllWave();
-			PlayerPawn->GetPlayerUI()->SetObjectiveName(FString("Kill All Enemies"));
-			PlayerPawn->GetPlayerUI()->SetRemainingEnemies(CurrentSettings->EnemyTotal);
-			break;
-		case KillBoss:
-			SetupKillBoss();
-			PlayerPawn->GetPlayerUI()->SetObjectiveName(FString("Kill The Boss"));
-		default:
-			break;
+			switch (CurrentObjective)
+			{
+			case Survive:
+				CreatedWidget->ShowPopupMessage(FKey("F"), FText::FromString("survive\n\npress f to start"));
+				CreatedWidget->OnConditionFufilled.BindUFunction(this, TEXT("SetupSurvive"));
+				break;
+			case ReachObjective:
+				CreatedWidget->ShowPopupMessage(FKey("F"), FText::FromString("reach the end\n\npress f to start"));
+				CreatedWidget->OnConditionFufilled.BindUFunction(this, TEXT("SetupObjective"));
+				break;
+			case CaptureTheFlag:
+				CreatedWidget->ShowPopupMessage(FKey("F"), FText::FromString("capture the tablet\n\npress f to start"));
+				CreatedWidget->OnConditionFufilled.BindUFunction(this, TEXT("SetupFlag"));
+				break;
+			case KillAllEnemies:
+				CreatedWidget->ShowPopupMessage(FKey("F"), FText::FromString("kill all enemy waves\n\npress f to start"));
+				CreatedWidget->OnConditionFufilled.BindUFunction(this, TEXT("SetupKillAll"));
+				break;
+			case KillBoss:
+				CreatedWidget->ShowPopupMessage(FKey("F"), FText::FromString("kill sir epoch\n\npress f to start"));
+				CreatedWidget->OnConditionFufilled.BindUFunction(this, TEXT("SetupKillBoss"));
+			default:
+				break;
+			}
 		}
 	}
 }
+void AArena::SetupSurvive()
+{
+	bSpawningEnemyWaves = true;
+	WaveTimerTargetTime = GetWorld()->GetTimeSeconds();
 
+	bSurviving = true;
+	SurviveTargetTime = GetWorld()->GetTimeSeconds() + CurrentSettings->SurviveTime;
+
+	PlayerPawn->GetPlayerUI()->SetSurviveTime(CurrentSettings->SurviveTime);
+}
 void AArena::SetupFlag()
 {
+	bSpawningEnemyWaves = true;
+	WaveTimerTargetTime = GetWorld()->GetTimeSeconds();
+
 	if (auto Spawned = GetWorld()->SpawnActor<AFlag>(FlagScene->GetComponentLocation(), FRotator(0)))
 	{
 		Spawned->OnFlagCollision.BindUFunction(this, FName("AquireFlag"));
@@ -175,6 +179,9 @@ void AArena::TryDeliverFlag()
 }
 void AArena::SetupObjective()
 {
+	bSpawningEnemyWaves = true;
+	WaveTimerTargetTime = GetWorld()->GetTimeSeconds();
+
 	if (auto Spawned = GetWorld()->SpawnActor<ATargetLocation>(LocationTargetScene->GetComponentLocation(), FRotator(0)))
 	{
 		Spawned->OnTargetLocationCollision.BindUFunction(this, FName("FinishObjective"));
@@ -182,6 +189,11 @@ void AArena::SetupObjective()
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("Reach Objective Setup Finished"));
+}
+void AArena::SetupKillAll()
+{
+	SpawnKillAllWave();
+	PlayerPawn->GetPlayerUI()->SetRemainingEnemies(CurrentSettings->EnemyTotal);
 }
 void AArena::SpawnKillAllWave()
 {
@@ -285,12 +297,7 @@ void AArena::FinishObjective()
 	}
 	SpawnedEnemies.Empty();
 
-	///Prompt player into entering next level
-	if (auto Spawned = CreateWidget<UPopupMessage>(GetWorld(), PopupMessageClass))
-	{
-		Spawned->ShowPopupMessage(FKey("F"), FText::FromString("PRESS F TO CONTINUE"));
-		Spawned->OnConditionFufilled.BindUFunction(this, TEXT("FinishArena"));
-	}
+	FinishArena();
 
 	TArray<AActor*> OutActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAIProjectile::StaticClass(), OutActors);
