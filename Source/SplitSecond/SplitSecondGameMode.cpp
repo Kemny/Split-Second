@@ -165,6 +165,16 @@ void ASplitSecondGameMode::SpawnNextArena()
 		CurrentArena->OnArenaFinished.BindUFunction(this, TEXT("HandleArenaFinished"));
 		CurrentArena->SpawnActors();
 		UNavigationSystemV1::GetNavigationSystem(GetWorld())->Build();
+
+		if (!ArenaMusicReference)
+		{
+			if (!ensure(ArenaMusic != nullptr)) { return; }
+			ArenaMusicReference = UGameplayStatics::SpawnSound2D(GetWorld(), ArenaMusic);
+		}
+		else
+		{
+			ArenaMusicReference->SetActive(true);
+		}
 	}
 	else
 	{
@@ -175,6 +185,16 @@ void ASplitSecondGameMode::SpawnNextArena()
 		CurrentArena->OnArenaFinished.BindUFunction(this, TEXT("HandleBossFinished"));
 		CurrentArena->SpawnActors();
 		UNavigationSystemV1::GetNavigationSystem(GetWorld())->Build();
+
+		if (!BossMusicReference)
+		{
+			if (!ensure(BossMusic != nullptr)) { return; }
+			BossMusicReference = UGameplayStatics::SpawnSound2D(GetWorld(), BossMusic);
+		}
+		else
+		{
+			BossMusicReference->SetActive(true);
+		}
 	}
 }
 void ASplitSecondGameMode::HandleArenaFinished()

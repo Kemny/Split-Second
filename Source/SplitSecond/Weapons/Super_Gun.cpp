@@ -51,8 +51,8 @@ void ASuper_Gun::BeginPlay()
 
 void ASuper_Gun::FireGun()
 {
-    if (!ensure(ShootSound != nullptr)) { return; }
-    UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShootSound, GetActorLocation());
+    if (!ensure(FireSouns.Num() > 0)) { return; }
+    UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSouns[FMath::RandRange(0, FireSouns.Num() - 1)], GetActorLocation());
 
     AI_SpawnProjectile();
 }
@@ -166,8 +166,8 @@ APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector con
 
 void ASuper_Gun::AfterPlayerFireGun()
 {
-    if (!ensure(ShootSound != nullptr)) { return; }
-    UGameplayStatics::PlaySound2D(GetWorld(), ShootSound);
+    if (!ensure(FireSouns.Num() > 0)) { return; }
+    UGameplayStatics::PlaySound2D(GetWorld(), FireSouns[FMath::RandRange(0, FireSouns.Num() - 1)]);
 
     LastTimeFired = GetWorld()->TimeSeconds;
 }
