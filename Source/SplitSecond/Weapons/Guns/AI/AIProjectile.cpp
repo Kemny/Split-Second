@@ -6,10 +6,6 @@
 #include "NiagaraFunctionLibrary.h"
 #include "../../../AI/Super_AI_Character.h"
 #include "../../../SplitSecondGameMode.h"
-#include "TimerManager.h"
-#include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
-#include "../../BulletMovementComponent.h"
 
 void AAIProjectile::BeginPlay()
 {
@@ -20,10 +16,7 @@ void AAIProjectile::BeginPlay()
 
 	if (Gamemode->GetIsGameSlowed())
 	{
-		CustomTimeDilation = Gamemode->GetCurrentSlowValue();
-
-		FTimerHandle Handle;
-		GetWorldTimerManager().SetTimer(Handle, this, &AAIProjectile::StopBeingSlowed, FMath::Abs(Gamemode->GetSlowEndTime() - GetWorld()->GetTimeSeconds()), false);
+		Gamemode->AddActorToSlowedArray(this);
 	}
 }
 
@@ -53,9 +46,4 @@ void AAIProjectile::SetCurrentAI(AActor* AI)
 	if (!ensure(AIChar != nullptr)) { return; }
 
 	AICharacter = AIChar;
-}
-
-void AAIProjectile::StopBeingSlowed()
-{
-	CustomTimeDilation = 1;
 }

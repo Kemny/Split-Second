@@ -249,6 +249,16 @@ void ASplitSecondGameMode::PlayerSlowGame()
 
 	SlowEndTime = GetWorld()->GetTimeSeconds() + SplitSecondPlayerState->CurrentStats.GameSlowDuration;
 }
+void ASplitSecondGameMode::AddActorToSlowedArray(AActor* ActorToSlow)
+{
+	if (!ensure(ActorToSlow != nullptr)) { return; }
+
+	if (bGameIsSlowed)
+	{
+		SlowedActors.Add(ActorToSlow);
+		ActorToSlow->CustomTimeDilation = CurrentSlowValue;
+	}
+}
 
 void ASplitSecondGameMode::OnPlayerDeath()
 {

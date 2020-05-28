@@ -90,6 +90,7 @@ public:
 	float GetCurrentSlowValue() const { return CurrentSlowValue; }
 
 	void HandleEnemyDeath();
+	void AddActorToSlowedArray(AActor* ActorToSlow);
 
 };
 

@@ -16,7 +16,6 @@ class SPLITSECOND_API AAIProjectile : public ASplitSecondProjectile
 
 public:
 	void BeginPlay() override;
-	UFUNCTION() void StopBeingSlowed();
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 
 	/* Called on begin play */

@@ -55,6 +55,12 @@ void ASuper_AI_Character::BeginPlay()
 	SpawnGun();
 
     Gamemode = Cast<ASplitSecondGameMode>(UGameplayStatics::GetGameMode(this));
+    if (!ensure(Gamemode != nullptr)) { return; }
+
+    if (Gamemode->GetIsGameSlowed())
+    {
+        Gamemode->AddActorToSlowedArray(this);
+    }
 
     ScaleEnemyDamage(Damage);
 
@@ -98,9 +104,7 @@ void ASuper_AI_Character::CheckGameSlowTimers()
 
         if (Gamemode->GetIsGameSlowed())
         {
-            CustomTimeDilation = Gamemode->GetCurrentSlowValue();
-
-            SlowTimerTargetTime = GetWorld()->GetTimeSeconds() + FMath::Abs(Gamemode->GetSlowEndTime() - GetWorld()->GetTimeSeconds());
+            Gamemode->AddActorToSlowedArray(this);
         }
         else
         {
