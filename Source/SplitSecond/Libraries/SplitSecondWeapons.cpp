@@ -1,5 +1,4 @@
-// This project falls under CC-BY-SA lisence
-
+// GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
 
 #include "SplitSecondWeapons.h"
 
