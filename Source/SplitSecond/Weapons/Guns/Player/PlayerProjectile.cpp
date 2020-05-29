@@ -12,6 +12,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/DamageType.h"
+#include "Sound/SoundAttenuation.h"
 
 APlayerProjectile::APlayerProjectile()
 {
