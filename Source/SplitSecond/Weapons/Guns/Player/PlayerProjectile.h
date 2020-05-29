@@ -36,6 +36,8 @@ protected:
 	USoundBase* Homing;
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundBase* Piercing;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* ShieldImpact;
 
 	UPROPERTY(EditAnywhere, Category = "FX")
 	class UNiagaraSystem* ExplodingBulletFX;

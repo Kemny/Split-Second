@@ -52,6 +52,9 @@ void ASuper_AI_Character::BeginPlay()
 {
 	Super::BeginPlay();
 
+    if (!ensure(SpawnSound != nullptr)) { return; }
+    UGameplayStatics::PlaySoundAtLocation(GetWorld(), SpawnSound, GetActorLocation());
+
 	SpawnGun();
 
     Gamemode = Cast<ASplitSecondGameMode>(UGameplayStatics::GetGameMode(this));
@@ -207,6 +210,8 @@ void ASuper_AI_Character::Die()
     DetachFromControllerPendingDestroy();
 
     UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NiagaraSystem, GetActorLocation(), GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
+    if (!ensure(DeathSounds.Num() > 0)) { return; }
+    UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeathSounds[FMath::RandRange(0, DeathSounds.Num() - 1)], GetActorLocation());
 
     Destroy();
 }

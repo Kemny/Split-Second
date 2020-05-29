@@ -55,6 +55,7 @@ class SPLITSECOND_API UUpgradeSelection : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+	UPROPERTY()
 	FUpgradeSelectionDelegate OnUpgradeSelected;
 
 	void ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const EWeapons& CurrentWeapon, const bool& bBossUpgrades);

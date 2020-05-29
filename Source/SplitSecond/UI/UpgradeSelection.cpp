@@ -607,10 +607,10 @@ void UUpgradeSelection::ApplyBossUpgrade(EBosssUpgrades TypeToApply)
 
 void UUpgradeSelection::FinishSelection()
 {
-	OnUpgradeSelected.ExecuteIfBound();
-
 	if (!ensure(SelectUpgradeSound != nullptr)) { return; }
 	UGameplayStatics::PlaySound2D(GetWorld(), SelectUpgradeSound);
-
+	
+	OnUpgradeSelected.ExecuteIfBound();
+	
 	RemoveFromParent();
 }

@@ -7,6 +7,7 @@
 #include "Components/SphereComponent.h"
 #include "../../../Player/PlayerCharacter.h"
 #include "../../../AI/Super_AI_Character.h"
+#include "../../../AI/TurretShield.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Components/SphereComponent.h"
@@ -58,6 +59,12 @@ void APlayerProjectile::OnBulletOverlap(class UPrimitiveComponent* OverlappedCom
 
 		bShouldDestroy = false;
 	}
+
+	if (OtherActor->IsA<ATurretShield>())
+	{
+		SoundToPlay = ShieldImpact;
+	}
+
 
 	if (bIsPiercing && OtherActor->IsA<ASuper_AI_Character>())
 	{
