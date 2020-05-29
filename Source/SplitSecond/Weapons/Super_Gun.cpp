@@ -134,7 +134,8 @@ APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector con
             auto Upgrades = PlayerCharacter->GetPlayerState<ASplitSecondPlayerState>()->CurrentStats;
 
             CurrentProjectile->SetDamage(Upgrades.Damage);
-            CurrentProjectile->GetProjectileMovement()->Velocity = CurrentProjectile->GetProjectileMovement()->Velocity.GetSafeNormal()* Upgrades.ProjectileSpeed;
+            CurrentProjectile->GetProjectileMovement()->InitialSpeed = Upgrades.ProjectileSpeed;
+            CurrentProjectile->GetProjectileMovement()->MaxSpeed = CurrentProjectile->GetProjectileMovement()->InitialSpeed;
 
             CurrentProjectile->bIsExplosive = Upgrades.bExplodingBullets;
             CurrentProjectile->bShouldBounce = Upgrades.bIsBouncing;

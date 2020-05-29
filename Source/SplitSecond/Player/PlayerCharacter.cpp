@@ -182,7 +182,7 @@ void APlayerCharacter::OnTakeDamage(AActor* DamagedActor, float Damage, const UD
     if (!ensure(PlayerHitSound != nullptr)) { return; }
     UGameplayStatics::PlaySound2D(GetWorld(), PlayerHitSound);
 
-    PlayerState->CurrentStats.Health -= Damage;
+    PlayerState->CurrentStats.Health = FMath::Clamp<float>(PlayerState->CurrentStats.Health - Damage, 0, PlayerState->CurrentStats.MaxHealth);
 
     if (PlayerState->CurrentStats.Health <= 0 && !bIsInvinclible)
     {

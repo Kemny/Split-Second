@@ -17,14 +17,15 @@ void UUpgradeSelection::ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const E
 	AddToPlayerScreen();
 	SetUserFocus(GetWorld()->GetFirstPlayerController());
 
-	if (!ensure(HealSound != nullptr)) { return; }
-	UGameplayStatics::PlaySound2D(GetWorld(), HealSound);
+	float HealthRegainMultiplier;
 
 	if (bBossUpgrades)
 	{
 		TryToCreateBossUpgrade(0);
 		TryToCreateBossUpgrade(1);
 		TryToCreateBossUpgrade(2);
+
+		HealthRegainMultiplier = BossHealthPercentageToRegain * 0.01;
 	}
 	else
 	{
@@ -33,16 +34,18 @@ void UUpgradeSelection::ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const E
 		TryToCreateRandomUpgrade(2);
 		TryToCreateRandomUpgrade(3);
 		TryToCreateRandomUpgrade(4);
+
+		HealthRegainMultiplier = ArenaHealthPercentageToRegain * 0.01;
 	}
 
-	txt_Homing->SetText(BoolToText(PlayerUpgrades->bIsHoming));
-	txt_Piercing->SetText(BoolToText(PlayerUpgrades->bIsPiercing));
-	txt_Bouncing->SetText(BoolToText(PlayerUpgrades->bIsBouncing));
-	txt_Explosive->SetText(BoolToText(PlayerUpgrades->bExplodingBullets));
-	txt_ExtraLife->SetText(BoolToText(PlayerUpgrades->bHasExtraLife));
-	txt_ThrowableGun->SetText(BoolToText(PlayerUpgrades->bCanThrowGun));
+	ProgressHealthBar->SetPercent(PlayerUpgrades->Health / PlayerUpgrades->MaxHealth);
+	HealthBarProgress = PlayerUpgrades->Health / PlayerUpgrades->MaxHealth;
+	PlayerUpgrades->Health += PlayerUpgrades->MaxHealth * HealthRegainMultiplier;
+	HealthBarTarget = PlayerUpgrades->Health / PlayerUpgrades->MaxHealth;
+	RegainingHealth = true;
+	UGameplayStatics::PlaySound2D(GetWorld(), RestoreHealthSound);
 
-	txt_Health->SetText(FText::FromString(FloatToString(PlayerUpgrades->Health, 0) + FString(" / ") + FloatToString(PlayerUpgrades->MaxHealth, 0)));
+	//txt_Health->SetText(FText::FromString(FloatToString(PlayerUpgrades->Health, 0) + FString(" / ") + FloatToString(PlayerUpgrades->MaxHealth, 0)));
 	txt_Damage->SetText(FloatToText(PlayerUpgrades->Damage, 1));
 	txt_FireRate->SetText(FloatToText(PlayerUpgrades->FireRate, 1));
 	txt_BulletSpeed->SetText(FloatToText(PlayerUpgrades->ProjectileSpeed, 0));
@@ -74,27 +77,42 @@ void UUpgradeSelection::ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const E
 
 }
 
+void UUpgradeSelection::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+
+	if (RegainingHealth)
+	{
+		HealthBarProgress = FMath::Clamp<float>(HealthBarProgress + InDeltaTime / HealthRegainTime, 0, HealthBarTarget);
+		ProgressHealthBar->SetPercent(HealthBarProgress);
+		if (HealthBarProgress >= HealthBarTarget)
+		{
+			RegainingHealth = false;
+		}
+	}
+}
+
 void UUpgradeSelection::SetBossTextUpgradeValue(UTextBlock* TextToSet, EBosssUpgrades TypeToApply)
 {
 	switch (TypeToApply)
 	{
 	case EBosssUpgrades::IsPiercing:
-		TextToSet->SetText(FText::FromString("Piercing Bullets"));
+		TextToSet->SetText(FText::FromString("Piercing\nBullets"));
 		break;
 	case EBosssUpgrades::IsHoming:
-		TextToSet->SetText(FText::FromString("Homing Bullets"));
+		TextToSet->SetText(FText::FromString("Homing\nBullets"));
 		break;
 	case EBosssUpgrades::IsBouncing:
-		TextToSet->SetText(FText::FromString("Bouncing Bullets"));
+		TextToSet->SetText(FText::FromString("Bouncing\nBullets"));
 		break;
 	case EBosssUpgrades::ExplodingBullets:
-		TextToSet->SetText(FText::FromString("Exploding Bullets"));
+		TextToSet->SetText(FText::FromString("Exploding\nBullets"));
 		break;
 	case EBosssUpgrades::ExtraLife:
-		TextToSet->SetText(FText::FromString("Extra Life"));
+		TextToSet->SetText(FText::FromString("Extra\nLife"));
 		break;
 	case EBosssUpgrades::CanThrowGun:
-		TextToSet->SetText(FText::FromString("Throwable Gun"));
+		TextToSet->SetText(FText::FromString("Throwable\nGun"));
 		break;
 	default:
 		break;
@@ -513,7 +531,7 @@ void UUpgradeSelection::ApplyArenaUpgrade(EArenaUpgrades TypeToApply)
 		break;
 	case EArenaUpgrades::Health:
 		PlayerUpgrades->MaxHealth += *ArenaUpgradeValues.Find(TypeToApply);
-		PlayerUpgrades->Health += *ArenaUpgradeValues.Find(TypeToApply);
+		PlayerUpgrades->Health = FMath::Clamp<float>(*ArenaUpgradeValues.Find(TypeToApply) + PlayerUpgrades->Health, 0, PlayerUpgrades->MaxHealth);
 		break;
 	case EArenaUpgrades::ProjectileSpeed:
 		PlayerUpgrades->ProjectileSpeed += *ArenaUpgradeValues.Find(TypeToApply);

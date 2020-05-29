@@ -224,7 +224,7 @@ void ASplitSecondGameMode::SpawnUpgradeScreen()
 		Created->OnUpgradeSelected.BindUFunction(this, TEXT("SpawnNextArena"));
 	}
 
-	SplitSecondPlayerState->CurrentStats.Health += SplitSecondPlayerState->CurrentStats.MaxHealth * 0.2;
+	;
 }
 void ASplitSecondGameMode::SpawnBossUpgradeScreen()
 {
