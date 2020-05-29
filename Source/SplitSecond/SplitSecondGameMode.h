@@ -84,8 +84,8 @@ private:
 	TSubclassOf<class UUpgradeSelection> UpgradeSelectionClass;
 
 	class UUserWidget* CurrentTransitionWidget;
-	UAudioComponent* ArenaMusicReference = nullptr;
-	UAudioComponent* BossMusicReference = nullptr;
+	class UAudioComponent* ArenaMusicReference = nullptr;
+	class UAudioComponent* BossMusicReference = nullptr;
 
 	UFUNCTION() void PlayerSlowGame();
 

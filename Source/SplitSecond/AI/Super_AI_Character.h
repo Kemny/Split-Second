@@ -121,9 +121,10 @@ protected:
     FLinearColor SlowedColor = FLinearColor::Blue;
     UPROPERTY(EditAnywhere, Category = "Colors")
     float MinEmmision = 0.3;
-
-    UPROPERTY(EditAnywhere, Category = "Health")
-    float DeathDespawnTime = 5;
+    UPROPERTY(EditAnywhere, Category = "Sound")
+    TArray<USoundBase*> DeathSounds;
+    UPROPERTY(EditAnywhere, Category = "Sound")
+    USoundBase* SpawnSound;
 
 	class ASplitSecondGameMode* Gamemode;
 

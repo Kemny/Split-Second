@@ -55,21 +55,34 @@ class SPLITSECOND_API UUpgradeSelection : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+	UPROPERTY()
 	FUpgradeSelectionDelegate OnUpgradeSelected;
 
 	void ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const EWeapons& CurrentWeapon, const bool& bBossUpgrades);
 
 protected:
-	UPROPERTY(EditAnywhere)
+	void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
+	UPROPERTY(EditAnywhere, Category = "Upgrade Menu")
 	TMap<EArenaUpgrades, FUpgradeValue> UpgradeValues;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Upgrade Menu")
 	int32 MAX_ATTEMPTS = 500;
 
-	UPROPERTY(EditAnywhere, Category = "Sound")
-	USoundBase* HealSound;
+	UPROPERTY(EditAnywhere, Category = "Upgrade Menu")
+	float HealthRegainTime = 0.5;
+
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundBase* SelectUpgradeSound;
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* RestoreHealthSound;
+
+	void OnRegainHealth(float Percentage, float OriginalHealth);
+
+	UPROPERTY(EditAnywhere)
+	float ArenaHealthPercentageToRegain = 20;
+	UPROPERTY(EditAnywhere)
+	float BossHealthPercentageToRegain = 100;
 
 #pragma region Upgrade Selection
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
@@ -107,23 +120,9 @@ protected:
 #pragma endregion
 
 #pragma region Player Stats
-#pragma region Bools
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	UTextBlock* txt_Homing;
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	UTextBlock* txt_Piercing;
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	UTextBlock* txt_Bouncing;
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	UTextBlock* txt_Explosive;
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	UTextBlock* txt_ExtraLife;
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	UTextBlock* txt_ThrowableGun;
-#pragma endregion
 #pragma region Values
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	UTextBlock* txt_Health;
+	UProgressBar* ProgressHealthBar;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	UTextBlock* txt_Damage;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
@@ -162,6 +161,10 @@ protected:
 #pragma endregion
 
 private:
+	bool RegainingHealth = false;
+	float HealthBarProgress;
+	float HealthBarTarget;
+
 	FUpgrades* PlayerUpgrades = nullptr;
 	EWeapons PlayerCurrentWeapon;
 	TMap<EArenaUpgrades, float> ArenaUpgradeValues;

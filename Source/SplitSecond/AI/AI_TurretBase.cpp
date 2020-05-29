@@ -12,69 +12,58 @@
 
 AAI_TurretBase::AAI_TurretBase()
 {
-  RotatingMovement = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("Rotating Movement"));
-  RotatingMovement->RotationRate = FRotator(0, 20, 0);
+	RotatingMovement = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("Rotating Movement"));
+	RotatingMovement->RotationRate = FRotator(0, 20, 0);
 
-  ProjectileClass = ASplitSecondProjectile::StaticClass();
+	ProjectileClass = ASplitSecondProjectile::StaticClass();
 }
 
 void AAI_TurretBase::ShootTurret()
 {
-  if (ProjectileClass != NULL)
-  {
-    UWorld* const World = GetWorld();
-    if (World != NULL)
-    {
-      // Shoot bullet out of right turret barrel
-      const FRotator RightSpawnRotation = GetMesh()->GetSocketRotation(FName("Right Turret"));
-      const FVector RightSpawnLocation = GetMesh()->GetSocketLocation(FName("Right Turret"));
+	if (ProjectileClass != NULL)
+	{
+		// Shoot bullet out of right turret barrel
+		const FRotator RightSpawnRotation = GetMesh()->GetSocketRotation(FName("Right Turret"));
+		const FVector RightSpawnLocation = GetMesh()->GetSocketLocation(FName("Right Turret"));
+		const FTransform RightSpawnTransform = FTransform(RightSpawnRotation, RightSpawnLocation);
 
-      //Set Spawn Collision Handling Override
-      FActorSpawnParameters ActorSpawnParams;
-      ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnTurretProjectile(RightSpawnTransform);
 
-	  // spawn the projectile at the muzzle
-	  auto LocalCurrentProjectile = World->SpawnActor<ASplitSecondProjectile>(ProjectileClass, RightSpawnLocation, RightSpawnRotation, ActorSpawnParams);
+		// Shoot bullet out of left turret barrel
+		const FRotator LeftSpawnRotation = GetMesh()->GetSocketRotation(FName("Left Turret"));
+		const FVector LeftSpawnLocation = GetMesh()->GetSocketLocation(FName("Left Turret"));
+		const FTransform LeftSpawnTransform = FTransform(LeftSpawnRotation, LeftSpawnLocation);
 
-	  auto LocalCurrentAIProjectile = Cast<AAIProjectile>(LocalCurrentProjectile);
+		SpawnTurretProjectile(LeftSpawnTransform);
 
-	  if (LocalCurrentAIProjectile)
-	  {
-		  LocalCurrentAIProjectile->SetCurrentAI(this);
-          LocalCurrentAIProjectile->ConstructEnemyProjectile();
-	  }
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShootSound, GetActorLocation());
+	}
+}
+void AAI_TurretBase::SpawnTurretProjectile(FTransform SpawnTransform)
+{
+	// spawn the projectile at the muzzle
+	if (auto LocalCurrentProjectile = GetWorld()->SpawnActorDeferred<ASplitSecondProjectile>(ProjectileClass, SpawnTransform))
+	{
+		if (auto LocalCurrentAIProjectile = Cast<AAIProjectile>(LocalCurrentProjectile))
+		{
+			LocalCurrentAIProjectile->SetDamage(Damage);
+			LocalCurrentAIProjectile->FinishSpawning(SpawnTransform);
+		}
 
-      // Shoot bullet out of left turret barrel
-      const FRotator LeftSpawnRotation = GetMesh()->GetSocketRotation(FName("Left Turret"));
-      const FVector LeftSpawnLocation = GetMesh()->GetSocketLocation(FName("Left Turret"));
-
-	  // spawn the projectile at the muzzle
-	  LocalCurrentProjectile = World->SpawnActor<ASplitSecondProjectile>(ProjectileClass, LeftSpawnLocation, LeftSpawnRotation, ActorSpawnParams);
-
-      LocalCurrentAIProjectile = Cast<AAIProjectile>(LocalCurrentProjectile);
-
-	  if (LocalCurrentAIProjectile)
-	  {
-		  if (!ensure(ShootSound != nullptr)) { return; }
-		  UGameplayStatics::PlaySoundAtLocation(GetWorld(), ShootSound, GetActorLocation());
-		  LocalCurrentAIProjectile->SetCurrentAI(this);
-          LocalCurrentAIProjectile->ConstructEnemyProjectile();
-	  }
-    }
-  }
+	}
 }
 
 void AAI_TurretBase::EnableRotationMovement(bool bEnable)
 {
-  RotatingMovement->SetActive(bEnable);
+	RotatingMovement->SetActive(bEnable);
 
-  bCurrentlyRotating = bEnable;
+	bCurrentlyRotating = bEnable;
 }
 
 void AAI_TurretBase::BeginPlay()
 {
-  Super::BeginPlay();
+	Super::BeginPlay();
 
-  RotatingMovement->SetActive(false);
+	RotatingMovement->SetActive(false);
 }
 

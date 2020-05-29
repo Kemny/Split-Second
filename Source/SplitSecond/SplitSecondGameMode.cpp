@@ -173,7 +173,14 @@ void ASplitSecondGameMode::SpawnNextArena()
 		}
 		else
 		{
-			ArenaMusicReference->SetActive(true);
+			if (ArenaMusicReference)
+			{
+				ArenaMusicReference->SetActive(true);
+			}
+			if (BossMusicReference)
+			{
+				BossMusicReference->SetActive(false);
+			}
 		}
 	}
 	else
@@ -193,7 +200,14 @@ void ASplitSecondGameMode::SpawnNextArena()
 		}
 		else
 		{
-			BossMusicReference->SetActive(true);
+			if (ArenaMusicReference)
+			{
+				ArenaMusicReference->SetActive(false);
+			}
+			if (BossMusicReference)
+			{
+				BossMusicReference->SetActive(true);
+			}
 		}
 	}
 }
@@ -224,7 +238,7 @@ void ASplitSecondGameMode::SpawnUpgradeScreen()
 		Created->OnUpgradeSelected.BindUFunction(this, TEXT("SpawnNextArena"));
 	}
 
-	SplitSecondPlayerState->CurrentStats.Health += SplitSecondPlayerState->CurrentStats.MaxHealth * 0.2;
+	;
 }
 void ASplitSecondGameMode::SpawnBossUpgradeScreen()
 {

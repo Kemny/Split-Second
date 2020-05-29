@@ -13,7 +13,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "SplitSecondProjectile.h"
 #include "Guns/Player/PlayerProjectile.h"
-#include "BulletMovementComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "../SplitSecondPlayerState.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -86,7 +86,8 @@ AAIProjectile* ASuper_Gun::AI_SpawnProjectile(FVector Offset)
         {
             const FVector SpawnLocation = GunMesh->GetSocketLocation(FName("MuzzleLocation"));
             FRotator SpawnRotation;
-            if (Cast<ASuper_AI_Character>(CurrentPawn)->IsFacingPlayer())
+            auto AIPawn = Cast<ASuper_AI_Character>(CurrentPawn);
+            if (AIPawn->IsFacingPlayer())
             {
                 SpawnRotation = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, UGameplayStatics::GetPlayerPawn(GetWorld(), 0)->GetActorLocation() + Offset);
             }
@@ -100,9 +101,7 @@ AAIProjectile* ASuper_Gun::AI_SpawnProjectile(FVector Offset)
             Projectile = World->SpawnActorDeferred<AAIProjectile>(ProjectileClass, SpawnTransform);
             if (Projectile)
             {
-                Projectile->SetCurrentAI(GetCurrentPawn());
-                Projectile->ConstructEnemyProjectile();
-
+                Projectile->SetDamage(AIPawn->Damage);
                 Projectile->FinishSpawning(SpawnTransform);
             }
         }
@@ -134,28 +133,23 @@ APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector con
         {
             auto Upgrades = PlayerCharacter->GetPlayerState<ASplitSecondPlayerState>()->CurrentStats;
 
-            CurrentProjectile->DamageValue = Upgrades.Damage;
-            CurrentProjectile->GetProjectileMovement()->Velocity = CurrentProjectile->GetProjectileMovement()->Velocity.GetSafeNormal()* Upgrades.ProjectileSpeed;
-
-            if (Upgrades.bIsPiercing)
-            {
-                CurrentProjectile->GetCollisionComp()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-                CurrentProjectile->GetBulletMesh()->SetStaticMesh(KnifeMesh);
-                CurrentProjectile->GetBulletMesh()->SetWorldScale3D(FVector(2));
-
-                CurrentProjectile->bIsPiercing = true;
-            }
+            CurrentProjectile->SetDamage(Upgrades.Damage);
+            CurrentProjectile->GetProjectileMovement()->InitialSpeed = Upgrades.ProjectileSpeed;
+            CurrentProjectile->GetProjectileMovement()->MaxSpeed = CurrentProjectile->GetProjectileMovement()->InitialSpeed;
 
             CurrentProjectile->bIsExplosive = Upgrades.bExplodingBullets;
+            CurrentProjectile->bShouldBounce = Upgrades.bIsBouncing;
+            CurrentProjectile->bIsPiercing = Upgrades.bIsPiercing;
 
-            if (Upgrades.bIsBouncing)
+            if (CurrentProjectile->bIsPiercing)
             {
-                CurrentProjectile->bShouldBounce = true;
+                CurrentProjectile->GetBulletMesh()->SetStaticMesh(KnifeMesh);
+                CurrentProjectile->GetBulletMesh()->SetWorldScale3D(FVector(2));
             }
-            if (Upgrades.bIsHoming)
+            /*if (Upgrades.bIsHoming)
             {
                 CurrentProjectile->GetProjectileMovement()->bIsHomingProjectile = true;
-            }
+            }*/
         }
 
         CurrentProjectile->FinishSpawning(SpawnTransform);

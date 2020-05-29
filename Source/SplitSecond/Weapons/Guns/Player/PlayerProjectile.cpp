@@ -1,77 +1,117 @@
 // This project falls under CC-BY-SA lisence
 
 #include "PlayerProjectile.h"
-#include "Projectile_Explosion.h"
 #include "GameFramework/DamageType.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "../../BulletMovementComponent.h"
 #include "Components/SphereComponent.h"
 #include "../../../Player/PlayerCharacter.h"
+#include "../../../AI/Super_AI_Character.h"
+#include "../../../AI/TurretShield.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Components/SphereComponent.h"
+#include "GameFramework/DamageType.h"
+#include "Sound/SoundAttenuation.h"
 
 APlayerProjectile::APlayerProjectile()
 {
+	PrimaryActorTick.bCanEverTick = false;
+
+	ExplosionRadiusCollision = CreateDefaultSubobject<USphereComponent>("Explosion Radius");
+	ExplosionRadiusCollision->SetupAttachment(RootComponent);
+	ExplosionRadiusCollision->SetSphereRadius(ExplosionRadius);
+
+	ExplosionRadiusCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	ExplosionRadiusCollision->SetCollisionResponseToAllChannels(ECR_Overlap);
+
+	//If it should bounce was set in blueprint for movement component, this will replicate it
 	bShouldBounce = GetProjectileMovement()->bShouldBounce;
 }
 
-void APlayerProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void APlayerProjectile::OnBulletOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!OtherActor) return;
-	if (OtherActor != this && !OtherActor->IsA<APlayerProjectile>())
+	if (!OtherActor || OtherActor == this) return;
+
+	bool bShouldDestroy = true;
+	
+	// Called to apply damage to hit actor
+	UGameplayStatics::ApplyDamage(OtherActor, Damage, UGameplayStatics::GetPlayerController(GetWorld(), 0), this, UDamageType::StaticClass());
+
+	UNiagaraSystem* SytemToSpawn = DefaultCollisionParticle;
+	USoundBase* SoundToPlay = nullptr;
+
+	if (bIsExplosive)
 	{
-		// Called to apply damage to hit actor
-		OnBulletHit(HitComp, OtherActor, OtherComp, NormalImpulse, Hit);
+		SytemToSpawn = ExplodingBulletFX;
+		ApplyExplosionDamage();
 
-		if (bShouldBounce && CurrentBounce > BounceNum)
-		{
-			Destroy();
-		}
+		if (!ensure(Explosion != nullptr)) { return; }
+		SoundToPlay = Explosion;
+	}
 
-		if (bIsExplosive)
-		{
-			FActorSpawnParameters SpawnParms;
-			FTransform SpawnLocation = FTransform(GetActorRotation(), Hit.ImpactPoint, FVector(1));
+	if (bShouldBounce && CurrentBounce < BounceNum)
+	{
+		CalcReflection(SweepResult);
+		++CurrentBounce;
 
-			auto CurrentExplosion = GetWorld()->SpawnActor<AProjectile_Explosion>(ExplosionToSpawn, SpawnLocation, SpawnParms);
-			CurrentExplosion->ApplyExplosionDamage(DamageValue, ExplosionUpTime, ExplosionRadius);
+		if (!ensure(Bounce != nullptr)) { return; }
+		SoundToPlay = Bounce;
 
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ExploadingBulletFX, GetActorLocation(), GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
+		bShouldDestroy = false;
+	}
 
-			if (!ensure(Explosion != nullptr)) { return; }
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), Explosion, GetActorLocation());
-			Destroy();
-		}
+	if (OtherActor->IsA<ATurretShield>())
+	{
+		SoundToPlay = ShieldImpact;
+	}
 
-		if (!OtherActor->IsA<APlayerCharacter>())
-		{
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NiagaraSystem, Hit.TraceStart, GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
-		}
 
-		if (!bShouldBounce && !bIsExplosive)
-		{
-			Destroy();
-		}
+	if (bIsPiercing && OtherActor->IsA<ASuper_AI_Character>())
+	{
+		if (!ensure(Piercing != nullptr)) { return; }
+		SoundToPlay = Piercing;
+
+		bShouldDestroy = false;
+	}
+
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SytemToSpawn, GetActorLocation(), GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
+
+	if (SoundToPlay)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), Explosion, GetActorLocation());
+	}
+
+	if (bShouldDestroy)
+	{
+		Destroy();
 	}
 }
 
-void APlayerProjectile::OnBulletHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void APlayerProjectile::CalcReflection(const FHitResult& Hit)
 {
-	if (bShouldBounce)
+	GetProjectileMovement()->bShouldBounce = true;
+	auto MyVelocity = GetProjectileMovement()->Velocity;
+
+	FVector ReflectedVelocity = BounceSpeedLoss * (-2 * FVector::DotProduct(MyVelocity, Hit.Normal) * Hit.Normal + MyVelocity);
+	GetProjectileMovement()->SetVelocityInLocalSpace(ReflectedVelocity);
+	ReflectedVelocity.Normalize();
+	SetActorRotation(ReflectedVelocity.Rotation());
+}
+
+void APlayerProjectile::ApplyExplosionDamage()
+{
+	TArray<AActor*> ActorsToDamage;
+	ExplosionRadiusCollision->GetOverlappingActors(ActorsToDamage, ASuper_AI_Character::StaticClass());
+
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (!ensure(PlayerController != nullptr)) { return; }
+
+	for (auto ActorToDamage : ActorsToDamage)
 	{
-		CalcReflection(Hit);
-		++CurrentBounce;
-
-		APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-		if (!ensure(PlayerController != nullptr)) { return; }
-
-		UGameplayStatics::ApplyDamage(OtherActor, DamageValue, PlayerController, this, UDamageType::StaticClass());
-
-		if (!ensure(Bounce != nullptr)) { return; }
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), Bounce, GetActorLocation());
-	}
-	else
-	{
-		Super::OnBulletHit_Implementation(HitComp, OtherActor, OtherComp, NormalImpulse, Hit);
+		if (ActorToDamage)
+		{
+			UGameplayStatics::ApplyDamage(ActorToDamage, Damage, PlayerController, this, UDamageType::StaticClass());
+		}
 	}
 }
