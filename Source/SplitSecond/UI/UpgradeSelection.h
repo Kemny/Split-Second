@@ -24,6 +24,8 @@ enum class EArenaUpgrades : uint8
 	BulletNum,
 	BulletSpread,
 	BowDrawSpeed,
+	GameSlowTime,
+	PlayerMovementSpeed,
 };
 UENUM(BlueprintType)
 enum class EBosssUpgrades : uint8
@@ -35,6 +37,7 @@ enum class EBosssUpgrades : uint8
 	ExplodingBullets,
 	ExtraLife,
 	CanThrowGun,
+	Flaming,
 };
 
 USTRUCT(Blueprintable)

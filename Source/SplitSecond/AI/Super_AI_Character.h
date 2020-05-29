@@ -94,7 +94,7 @@ public:
     FORCEINLINE class UHealthComponent* GetHealthComponent() const { return HealthComponent; }
 
     void Highlight(EHighlightType HighlightType);
-    void GetSlowed(float SlowTime, float SlowAmmount);
+    virtual void GetSlowed(float SlowTime, float SlowAmmount);
     bool GetIsSlowed() const { return bIsSlowed; }
     
     UPROPERTY(BlueprintReadWrite)

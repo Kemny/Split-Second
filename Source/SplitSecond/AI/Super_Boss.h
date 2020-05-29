@@ -15,11 +15,12 @@ class SPLITSECOND_API ASuper_Boss : public ASuper_AI_Character
 	GENERATED_BODY()
 
 public:
-
-    /* Resets time dilation back to 1 */
-    UFUNCTION(BlueprintCallable, Category = "Boss Functions")
-    void ResetTimeDilation();
+	void GetSlowed(float SlowTime, float SlowAmmount) override;
 
 	void ScaleEnemyHealth(float BaseValue) override;
 	void ScaleEnemyDamage(float BaseValue) override;
+
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	float SlowDivider = 2;
 };

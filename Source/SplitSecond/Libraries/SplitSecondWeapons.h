@@ -26,6 +26,7 @@ public:
     UPROPERTY(EditAnywhere)bool bIsBouncing = false;
     UPROPERTY(EditAnywhere)bool bExplodingBullets = false;
     UPROPERTY(EditAnywhere)bool bExtraLife = false;
+    UPROPERTY(EditAnywhere)bool Flaming = false;
 
     ///Guns
     UPROPERTY(EditAnywhere)float Damage = 10;
@@ -33,6 +34,7 @@ public:
     UPROPERTY(EditAnywhere)float FireRate = 0.3;
 
     ///Player
+    UPROPERTY(EditAnywhere)float MovementSpeed = 1000;
     UPROPERTY(EditAnywhere)float MaxHealth = 100;
     UPROPERTY(EditAnywhere)float Health = 100;
     UPROPERTY(EditAnywhere)bool bCanThrowGun = false;
@@ -55,6 +57,7 @@ public:
     UPROPERTY(EditAnywhere)bool bIsBouncing = false;
     UPROPERTY(EditAnywhere)bool bExplodingBullets = false;
     UPROPERTY(EditAnywhere)bool bExtraLife = false;
+    UPROPERTY(EditAnywhere)bool Flaming = false;
 
     ///Guns
     UPROPERTY(EditAnywhere)float Damage = 10;
@@ -62,6 +65,7 @@ public:
     UPROPERTY(EditAnywhere)float FireRate = 0.3;
 
     ///Player
+    UPROPERTY(EditAnywhere)float MovementSpeed = 1000;
     UPROPERTY(EditAnywhere)float MaxHealth = 100;
     UPROPERTY(EditAnywhere)float Health = 100;
     UPROPERTY(EditAnywhere)bool bCanThrowGun = false;
@@ -86,12 +90,14 @@ public:
     UPROPERTY(EditAnywhere)bool bIsBouncing = false;
     UPROPERTY(EditAnywhere)bool bExplodingBullets = false;
     UPROPERTY(EditAnywhere)bool bExtraLife = false;
+    UPROPERTY(EditAnywhere)bool Flaming = false;
 
     ///Guns
     UPROPERTY(EditAnywhere)float Damage = 10;
     UPROPERTY(EditAnywhere)float ProjectileSpeed = 1500;
 
     ///Player
+    UPROPERTY(EditAnywhere)float MovementSpeed = 1000;
     UPROPERTY(EditAnywhere)float MaxHealth = 100;
     UPROPERTY(EditAnywhere)float Health = 100;
     UPROPERTY(EditAnywhere)bool bCanThrowGun = false;
@@ -116,8 +122,10 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadWrite)bool bIsHoming = false;
     UPROPERTY(EditAnywhere, BlueprintReadWrite)bool bIsBouncing = false;
     UPROPERTY(EditAnywhere, BlueprintReadWrite)bool bExplodingBullets = false;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)bool Flaming = false;
 
     ///Player
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)float MovementSpeed = 1000;
     UPROPERTY(EditAnywhere, BlueprintReadWrite)float MaxHealth = 100;
     UPROPERTY(EditAnywhere, BlueprintReadWrite)float Health = 100;
     UPROPERTY(EditAnywhere, BlueprintReadWrite)bool bHasExtraLife = false;
@@ -157,7 +165,9 @@ public:
         bIsBouncing = Defaults.bIsBouncing;
         bExplodingBullets = Defaults.bExplodingBullets;
         bHasExtraLife = Defaults.bExtraLife;
+        Flaming = Defaults.Flaming;
 
+        MovementSpeed = Defaults.MovementSpeed;
         MaxHealth = Defaults.MaxHealth;
         Health = Defaults.MaxHealth;
         bCanThrowGun = Defaults.bCanThrowGun;
@@ -180,7 +190,9 @@ public:
         bIsBouncing = Defaults.bIsBouncing;
         bExplodingBullets = Defaults.bExplodingBullets;
         bHasExtraLife = Defaults.bExtraLife;
+        Flaming = Defaults.Flaming;
 
+        MovementSpeed = Defaults.MovementSpeed;
         MaxHealth = Defaults.MaxHealth;
         Health = Defaults.MaxHealth;
         bCanThrowGun = Defaults.bCanThrowGun;
@@ -205,7 +217,9 @@ public:
         bIsBouncing = Defaults.bIsBouncing;
         bExplodingBullets = Defaults.bExplodingBullets;
         bHasExtraLife = Defaults.bExtraLife;
+        Flaming = Defaults.Flaming;
 
+        MovementSpeed = Defaults.MovementSpeed;
         MaxHealth = Defaults.MaxHealth;
         Health = Defaults.MaxHealth;
         bCanThrowGun = Defaults.bCanThrowGun;

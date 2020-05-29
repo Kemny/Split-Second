@@ -45,7 +45,6 @@ void UUpgradeSelection::ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const E
 	RegainingHealth = true;
 	UGameplayStatics::PlaySound2D(GetWorld(), RestoreHealthSound);
 
-	//txt_Health->SetText(FText::FromString(FloatToString(PlayerUpgrades->Health, 0) + FString(" / ") + FloatToString(PlayerUpgrades->MaxHealth, 0)));
 	txt_Damage->SetText(FloatToText(PlayerUpgrades->Damage, 1));
 	txt_FireRate->SetText(FloatToText(PlayerUpgrades->FireRate, 1));
 	txt_BulletSpeed->SetText(FloatToText(PlayerUpgrades->ProjectileSpeed, 0));
@@ -64,8 +63,8 @@ void UUpgradeSelection::ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const E
 		txt_ShotgunBulletSpread->SetText(FText::FromString(FString::FromInt(100 * (int32)PlayerUpgrades->BulletSpread / (int32)PlayerUpgrades->BulletSpreadDefault) + "%"));
 		break;
 	case Bow:
-		txt_FireRateName->SetVisibility(ESlateVisibility::Hidden);
-		txt_FireRate->SetVisibility(ESlateVisibility::Hidden);
+		txt_FireRateName->SetVisibility(ESlateVisibility::Collapsed);
+		txt_FireRate->SetVisibility(ESlateVisibility::Collapsed);
 		Name_BowSpecificBox->SetVisibility(ESlateVisibility::Visible);
 		Upgrades_BowSpecificBox->SetVisibility(ESlateVisibility::Visible);
 		txt_BowDrawSpeed->SetText(FloatToText(PlayerUpgrades->BowDrawSpeed, 3));
@@ -114,6 +113,9 @@ void UUpgradeSelection::SetBossTextUpgradeValue(UTextBlock* TextToSet, EBosssUpg
 	case EBosssUpgrades::CanThrowGun:
 		TextToSet->SetText(FText::FromString("Throwable\nGun"));
 		break;
+	case EBosssUpgrades::Flaming:
+		TextToSet->SetText(FText::FromString("Flamable\nProjectile"));
+		break;
 	default:
 		break;
 	}
@@ -146,6 +148,12 @@ void UUpgradeSelection::SetArenaTextUpgradeValue(UTextBlock* TextToSet, EArenaUp
 		break;
 	case EArenaUpgrades::BowDrawSpeed:
 		TextToSet->SetText(FText::FromString("Bow Draw\nSpeed\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 3)));
+		break;
+	case EArenaUpgrades::GameSlowTime:
+		TextToSet->SetText(FText::FromString("Game\nSlow\nTime\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 2)));
+		break;
+	case EArenaUpgrades::PlayerMovementSpeed:
+		TextToSet->SetText(FText::FromString("Movement\nSpeed\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 0)));
 		break;
 	default:
 		break;
@@ -289,7 +297,7 @@ bool UUpgradeSelection::CreateRandomUpgrade(int32 index, EArenaUpgrades& OutType
 
 	for (AttemptNum; AttemptNum < MAX_ATTEMPTS; AttemptNum++)
 	{
-		switch (FMath::RandRange(0, 7))
+		switch (FMath::RandRange(0, 9))
 		{
 		case 0:
 			if (auto FoundValue = UpgradeValues.Find(EArenaUpgrades::Health))
@@ -312,10 +320,13 @@ bool UUpgradeSelection::CreateRandomUpgrade(int32 index, EArenaUpgrades& OutType
 		case 2:
 			if (auto FoundValue = UpgradeValues.Find(EArenaUpgrades::ProjectileSpeed))
 			{
-				auto DigitMultiplier = FMath::Pow(10, FoundValue->MaxDigits);
-				int32 HighRandom = FMath::RandRange(FoundValue->MinValue * DigitMultiplier, FoundValue->MaxValue * DigitMultiplier);
-				Value = (float)HighRandom / DigitMultiplier;
-				OutType = EArenaUpgrades::ProjectileSpeed;
+				if (PlayerCurrentWeapon != EWeapons::Bow)
+				{
+					auto DigitMultiplier = FMath::Pow(10, FoundValue->MaxDigits);
+					int32 HighRandom = FMath::RandRange(FoundValue->MinValue * DigitMultiplier, FoundValue->MaxValue * DigitMultiplier);
+					Value = (float)HighRandom / DigitMultiplier;
+					OutType = EArenaUpgrades::ProjectileSpeed;
+				}
 			}
 			break;
 		case 3:
@@ -376,6 +387,24 @@ bool UUpgradeSelection::CreateRandomUpgrade(int32 index, EArenaUpgrades& OutType
 				}
 			}
 			break;
+		case 8:
+			if (auto FoundValue = UpgradeValues.Find(EArenaUpgrades::GameSlowTime))
+			{
+				auto DigitMultiplier = FMath::Pow(10, FoundValue->MaxDigits);
+				int32 HighRandom = FMath::RandRange(FoundValue->MinValue * DigitMultiplier, FoundValue->MaxValue * DigitMultiplier);
+				Value = (float)HighRandom / DigitMultiplier;
+				OutType = EArenaUpgrades::GameSlowTime;
+			}
+			break;
+		case 9:
+			if (auto FoundValue = UpgradeValues.Find(EArenaUpgrades::PlayerMovementSpeed))
+			{
+				auto DigitMultiplier = FMath::Pow(10, FoundValue->MaxDigits);
+				int32 HighRandom = FMath::RandRange(FoundValue->MinValue * DigitMultiplier, FoundValue->MaxValue * DigitMultiplier);
+				Value = (float)HighRandom / DigitMultiplier;
+				OutType = EArenaUpgrades::PlayerMovementSpeed;
+			}
+			break;
 		default:
 			break;
 		}
@@ -426,7 +455,7 @@ bool UUpgradeSelection::CreateRandomBossUpgrade(int32 index, EBosssUpgrades& Out
 
 	for (AttemptNum; AttemptNum < MAX_ATTEMPTS; AttemptNum++)
 	{
-		switch (FMath::RandRange(0, 3))
+		switch (FMath::RandRange(0, 4))
 		{
 		case 0:
 			if (!PlayerUpgrades->bIsPiercing)
@@ -459,10 +488,16 @@ bool UUpgradeSelection::CreateRandomBossUpgrade(int32 index, EBosssUpgrades& Out
 			}
 			break;
 		case 5:
+			if (!PlayerUpgrades->Flaming)
+			{
+				OutType = EBosssUpgrades::Flaming;
+			}
+		case 6:
 			if (!PlayerUpgrades->bCanThrowGun)
 			{
 				OutType = EBosssUpgrades::CanThrowGun;
 			}
+
 			break;
 		default:
 			break;
@@ -552,6 +587,12 @@ void UUpgradeSelection::ApplyArenaUpgrade(EArenaUpgrades TypeToApply)
 	case EArenaUpgrades::BowDrawSpeed:
 		PlayerUpgrades->BowDrawSpeed += *ArenaUpgradeValues.Find(TypeToApply);
 		break;
+	case EArenaUpgrades::GameSlowTime:
+		PlayerUpgrades->GameSlowValue += *ArenaUpgradeValues.Find(TypeToApply);
+		break;
+	case EArenaUpgrades::PlayerMovementSpeed:
+		PlayerUpgrades->MovementSpeed += *ArenaUpgradeValues.Find(TypeToApply);
+		break;
 	default:
 		break;
 	}
@@ -594,6 +635,9 @@ void UUpgradeSelection::ApplyBossUpgrade(EBosssUpgrades TypeToApply)
 		PlayerUpgrades->bHasExtraLife = true;
 		break;
 	case EBosssUpgrades::CanThrowGun:
+		PlayerUpgrades->bCanThrowGun = true;
+		break;
+	case EBosssUpgrades::Flaming:
 		PlayerUpgrades->bCanThrowGun = true;
 		break;
 	default:
