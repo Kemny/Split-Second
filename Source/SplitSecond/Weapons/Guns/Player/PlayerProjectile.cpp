@@ -10,9 +10,11 @@
 #include "../../../AI/TurretShield.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "NiagaraComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/DamageType.h"
 #include "Sound/SoundAttenuation.h"
+#include "../../../SplitSecondGameMode.h"
 
 APlayerProjectile::APlayerProjectile()
 {
@@ -75,7 +77,13 @@ void APlayerProjectile::OnBulletOverlap(class UPrimitiveComponent* OverlappedCom
 		bShouldDestroy = false;
 	}
 
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SytemToSpawn, GetActorLocation(), GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
+	auto Particle = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SytemToSpawn, GetActorLocation(), GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
+	auto Gamemode = GetWorld()->GetAuthGameMode<ASplitSecondGameMode>();
+	if (Gamemode->GetIsGameSlowed())
+	{
+		Particle->SetFloatParameter(TEXT("TimeDilation"), Gamemode->GetCurrentSlowValue());
+	}
+	
 
 	if (SoundToPlay)
 	{
