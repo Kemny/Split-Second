@@ -16,15 +16,5 @@ class SPLITSECOND_API AAIProjectile : public ASplitSecondProjectile
 
 public:
 	void BeginPlay() override;
-	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
-
-	/* Called on begin play */
-	UFUNCTION(BlueprintImplementableEvent)
-	void ConstructEnemyProjectile();
-
-	void SetCurrentAI(AActor* AI);
-
-	/* The AI that spawned this projectile */
-	UPROPERTY(BlueprintReadWrite)
-	class ASuper_AI_Character* AICharacter = nullptr;
+	void OnBulletOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 };

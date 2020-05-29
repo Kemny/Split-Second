@@ -1,9 +1,7 @@
 // This project falls under CC-BY-SA lisence
 
 #include "AIProjectile.h"
-#include "../../../Player/PlayerCharacter.h"
-#include "NiagaraSystem.h"
-#include "NiagaraFunctionLibrary.h"
+#include "Engine/World.h"
 #include "../../../AI/Super_AI_Character.h"
 #include "../../../SplitSecondGameMode.h"
 
@@ -19,31 +17,10 @@ void AAIProjectile::BeginPlay()
 		Gamemode->AddActorToSlowedArray(this);
 	}
 }
-
-void AAIProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AAIProjectile::OnBulletOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!OtherActor) return;
-	if (OtherActor != this && !OtherActor->IsA<AAIProjectile>())
-	{
-		// Called to apply damage to hit actor
-		OnBulletHit(HitComp, OtherActor, OtherComp, NormalImpulse, Hit);
+	if (OtherActor->IsA<ASuper_AI_Character>()) Destroy();
 
-		if (!OtherActor->IsA<APlayerCharacter>())
-		{
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NiagaraSystem, Hit.TraceStart, GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
-		}
+	Super::OnBulletOverlap(OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 
-		Destroy();
-	}
-}
-
-void AAIProjectile::SetCurrentAI(AActor* AI)
-{
-	if (!ensure(AI != nullptr)) { return; }
-
-	auto AIChar = Cast<ASuper_AI_Character>(AI);
-
-	if (!ensure(AIChar != nullptr)) { return; }
-
-	AICharacter = AIChar;
 }
