@@ -203,6 +203,7 @@ void ASplitSecondGameMode::SpawnNextArena()
 }
 void ASplitSecondGameMode::HandleArenaFinished()
 {
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
 	if (auto Created = CreateWidget<UTransitionScreen>(GetWorld(), TransitionScreenClass))
 	{
 		Created->OnTransitionFinished.BindUFunction(this, TEXT("SpawnUpgradeScreen"));

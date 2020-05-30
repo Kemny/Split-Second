@@ -51,6 +51,7 @@ void ASuper_Gun::BeginPlay()
 
 void ASuper_Gun::FireGun()
 {
+
     if (!ensure(FireSouns.Num() > 0)) { return; }
     UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSouns[FMath::RandRange(0, FireSouns.Num() - 1)], GetActorLocation());
 

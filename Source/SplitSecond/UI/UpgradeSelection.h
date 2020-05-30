@@ -25,7 +25,6 @@ enum class EArenaUpgrades : uint8
 	BulletSpread,
 	BowDrawSpeed,
 	GameSlowTime,
-	PlayerMovementSpeed,
 };
 UENUM(BlueprintType)
 enum class EBosssUpgrades : uint8

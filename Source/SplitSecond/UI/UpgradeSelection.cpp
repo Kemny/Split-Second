@@ -125,35 +125,32 @@ void UUpgradeSelection::SetArenaTextUpgradeValue(UTextBlock* TextToSet, EArenaUp
 	switch (TypeToApply)
 	{
 	case EArenaUpgrades::Damage:
-		TextToSet->SetText(FText::FromString("Damage\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 1)));
+		TextToSet->SetText(FText::FromString("Damage\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), UpgradeValues.Find(EArenaUpgrades::Damage)->MaxDigits)));
 		break;
 	case EArenaUpgrades::ProjectileSpeed:
-		TextToSet->SetText(FText::FromString("Bullet\nSpeed\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 0)));
+		TextToSet->SetText(FText::FromString("Bullet\nSpeed\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), UpgradeValues.Find(EArenaUpgrades::Damage)->MaxDigits)));
 		break;
 	case EArenaUpgrades::Health:
-		TextToSet->SetText(FText::FromString("Health\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 0)));
+		TextToSet->SetText(FText::FromString("Health\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), UpgradeValues.Find(EArenaUpgrades::Damage)->MaxDigits)));
 		break;
 	case EArenaUpgrades::FireRate:
-		TextToSet->SetText(FText::FromString("Fire\nRate\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 1)));
+		TextToSet->SetText(FText::FromString("Fire\nRate\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), UpgradeValues.Find(EArenaUpgrades::Damage)->MaxDigits)));
 		break;
 	case EArenaUpgrades::MaxJumps:
-		TextToSet->SetText(FText::FromString("Jumps\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 0)));
+		TextToSet->SetText(FText::FromString("Jumps\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), UpgradeValues.Find(EArenaUpgrades::Damage)->MaxDigits)));
 		break;
 	case EArenaUpgrades::BulletNum:
-		TextToSet->SetText(FText::FromString("Bullet\nNum\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 0)));
+		TextToSet->SetText(FText::FromString("Bullet\nNum\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), UpgradeValues.Find(EArenaUpgrades::Damage)->MaxDigits)));
 		break;
 	case EArenaUpgrades::BulletSpread:
 		if (!ensure(PlayerUpgrades != nullptr)) { return; }
 		TextToSet->SetText(FText::FromString("Bullet\nSpread\n" + FString::FromInt(100* (int32)(*ArenaUpgradeValues.Find(TypeToApply)) / (int32)PlayerUpgrades->BulletSpreadDefault) + "%"));
 		break;
 	case EArenaUpgrades::BowDrawSpeed:
-		TextToSet->SetText(FText::FromString("Bow Draw\nSpeed\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 3)));
+		TextToSet->SetText(FText::FromString("Bow Draw\nSpeed\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), UpgradeValues.Find(EArenaUpgrades::Damage)->MaxDigits)));
 		break;
 	case EArenaUpgrades::GameSlowTime:
-		TextToSet->SetText(FText::FromString("Game\nSlow\nTime\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 2)));
-		break;
-	case EArenaUpgrades::PlayerMovementSpeed:
-		TextToSet->SetText(FText::FromString("Movement\nSpeed\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), 0)));
+		TextToSet->SetText(FText::FromString("Game\nSlow\nTime\n" + FString("+") + FloatToString(*ArenaUpgradeValues.Find(TypeToApply), UpgradeValues.Find(EArenaUpgrades::Damage)->MaxDigits)));
 		break;
 	default:
 		break;
@@ -297,7 +294,7 @@ bool UUpgradeSelection::CreateRandomUpgrade(int32 index, EArenaUpgrades& OutType
 
 	for (AttemptNum; AttemptNum < MAX_ATTEMPTS; AttemptNum++)
 	{
-		switch (FMath::RandRange(0, 9))
+		switch (FMath::RandRange(0, 8))
 		{
 		case 0:
 			if (auto FoundValue = UpgradeValues.Find(EArenaUpgrades::Health))
@@ -396,15 +393,6 @@ bool UUpgradeSelection::CreateRandomUpgrade(int32 index, EArenaUpgrades& OutType
 				OutType = EArenaUpgrades::GameSlowTime;
 			}
 			break;
-		case 9:
-			if (auto FoundValue = UpgradeValues.Find(EArenaUpgrades::PlayerMovementSpeed))
-			{
-				auto DigitMultiplier = FMath::Pow(10, FoundValue->MaxDigits);
-				int32 HighRandom = FMath::RandRange(FoundValue->MinValue * DigitMultiplier, FoundValue->MaxValue * DigitMultiplier);
-				Value = (float)HighRandom / DigitMultiplier;
-				OutType = EArenaUpgrades::PlayerMovementSpeed;
-			}
-			break;
 		default:
 			break;
 		}
@@ -455,7 +443,7 @@ bool UUpgradeSelection::CreateRandomBossUpgrade(int32 index, EBosssUpgrades& Out
 
 	for (AttemptNum; AttemptNum < MAX_ATTEMPTS; AttemptNum++)
 	{
-		switch (FMath::RandRange(0, 4))
+		switch (FMath::RandRange(0, 3))
 		{
 		case 0:
 			if (!PlayerUpgrades->bIsPiercing)
@@ -482,15 +470,15 @@ bool UUpgradeSelection::CreateRandomBossUpgrade(int32 index, EBosssUpgrades& Out
 			}
 			break;
 		case 4:
-			if (!PlayerUpgrades->bIsHoming)
-			{
-				OutType = EBosssUpgrades::IsHoming;
-			}
-			break;
-		case 5:
 			if (!PlayerUpgrades->Flaming)
 			{
 				OutType = EBosssUpgrades::Flaming;
+			}
+			break;
+		case 5:
+			if (!PlayerUpgrades->bIsHoming)
+			{
+				OutType = EBosssUpgrades::IsHoming;
 			}
 		case 6:
 			if (!PlayerUpgrades->bCanThrowGun)
@@ -589,9 +577,6 @@ void UUpgradeSelection::ApplyArenaUpgrade(EArenaUpgrades TypeToApply)
 		break;
 	case EArenaUpgrades::GameSlowTime:
 		PlayerUpgrades->GameSlowValue += *ArenaUpgradeValues.Find(TypeToApply);
-		break;
-	case EArenaUpgrades::PlayerMovementSpeed:
-		PlayerUpgrades->MovementSpeed += *ArenaUpgradeValues.Find(TypeToApply);
 		break;
 	default:
 		break;
