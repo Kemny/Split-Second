@@ -15,6 +15,10 @@ UBossSpawnLocation::UBossSpawnLocation()
 	BoxComponent->SetBoxExtent(FVector(32, 32, 95));
 	BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	BoxComponent->SetCollisionResponseToAllChannels(ECR_Overlap);
+	BoxComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
+	BoxComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Ignore);
+	BoxComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Ignore);
+	BoxComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel4, ECR_Ignore);
 
 	ConstructorHelpers::FClassFinder<AActor> BP_Boss1_Class(TEXT("/Game/Blueprint/NPC/BP_Boss"));
 	if (BP_Boss1_Class.Class) Boss_1_Class = BP_Boss1_Class.Class;
