@@ -9,6 +9,8 @@
 #include "SplitSecondPlayerState.h"
 #include "World/Arena.h"
 #include "SplitSecondGameState.h"
+#include "TimerManager.h"
+#include "SplitSecond/SplitSecond.h"
 #include "NavigationSystem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -145,7 +147,7 @@ void ASplitSecondGameMode::CheckSlowGame()
 void ASplitSecondGameMode::SpawnNextArena()
 {
 	++ArenaNum;
-	UE_LOG(LogTemp, Log, TEXT("Arena Num: %i"), ArenaNum);
+	UE_LOG(LogArena, Log, TEXT("Arena Num: %i"), ArenaNum);
 
 	if (CurrentArena)
 	{
@@ -157,7 +159,7 @@ void ASplitSecondGameMode::SpawnNextArena()
 
 	if (ArenaNum % 10 != 0)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Spawning Normal Arena"));
+		UE_LOG(LogArena, Log, TEXT("Spawning Normal Arena"));
 
 		auto RoomIndex = FMath::RandRange(0, PossibleArenas.Num() - 1);
 		CurrentArena = GetWorld()->SpawnActor<AArena>(PossibleArenas[RoomIndex]);
@@ -180,7 +182,7 @@ void ASplitSecondGameMode::SpawnNextArena()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("Spawning Boss Arena"));
+		UE_LOG(LogArena, Log, TEXT("Spawning Boss Arena"));
 
 		CurrentArena = GetWorld()->SpawnActor<AArena>(BossArena);
 		if (!ensure(CurrentArena != nullptr)) { return; }

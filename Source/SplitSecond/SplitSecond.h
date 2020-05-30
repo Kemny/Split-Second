@@ -5,3 +5,5 @@
 #include "CoreMinimal.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogAISystem, All, All)
+
+DECLARE_LOG_CATEGORY_EXTERN(LogArena, All, All)
