@@ -148,7 +148,7 @@ private:
     void SpawnGun();
 
     UFUNCTION() virtual void OnTakeDamage(AActor* DamagedActor, float NewDamage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
-    void Die(AActor* DamageCauser);
+    void Die();
 
 public:
     bool IsFacingPlayer() { return bIsFacingPlayer; }
