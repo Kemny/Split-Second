@@ -15,8 +15,8 @@ class SPLITSECOND_API APlayerProjectile : public ASplitSecondProjectile
 	GENERATED_BODY()
 	
 public:
+	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 	void OnBulletOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
-
 
 	bool bIsExplosive = false;
 	bool bIsPiercing = false;
@@ -54,4 +54,9 @@ protected:
 	class USphereComponent* ExplosionRadiusCollision;
 	UFUNCTION(BlueprintCallable, Category = "Damage Functions")
 	void ApplyExplosionDamage();
+
+	void SetExplosive(UNiagaraSystem*& SytemToSpawn, USoundBase*& SoundToPlay);
+	void SetBounce(AActor* OtherActor, const FHitResult& Hit, USoundBase*& SoundToPlay, bool& bShouldDestroy);
+	void PlayShieldSound(AActor* OtherActor, USoundBase*& SoundToPlay);
+	void SetPiercing(AActor* OtherActor, USoundBase*& SoundToPlay, bool& bShouldDestroy);
 };

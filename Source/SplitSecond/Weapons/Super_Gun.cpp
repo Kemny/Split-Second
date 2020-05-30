@@ -137,7 +137,7 @@ APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector con
             CurrentProjectile->SetDamage(Upgrades.Damage);
             CurrentProjectile->GetProjectileMovement()->InitialSpeed = Upgrades.ProjectileSpeed;
             CurrentProjectile->GetProjectileMovement()->MaxSpeed = CurrentProjectile->GetProjectileMovement()->InitialSpeed;
-
+            
             CurrentProjectile->bIsExplosive = Upgrades.bExplodingBullets;
             CurrentProjectile->bShouldBounce = Upgrades.bIsBouncing;
             CurrentProjectile->bIsPiercing = Upgrades.bIsPiercing;
@@ -146,6 +146,7 @@ APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector con
             {
                 CurrentProjectile->GetBulletMesh()->SetStaticMesh(KnifeMesh);
                 CurrentProjectile->GetBulletMesh()->SetWorldScale3D(FVector(2));
+                CurrentProjectile->GetCollisionComp()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);
             }
             /*if (Upgrades.bIsHoming)
             {

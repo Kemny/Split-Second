@@ -17,13 +17,12 @@ ASplitSecondProjectile::ASplitSecondProjectile()
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
 	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ASplitSecondProjectile::OnBulletOverlap);
 	CollisionComp->OnComponentHit.AddDynamic(this, &ASplitSecondProjectile::OnHit);
-
+	
 	// Players can't walk on it
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
 	CollisionComp->CanCharacterStepUpOn = ECB_No;
 	// Set as root component
 	RootComponent = CollisionComp;
-
 
 	// Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("BulletComp"));

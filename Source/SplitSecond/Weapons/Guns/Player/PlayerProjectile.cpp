@@ -31,57 +31,33 @@ APlayerProjectile::APlayerProjectile()
 	bShouldBounce = GetProjectileMovement()->bShouldBounce;
 }
 
-void APlayerProjectile::OnBulletOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void APlayerProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (!OtherActor || OtherActor == this) return;
 
 	bool bShouldDestroy = true;
-	
+
 	// Called to apply damage to hit actor
 	UGameplayStatics::ApplyDamage(OtherActor, Damage, UGameplayStatics::GetPlayerController(GetWorld(), 0), this, UDamageType::StaticClass());
 
 	UNiagaraSystem* SytemToSpawn = DefaultCollisionParticle;
 	USoundBase* SoundToPlay = nullptr;
 
-	if (bIsExplosive)
-	{
-		SytemToSpawn = ExplodingBulletFX;
-		ApplyExplosionDamage();
+	SetExplosive(SytemToSpawn, SoundToPlay);
 
-		if (!ensure(Explosion != nullptr)) { return; }
-		SoundToPlay = Explosion;
-	}
+	SetBounce(OtherActor, Hit, SoundToPlay, bShouldDestroy);
+	
+	SetPiercing(OtherActor, SoundToPlay, bShouldDestroy);
 
-	if (bShouldBounce && CurrentBounce < BounceNum)
-	{
-		ReflectProjectile(SweepResult);
-		++CurrentBounce;
+	PlayShieldSound(OtherActor, SoundToPlay);
 
-		if (!ensure(Bounce != nullptr)) { return; }
-		SoundToPlay = Bounce;
-
-		bShouldDestroy = false;
-	}
-
-	if (OtherActor->IsA<ATurretShield>())
-	{
-		SoundToPlay = ShieldImpact;
-	}
-
-
-	if (bIsPiercing && OtherActor->IsA<ASuper_AI_Character>())
-	{
-		if (!ensure(Piercing != nullptr)) { return; }
-		SoundToPlay = Piercing;
-
-		bShouldDestroy = false;
-	}
+	UE_LOG(LogTemp, Log, TEXT("DONKEY"))
 
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SytemToSpawn, GetActorLocation(), FRotator(0), FVector(1), true, true, ENCPoolMethod::AutoRelease);
-	
+
 	if (SoundToPlay)
 	{
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), Explosion, GetActorLocation());
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundToPlay, GetActorLocation());
 	}
 
 	if (bShouldDestroy)
@@ -89,6 +65,38 @@ void APlayerProjectile::OnBulletOverlap(class UPrimitiveComponent* OverlappedCom
 		Destroy();
 	}
 }
+
+void APlayerProjectile::OnBulletOverlap(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (!OtherActor || OtherActor == this) return;
+
+	bool bShouldDestroy = true;
+
+	// Called to apply damage to hit actor
+	UGameplayStatics::ApplyDamage(OtherActor, Damage, UGameplayStatics::GetPlayerController(GetWorld(), 0), this, UDamageType::StaticClass());
+
+	UNiagaraSystem* SytemToSpawn = DefaultCollisionParticle;
+	USoundBase* SoundToPlay = nullptr;
+
+	SetExplosive(SytemToSpawn, SoundToPlay);
+
+	SetPiercing(OtherActor, SoundToPlay, bShouldDestroy);
+
+	PlayShieldSound(OtherActor, SoundToPlay);
+
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SytemToSpawn, GetActorLocation(), FRotator(0), FVector(1), true, true, ENCPoolMethod::AutoRelease);
+
+	if (SoundToPlay)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), SoundToPlay, GetActorLocation());
+	}
+
+	if (bShouldDestroy)
+	{
+		Destroy();
+	}
+}
+
 FVector APlayerProjectile::CalculateReflectionVelocity(FVector ReflectorNormal)
 {
 	auto MyVelocity = GetProjectileMovement()->Velocity;
@@ -118,5 +126,54 @@ void APlayerProjectile::ApplyExplosionDamage()
 		{
 			UGameplayStatics::ApplyDamage(ActorToDamage, Damage, PlayerController, this, UDamageType::StaticClass());
 		}
+	}
+}
+
+void APlayerProjectile::SetExplosive(UNiagaraSystem*& SytemToSpawn, USoundBase*& SoundToPlay)
+{
+	if (bIsExplosive)
+	{
+		SytemToSpawn = ExplodingBulletFX;
+		ApplyExplosionDamage();
+
+		if (!ensure(Explosion != nullptr)) { return; }
+		SoundToPlay = Explosion;
+	}
+}
+
+void APlayerProjectile::SetBounce(AActor* OtherActor, const FHitResult& Hit, USoundBase*& SoundToPlay, bool& bShouldDestroy)
+{
+	if (bShouldBounce && CurrentBounce < BounceNum)
+	{
+		ReflectProjectile(Hit);
+		++CurrentBounce;
+
+		if (!ensure(Bounce != nullptr)) { return; }
+		SoundToPlay = Bounce;
+
+		bShouldDestroy = false;
+	}
+	else
+	{
+		bShouldDestroy = true;
+	}
+}
+
+void APlayerProjectile::PlayShieldSound(AActor* OtherActor, USoundBase*& SoundToPlay)
+{
+	if (OtherActor->IsA<ATurretShield>())
+	{
+		SoundToPlay = ShieldImpact;
+	}
+}
+
+void APlayerProjectile::SetPiercing(AActor* OtherActor, USoundBase*& SoundToPlay, bool& bShouldDestroy)
+{
+	if (bIsPiercing && OtherActor->IsA<ASuper_AI_Character>())
+	{
+		if (!ensure(Piercing != nullptr)) { return; }
+		SoundToPlay = Piercing;
+
+		bShouldDestroy = false;
 	}
 }
