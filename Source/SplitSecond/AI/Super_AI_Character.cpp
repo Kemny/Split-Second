@@ -243,18 +243,7 @@ void ASuper_AI_Character::OnTakeDamage(AActor* DamagedActor, float NewDamage, co
     {
         if (!ensure(Gamemode != nullptr)) { return; }
         if (!ensure(DeathParticles != nullptr)) { return; }
-        if (auto Particles = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DeathParticles, GetActorLocation(), FRotator(0), FVector(1), true, true, ENCPoolMethod::None))
-        {
-            if (Gamemode->GetIsGameSlowed())
-            {
-                Particles->SetNiagaraVariableFloat(TEXT("User.TimeDilation"), Gamemode->GetCurrentSlowValue());
-            }
-            else
-            {
-                Particles->SetNiagaraVariableFloat(TEXT("User.TimeDilation"), 1);
-            }
-            Particles->SetNiagaraVariableVec3(TEXT("User.LaunchDirection"), DamageCauser->GetActorRotation().Vector());
-        }
+        UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DeathParticles, GetActorLocation(), FRotator(0), FVector(1), true, true, ENCPoolMethod::None);
 
         Die();
     }

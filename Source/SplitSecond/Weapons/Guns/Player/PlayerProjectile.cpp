@@ -76,24 +76,9 @@ void APlayerProjectile::OnBulletOverlap(class UPrimitiveComponent* OverlappedCom
 
 		bShouldDestroy = false;
 	}
-	if (auto Particle = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SytemToSpawn, GetActorLocation(), FRotator(0), FVector(1), true, true, ENCPoolMethod::AutoRelease))
-	{
-		if (auto Gamemode = GetWorld()->GetAuthGameMode<ASplitSecondGameMode>())
-		{
-			if (Gamemode->GetIsGameSlowed())
-			{
-				Particle->SetNiagaraVariableFloat(TEXT("User.TimeDilation"), Gamemode->GetCurrentSlowValue());
-			}
-			else
-			{
-				Particle->SetNiagaraVariableFloat(TEXT("User.TimeDilation"), 1);
-			}
-		}
-		
-		Particle->SetNiagaraVariableVec3(TEXT("User.LaunchDirection"), (SweepResult.Normal * FVector::DotProduct(GetProjectileMovement()->Velocity, SweepResult.Normal)).GetSafeNormal() * -1);
-	}
-	
 
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SytemToSpawn, GetActorLocation(), FRotator(0), FVector(1), true, true, ENCPoolMethod::AutoRelease);
+	
 	if (SoundToPlay)
 	{
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), Explosion, GetActorLocation());
