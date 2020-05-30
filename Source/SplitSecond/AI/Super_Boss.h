@@ -18,7 +18,6 @@ public:
 	void GetSlowed(float SlowTime, float SlowAmmount) override;
 
 	void ScaleEnemyHealth(float BaseValue) override;
-	void ScaleEnemyDamage(float BaseValue) override;
 
 protected:
 	UPROPERTY(EditDefaultsOnly)

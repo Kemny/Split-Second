@@ -29,19 +29,3 @@ void ASuper_Boss::ScaleEnemyHealth(float BaseValue)
 		}
 	}
 }
-
-void ASuper_Boss::ScaleEnemyDamage(float BaseValue)
-{
-	if (!ensure(Gamemode != nullptr)) { return; }
-
-	if (auto Pawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0))
-	{
-		if (auto PlayerPawn = Cast<APlayerCharacter>(Pawn))
-		{
-			auto PlayerStats = PlayerPawn->GetPlayerState<ASplitSecondPlayerState>()->CurrentStats;
-			float NewValue = (PlayerStats.Damage * PlayerStats.FireRate / 100 * BaseValue * Gamemode->BossDamageScaler) + BaseValue;
-			Damage = NewValue;
-		}
-	}
-	
-}
