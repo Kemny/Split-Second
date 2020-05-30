@@ -3,6 +3,8 @@
 #include "PlayerBow.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "../../../SplitSecondPlayerState.h"
+#include "PlayerProjectile.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 APlayerBow::APlayerBow()
 {
@@ -19,10 +21,7 @@ void APlayerBow::OnInputReleased_Implementation()
 {
     if (!ensure(PlayerState != nullptr)) { return; }
 
-    if (BowDrawPrecentage > PlayerState->CurrentStats.MinimalDrawValue)
-    {
-        FireGun();
-    }
+    FireGun();
 
     bIsHeld = false;
     bIsDrawingBow = false;
@@ -49,11 +48,15 @@ void APlayerBow::Tick(float DeltaTime)
 
 void APlayerBow::FireGun()
 {
+    if (!ensure(PlayerState != nullptr)) { return; }
+
     if (ProjectileClass != NULL)
     {
         // spawn the projectile at the muzzle
         if (auto Spawned = Player_SpawnProjectile(ProjectileClass, BowMesh->GetSocketLocation(FName("MuzzleLocation")), FindPlayerBulletRotation(BowMesh)))
         {
+            Spawned->SetDamage(PlayerState->CurrentStats.Damage * (BowDrawPrecentage * PlayerState->CurrentStats.BowDrawDamageMultiplier));
+            Spawned->GetProjectileMovement()->ProjectileGravityScale = FMath::Abs(BowDrawPrecentage - 1) * PlayerState->CurrentStats.BowGravityMultiplier;
             AfterPlayerFireGun();
         }
     }

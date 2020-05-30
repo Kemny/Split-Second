@@ -105,7 +105,8 @@ public:
     UPROPERTY(EditAnywhere)float GameSlowCooldown = 10;
 
     UPROPERTY(EditAnywhere)float BowDrawSpeed = 0.01;
-    UPROPERTY(EditAnywhere)float MinimalDrawValue = 0.3;
+    UPROPERTY(EditAnywhere)float BowDrawDamageMultiplier = 10;
+    UPROPERTY(EditAnywhere)float BowGravityMultiplier = 20;
 };
 
 USTRUCT(BlueprintType)
@@ -147,8 +148,8 @@ public:
     ///Bow Specific
     /*Will fire at 1 and add this value every tick*/
     UPROPERTY(EditAnywhere, BlueprintReadWrite)float BowDrawSpeed = 0.01;
-    /*Minimal needed draw value to fire*/
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)float MinimalDrawValue = 0.3;
+    UPROPERTY(EditAnywhere)float BowDrawDamageMultiplier = 10;
+    UPROPERTY(EditAnywhere)float BowGravityMultiplier = 20;
 
     FUpgrades()
     {
@@ -226,7 +227,8 @@ public:
         ProjectileSpeed = Defaults.ProjectileSpeed;
 
         BowDrawSpeed = Defaults.BowDrawSpeed;
-        MinimalDrawValue = Defaults.MinimalDrawValue;
+        BowDrawDamageMultiplier = Defaults.BowDrawDamageMultiplier;
+        BowGravityMultiplier = Defaults.BowGravityMultiplier;
     }
 
 };

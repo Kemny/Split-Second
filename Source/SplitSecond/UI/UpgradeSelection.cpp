@@ -45,9 +45,9 @@ void UUpgradeSelection::ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const E
 	RegainingHealth = true;
 	UGameplayStatics::PlaySound2D(GetWorld(), RestoreHealthSound);
 
-	txt_Damage->SetText(FloatToText(PlayerUpgrades->Damage, 1));
-	txt_FireRate->SetText(FloatToText(PlayerUpgrades->FireRate, 1));
-	txt_BulletSpeed->SetText(FloatToText(PlayerUpgrades->ProjectileSpeed, 0));
+	txt_Damage->SetText(FloatToText(PlayerUpgrades->Damage, UpgradeValues.Find(EArenaUpgrades::Damage)->MaxDigits));
+	txt_FireRate->SetText(FloatToText(PlayerUpgrades->FireRate, UpgradeValues.Find(EArenaUpgrades::FireRate)->MaxDigits));
+	txt_BulletSpeed->SetText(FloatToText(PlayerUpgrades->ProjectileSpeed, UpgradeValues.Find(EArenaUpgrades::ProjectileSpeed)->MaxDigits));
 
 	switch (CurrentWeapon)
 	{
@@ -67,7 +67,7 @@ void UUpgradeSelection::ShowUpgradeSelection(FUpgrades* CurrentUpgrades, const E
 		txt_FireRate->SetVisibility(ESlateVisibility::Collapsed);
 		Name_BowSpecificBox->SetVisibility(ESlateVisibility::Visible);
 		Upgrades_BowSpecificBox->SetVisibility(ESlateVisibility::Visible);
-		txt_BowDrawSpeed->SetText(FloatToText(PlayerUpgrades->BowDrawSpeed, 3));
+		txt_BowDrawSpeed->SetText(FloatToText(PlayerUpgrades->BowDrawSpeed, UpgradeValues.Find(EArenaUpgrades::BowDrawSpeed)->MaxDigits));
 		break;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("Unknown gun enum placed in UpgradeSelection Widget"));
