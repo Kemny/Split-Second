@@ -64,6 +64,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Game Scaling") float BossHealthScaler = 4;
 
 private:
+	UPROPERTY(EditDefaultsOnly)
 	int32 ArenaNum = 0;
 	int32 Kills = 0;
 	int32 ArenaHighscore = 0;

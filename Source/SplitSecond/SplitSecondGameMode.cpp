@@ -166,21 +166,16 @@ void ASplitSecondGameMode::SpawnNextArena()
 		CurrentArena->SpawnActors();
 		UNavigationSystemV1::GetNavigationSystem(GetWorld())->Build();
 
-		if (!ArenaMusicReference)
+		if (ArenaMusicReference == nullptr)
 		{
 			if (!ensure(ArenaMusic != nullptr)) { return; }
 			ArenaMusicReference = UGameplayStatics::SpawnSound2D(GetWorld(), ArenaMusic);
 		}
-		else
+		if (BossMusicReference != nullptr)
 		{
-			if (ArenaMusicReference)
-			{
-				ArenaMusicReference->SetActive(true);
-			}
-			if (BossMusicReference)
-			{
-				BossMusicReference->SetActive(false);
-			}
+			BossMusicReference->DetachFromParent();
+			BossMusicReference->DestroyComponent();
+			BossMusicReference = nullptr;
 		}
 	}
 	else
@@ -193,21 +188,16 @@ void ASplitSecondGameMode::SpawnNextArena()
 		CurrentArena->SpawnActors();
 		UNavigationSystemV1::GetNavigationSystem(GetWorld())->Build();
 
-		if (!BossMusicReference)
+		if (BossMusicReference == nullptr)
 		{
 			if (!ensure(BossMusic != nullptr)) { return; }
 			BossMusicReference = UGameplayStatics::SpawnSound2D(GetWorld(), BossMusic);
 		}
-		else
+		if (ArenaMusicReference != nullptr)
 		{
-			if (ArenaMusicReference)
-			{
-				ArenaMusicReference->SetActive(false);
-			}
-			if (BossMusicReference)
-			{
-				BossMusicReference->SetActive(true);
-			}
+			ArenaMusicReference->DetachFromParent();
+			ArenaMusicReference->DestroyComponent();
+			ArenaMusicReference = nullptr;
 		}
 	}
 }
