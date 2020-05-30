@@ -147,6 +147,7 @@ APlayerProjectile* ASuper_Gun::Player_SpawnProjectile(UClass* Class, FVector con
                 CurrentProjectile->GetBulletMesh()->SetStaticMesh(KnifeMesh);
                 CurrentProjectile->GetBulletMesh()->SetWorldScale3D(FVector(2));
                 CurrentProjectile->GetCollisionComp()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);
+                CurrentProjectile->GetCollisionComp()->SetCollisionResponseToChannel(ECC_GameTraceChannel4, ECollisionResponse::ECR_Overlap);
             }
             /*if (Upgrades.bIsHoming)
             {

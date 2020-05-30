@@ -82,7 +82,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun Vars")
 	float Damage;
 	float Health;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun Vars")
+
+    /* Max Health this AI can have */
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Settings")
     float MaxHealth = 10;
 
 	UPROPERTY(EditAnywhere, Category = "FX")

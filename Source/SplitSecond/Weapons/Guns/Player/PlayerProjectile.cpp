@@ -51,8 +51,6 @@ void APlayerProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 
 	PlayShieldSound(OtherActor, SoundToPlay);
 
-	UE_LOG(LogTemp, Log, TEXT("DONKEY"))
-
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SytemToSpawn, GetActorLocation(), FRotator(0), FVector(1), true, true, ENCPoolMethod::AutoRelease);
 
 	if (SoundToPlay)
