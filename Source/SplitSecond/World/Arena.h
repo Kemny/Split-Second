@@ -62,7 +62,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Arena")
 	TMap<TEnumAsByte<EObjectives>, FArenaSettings> Objectives;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category ="Random")
-	INT32 MAX_ATTEMPTS = 500;
+	int32 MAX_ATTEMPTS = 500;
 
 public:
 	AArena();
