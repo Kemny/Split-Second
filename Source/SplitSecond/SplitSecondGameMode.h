@@ -94,6 +94,7 @@ private:
 	bool bGameIsSlowed = false;
 	float SlowEndTime;
 	void CheckSlowGame();
+	void StopPlayerFire();
 
 public:
 

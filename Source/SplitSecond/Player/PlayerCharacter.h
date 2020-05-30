@@ -83,6 +83,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Movement")
 	FORCEINLINE class UPlayerMovementComponent* GetMyMovementComponent() const { return PlayerMovementComponent; }
 	FORCEINLINE class UPlayerUI* GetPlayerUI() const { return PlayerUI; }
+    UFUNCTION(BlueprintCallable, Category = "Weapons")
+    FORCEINLINE ASuper_Gun* GetCurrentGun() const { return CurrentGun; }
     void SpawnPlayerUI(TSubclassOf<class UPlayerUI> UIToSpawn);
 
 private:

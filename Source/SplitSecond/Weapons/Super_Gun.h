@@ -52,13 +52,13 @@ public:
 
 	virtual class UStaticMeshComponent* GetGunMesh() const { return GunMesh; }
 
+	FTimerHandle FireRateTimer;
+
 protected:
     ACharacter* CurrentPawn;
     class ASplitSecondPlayerState* PlayerState;
 
 	bool bCanFire;
-
-	FTimerHandle FireRateTimer;
 
 	float LastTimeFired;
 

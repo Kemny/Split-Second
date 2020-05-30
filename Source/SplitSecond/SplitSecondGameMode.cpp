@@ -207,6 +207,7 @@ void ASplitSecondGameMode::HandleArenaFinished()
 {
 	if (auto Created = CreateWidget<UTransitionScreen>(GetWorld(), TransitionScreenClass))
 	{
+		StopPlayerFire();
 		Created->OnTransitionFinished.BindUFunction(this, TEXT("SpawnUpgradeScreen"));
 		Created->PlayWinAnimation(ArenaNum);
 	}
@@ -215,6 +216,7 @@ void ASplitSecondGameMode::HandleBossFinished()
 {
 	if (auto Created = CreateWidget<UTransitionScreen>(GetWorld(), TransitionScreenClass))
 	{
+		StopPlayerFire();
 		Created->OnTransitionFinished.BindUFunction(this, TEXT("SpawnBossUpgradeScreen"));
 		Created->PlayWinAnimation(ArenaNum);
 	}
@@ -229,8 +231,6 @@ void ASplitSecondGameMode::SpawnUpgradeScreen()
 		Created->ShowUpgradeSelection(&SplitSecondPlayerState->CurrentStats, PlayerGun, false);
 		Created->OnUpgradeSelected.BindUFunction(this, TEXT("SpawnNextArena"));
 	}
-
-	;
 }
 void ASplitSecondGameMode::SpawnBossUpgradeScreen()
 {
@@ -308,6 +308,7 @@ void ASplitSecondGameMode::OnPlayerDeath()
 	///This triggers immediately after the player dies
 	if (auto Created = CreateWidget<UTransitionScreen>(GetWorld(), TransitionScreenClass))
 	{
+		StopPlayerFire();
 		Created->OnTransitionFinished.BindUFunction(this, TEXT("OnConfirmedPlayerDeath"));
 		Created->PlayFailAnimation(ArenaNum);
 	}
@@ -319,4 +320,12 @@ void ASplitSecondGameMode::OnConfirmedPlayerDeath()
 
 	if (!ensure(SplitSecondPlayerController != nullptr)) { return; }
 	SplitSecondPlayerController->ClientTravel(FString("/Game/Maps/MainMenu"), ETravelType::TRAVEL_Absolute, false);
+}
+
+void ASplitSecondGameMode::StopPlayerFire()
+{
+	if (auto Player = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0)))
+	{
+		GetWorldTimerManager().ClearTimer(Player->GetCurrentGun()->FireRateTimer);
+	}
 }
