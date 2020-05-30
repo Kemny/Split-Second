@@ -26,9 +26,6 @@ public:
 	ASuper_AI_Character();
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-    class UHealthComponent* HealthComponent;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     class UBoxComponent* TraceComp;
 
     /* Gun to give AI */
@@ -84,15 +81,14 @@ public:
 	/* Damage the AI applies to the player */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun Vars")
 	float Damage;
+	float Health;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Gun Vars")
+    float MaxHealth = 10;
 
 	UPROPERTY(EditAnywhere, Category = "FX")
-	class UNiagaraSystem* NiagaraSystem;
+	class UNiagaraSystem* DeathParticles;
 
 public:
-
-    UFUNCTION(BlueprintCallable, Category = "Health")
-    FORCEINLINE class UHealthComponent* GetHealthComponent() const { return HealthComponent; }
-
     void Highlight(EHighlightType HighlightType);
     virtual void GetSlowed(float SlowTime, float SlowAmmount);
     bool GetIsSlowed() const { return bIsSlowed; }
@@ -106,12 +102,16 @@ protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
     void Tick(float DeltaTime) override;
+    void RotateToPlayer(float DeltaTime);
     void Destroyed() override;
 
     UPROPERTY(EditAnywhere, Category = "AI Settings")
     float RotationSpeed = 2;
     UPROPERTY(EditAnywhere, Category = "AI Settings")
     float MinRotationToFacePlayer = 2;
+
+    UPROPERTY(EditDefaultsOnly)
+    float SpawnTime = 1;
 
     UPROPERTY(EditAnywhere, Category = "Colors")
     FLinearColor DefaultColor = FLinearColor::Red;
@@ -121,23 +121,34 @@ protected:
     FLinearColor SlowedColor = FLinearColor::Blue;
     UPROPERTY(EditAnywhere, Category = "Colors")
     float MinEmmision = 0.3;
+
+    UPROPERTY(EditAnywhere, Category = "Colors")
+    UMaterialInterface* Body;
+    UPROPERTY(EditAnywhere, Category = "Colors")
+    UMaterialInterface* Wireframe;
+
     UPROPERTY(EditAnywhere, Category = "Sound")
     TArray<USoundBase*> DeathSounds;
     UPROPERTY(EditAnywhere, Category = "Sound")
     USoundBase* SpawnSound;
+
 
 	class ASplitSecondGameMode* Gamemode;
 
     void CheckGameSlowTimers();
 
 private:
+    TArray<UMaterialInstanceDynamic*> SpawningMaterials;
+    bool bIsSpawning = false;
+    float SpawnProgress = 1;
+
     bool bIsSlowed = false;
     bool bIsFacingPlayer = false;
 
     void SpawnGun();
 
-    UFUNCTION() virtual void OnTakeDamage();
-    void Die();
+    UFUNCTION() virtual void OnTakeDamage(AActor* DamagedActor, float NewDamage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
+    void Die(AActor* DamageCauser);
 
 public:
     bool IsFacingPlayer() { return bIsFacingPlayer; }

@@ -19,6 +19,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "NiagaraComponent.h"
 
 // Sets default values
 ASuper_AI_Character::ASuper_AI_Character()
@@ -39,8 +40,7 @@ ASuper_AI_Character::ASuper_AI_Character()
 	TraceComp->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_No;
 	TraceComp->SetBoxExtent(FVector(32, 32, 80));
 
-	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("Health Component"));
-    HealthComponent->OnHealthChanged.BindUFunction(this, TEXT("OnTakeDamage"));
+    OnTakeAnyDamage.AddUniqueDynamic(this, &ASuper_AI_Character::OnTakeDamage);
 
 	GunFireDelay = 2.0f;
 	MaxTargetDistance = 2000.f;
@@ -51,6 +51,21 @@ ASuper_AI_Character::ASuper_AI_Character()
 void ASuper_AI_Character::BeginPlay()
 {
 	Super::BeginPlay();
+
+    switch (FMath::RandRange(0, 1))
+    {
+    case 0:
+        SpawningMaterials.Add(GetMesh()->CreateAndSetMaterialInstanceDynamic(1));
+        break;
+    case 1:
+        SpawningMaterials.Add(GetMesh()->CreateAndSetMaterialInstanceDynamic(0));
+        SpawningMaterials.Add(GetMesh()->CreateAndSetMaterialInstanceDynamic(1));
+        break;
+    default:
+        break;
+    }
+
+    bIsSpawning = true;
 
     if (!ensure(SpawnSound != nullptr)) { return; }
     UGameplayStatics::PlaySoundAtLocation(GetWorld(), SpawnSound, GetActorLocation());
@@ -67,20 +82,45 @@ void ASuper_AI_Character::BeginPlay()
 
     ScaleEnemyDamage(Damage);
 
-    if (!ensure(HealthComponent != nullptr)) { return; }
-    ScaleEnemyHealth(HealthComponent->GetMaxHealth());
+    ScaleEnemyHealth(MaxHealth);
 }
 
 void ASuper_AI_Character::Tick(float DeltaTime)
 {
     Super::Tick(DeltaTime);
 
+    if (bIsSpawning)
+    {
+        SpawnProgress = FMath::Clamp<float>(SpawnProgress - DeltaTime / SpawnTime, 0, 1);
+        for (auto& SpawnMaterial : SpawningMaterials)
+        {
+            SpawnMaterial->SetScalarParameterValue(TEXT("Amount"), SpawnProgress);
+        }
+        if (SpawnProgress == 0)
+        {
+            if (!ensure(Body != nullptr)) { return; }
+            if (!ensure(Wireframe != nullptr)) { return; }
+            GetMesh()->SetMaterial(0, Body);
+            GetMesh()->SetMaterial(1, Wireframe);
+
+            SpawnDefaultController();
+
+            bIsSpawning = false;
+        }
+    }
+
+    RotateToPlayer(DeltaTime);
+    CheckGameSlowTimers();
+}
+
+void ASuper_AI_Character::RotateToPlayer(float DeltaTime)
+{
     if (bAbleToRotate && !bIsDead)
     {
         if (auto Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0))
         {
             auto Rotation = FMath::RInterpTo(GetActorRotation(), UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Player->GetActorLocation()), DeltaTime, RotationSpeed);
-            if (FMath::Abs(Rotation.Yaw - UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Player->GetActorLocation()).Yaw)  <= MinRotationToFacePlayer)
+            if (FMath::Abs(Rotation.Yaw - UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), Player->GetActorLocation()).Yaw) <= MinRotationToFacePlayer)
             {
                 bIsFacingPlayer = true;
             }
@@ -92,8 +132,6 @@ void ASuper_AI_Character::Tick(float DeltaTime)
             SetActorRelativeRotation(FRotator(0, Rotation.Yaw, 0));
         }
     }
-
-    CheckGameSlowTimers();
 }
 
 void ASuper_AI_Character::CheckGameSlowTimers()
@@ -148,7 +186,7 @@ void ASuper_AI_Character::Highlight(EHighlightType HighlightType)
 {
     if (bIsSlowed) HighlightType = EHighlightType::Slow;
 
-    float HealthPercentage = HealthComponent->GetHealth() / HealthComponent->GetMaxHealth();
+    float HealthPercentage = Health / MaxHealth;
     HealthPercentage = FMath::Clamp<float>(HealthPercentage, MinEmmision, 1);
 
     GetMesh()->CreateAndSetMaterialInstanceDynamic(1)->SetScalarParameterValue(TEXT("Emission Multiplier"), HealthPercentage);
@@ -174,7 +212,7 @@ void ASuper_AI_Character::GetSlowed(float SlowTime, float SlowAmmount)
     if (!GetMesh()) return;
     bIsSlowed = true;
 
-    float HealthPercentage = HealthComponent->GetHealth() / HealthComponent->GetMaxHealth();
+    float HealthPercentage = Health / MaxHealth;
     Highlight(EHighlightType::Slow);
 
     CustomTimeDilation = SlowAmmount;
@@ -192,27 +230,47 @@ void ASuper_AI_Character::Destroyed()
     Super::Destroyed();
 }
 
-void ASuper_AI_Character::OnTakeDamage()
+void ASuper_AI_Character::OnTakeDamage(AActor* DamagedActor, float NewDamage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
+    if (bIsSpawning || NewDamage <= 0) return;
+    if (!ensure(DamageCauser != nullptr)) { return; }
+
+    Health = FMath::Clamp(Health - NewDamage, 0.0f, MaxHealth);
+
     Highlight(EHighlightType::NONE);
 
-    if (HealthComponent->GetHealth() <= 0)
+    if (Health <= 0)
     {
-        Die();
+        Die(DamageCauser);
     }
 }
 
-void ASuper_AI_Character::Die()
+void ASuper_AI_Character::Die(AActor* DamageCauser)
 {
+    if (!ensure(DeathSounds.Num() > 0)) { return; }
+    UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeathSounds[FMath::RandRange(0, DeathSounds.Num() - 1)], GetActorLocation());
+
+    if (!ensure(Gamemode != nullptr)) { return; }
+    if (!ensure(DeathParticles != nullptr)) { return; }
+    if (auto Particles = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DeathParticles , GetActorLocation(), GetActorRotation(), FVector(1), true, true, ENCPoolMethod::None))
+    {
+        if (Gamemode->GetIsGameSlowed())
+        {
+            Particles->SetNiagaraVariableFloat(TEXT("User.TimeDilation"), Gamemode->GetCurrentSlowValue());
+        }
+        else
+        {
+            Particles->SetNiagaraVariableFloat(TEXT("User.TimeDilation"), 1);
+        }
+
+        Particles->SetNiagaraVariableVec3(TEXT("User.LaunchDirection"), DamageCauser->GetActorForwardVector());
+    }
+
     bIsDead = true;
     SetActorEnableCollision(false);
     DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
     DetachFromControllerPendingDestroy();
-
-    UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NiagaraSystem, GetActorLocation(), GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
-    if (!ensure(DeathSounds.Num() > 0)) { return; }
-    UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeathSounds[FMath::RandRange(0, DeathSounds.Num() - 1)], GetActorLocation());
-
+    
     Destroy();
 }
 
@@ -220,7 +278,8 @@ void ASuper_AI_Character::ScaleEnemyHealth(float BaseValue)
 {
     if (!ensure(Gamemode != nullptr)) { return; }
     float NewValue = (Gamemode->GetArenaNum() / 10 * BaseValue * Gamemode->EnemyHealthScaler) + BaseValue;
-    HealthComponent->ChangeMaxHealth(NewValue);
+    Health += NewValue;
+    MaxHealth = Health;
 }
 
 void ASuper_AI_Character::ScaleEnemyDamage(float BaseValue)

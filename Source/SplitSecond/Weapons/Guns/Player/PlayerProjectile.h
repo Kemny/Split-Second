@@ -25,7 +25,8 @@ public:
 	int32 CurrentBounce = 0;
 
 	APlayerProjectile();
-	void CalcReflection(const FHitResult& Hit);
+	FVector CalculateReflectionVelocity(FVector ReflectorNormal);
+	void ReflectProjectile(const FHitResult& Hit);
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "Sound")

@@ -24,7 +24,8 @@ void ASuper_Boss::ScaleEnemyHealth(float BaseValue)
 		{
 			auto PlayerStats = PlayerPawn->GetPlayerState<ASplitSecondPlayerState>()->CurrentStats;
 			float NewValue = (PlayerStats.MaxHealth / 100 * BaseValue * Gamemode->BossHealthScaler) + BaseValue;
-			HealthComponent->ChangeMaxHealth(NewValue);
+			Health += NewValue;
+			MaxHealth += NewValue;
 		}
 	}
 }
@@ -42,7 +43,5 @@ void ASuper_Boss::ScaleEnemyDamage(float BaseValue)
 			Damage = NewValue;
 		}
 	}
-	if (!ensure(Gamemode != nullptr)) { return; }
-	float NewValue = (Gamemode->GetArenaNum() / 10 * BaseValue * Gamemode->BossDamageScaler) + BaseValue;
 	
 }

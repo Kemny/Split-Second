@@ -54,7 +54,7 @@ void APlayerProjectile::OnBulletOverlap(class UPrimitiveComponent* OverlappedCom
 
 	if (bShouldBounce && CurrentBounce < BounceNum)
 	{
-		CalcReflection(SweepResult);
+		ReflectProjectile(SweepResult);
 		++CurrentBounce;
 
 		if (!ensure(Bounce != nullptr)) { return; }
@@ -76,12 +76,21 @@ void APlayerProjectile::OnBulletOverlap(class UPrimitiveComponent* OverlappedCom
 
 		bShouldDestroy = false;
 	}
-
-	auto Particle = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SytemToSpawn, GetActorLocation(), GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
-	auto Gamemode = GetWorld()->GetAuthGameMode<ASplitSecondGameMode>();
-	if (Gamemode->GetIsGameSlowed())
+	if (auto Particle = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), SytemToSpawn, GetActorLocation(), FRotator(0), FVector(1), true, true, ENCPoolMethod::AutoRelease))
 	{
-		Particle->SetFloatParameter(TEXT("TimeDilation"), Gamemode->GetCurrentSlowValue());
+		if (auto Gamemode = GetWorld()->GetAuthGameMode<ASplitSecondGameMode>())
+		{
+			if (Gamemode->GetIsGameSlowed())
+			{
+				Particle->SetNiagaraVariableFloat(TEXT("User.TimeDilation"), Gamemode->GetCurrentSlowValue());
+			}
+			else
+			{
+				Particle->SetNiagaraVariableFloat(TEXT("User.TimeDilation"), 1);
+			}
+		}
+		
+		Particle->SetNiagaraVariableVec3(TEXT("User.LaunchDirection"), (SweepResult.Normal * FVector::DotProduct(GetProjectileMovement()->Velocity, SweepResult.Normal)).GetSafeNormal() * -1);
 	}
 	
 
@@ -95,13 +104,16 @@ void APlayerProjectile::OnBulletOverlap(class UPrimitiveComponent* OverlappedCom
 		Destroy();
 	}
 }
-
-void APlayerProjectile::CalcReflection(const FHitResult& Hit)
+FVector APlayerProjectile::CalculateReflectionVelocity(FVector ReflectorNormal)
 {
-	GetProjectileMovement()->bShouldBounce = true;
 	auto MyVelocity = GetProjectileMovement()->Velocity;
+	return BounceSpeedLoss * (-2 * FVector::DotProduct(MyVelocity, ReflectorNormal) * ReflectorNormal + MyVelocity);
+}
+void APlayerProjectile::ReflectProjectile(const FHitResult& Hit)
+{
+	FVector ReflectedVelocity = CalculateReflectionVelocity(Hit.Normal);
 
-	FVector ReflectedVelocity = BounceSpeedLoss * (-2 * FVector::DotProduct(MyVelocity, Hit.Normal) * Hit.Normal + MyVelocity);
+	GetProjectileMovement()->bShouldBounce = true;
 	GetProjectileMovement()->SetVelocityInLocalSpace(ReflectedVelocity);
 	ReflectedVelocity.Normalize();
 	SetActorRotation(ReflectedVelocity.Rotation());
