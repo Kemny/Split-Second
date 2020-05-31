@@ -15,7 +15,8 @@ enum EObjectives
 	ReachObjective,
 	CaptureTheFlag,
 	KillAllEnemies,
-	KillBoss
+	KillBoss,
+	Tutorial
 };
 
 /*

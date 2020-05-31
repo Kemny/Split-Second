@@ -132,6 +132,9 @@ void AArena::SpawnActors()
 			case KillBoss:
 				CreatedWidget->ShowPopupMessage(FKey("F"), FText::FromString("kill sir epoch\n\npress f to start"));
 				CreatedWidget->OnConditionFufilled.BindUFunction(this, TEXT("SetupKillBoss"));
+			case Tutorial:
+				CreatedWidget->ShowPopupMessage(FKey("F"), FText::FromString("Learn game\n\npress f to start"));
+				CreatedWidget->OnConditionFufilled.BindUFunction(this, TEXT("SetupObjective"));
 			default:
 				break;
 			}
