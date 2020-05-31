@@ -39,6 +39,9 @@ ASplitSecondGameMode::ASplitSecondGameMode()
 	static ConstructorHelpers::FClassFinder<ASuper_Gun> Bow_BP(TEXT("/Game/Blueprint/Player/Weapons/BP_PlayerBow"));
 	if (Bow_BP.Class) BowClass = Bow_BP.Class;
 
+	static ConstructorHelpers::FClassFinder<AArena>ArenaClass_BP(TEXT("/Game/Blueprint/World/Arenas/TUTORIAL2"));
+	if (ArenaClass_BP.Class) TutorialClass = ArenaClass_BP.Class;
+
 	ConstructorHelpers::FClassFinder<UPlayerUI> BP_PlayerUIClass(TEXT("/Game/Blueprint/UI/WBP_PlayerUI"));
 	if (BP_PlayerUIClass.Class) PlayerUIClass = BP_PlayerUIClass.Class;
 
@@ -55,8 +58,6 @@ void ASplitSecondGameMode::BeginPlay()
 
 	GetWorldSettings()->MaxGlobalTimeDilation = MaxTimeDilation;
 	GetWorldSettings()->MinGlobalTimeDilation = MinTimeDilation;
-
-	SpawnNextArena();
 }
 void ASplitSecondGameMode::PostLogin(APlayerController* NewPlayer)
 {
@@ -142,6 +143,32 @@ void ASplitSecondGameMode::CheckSlowGame()
 		SlowedActors.Empty();
 		bGameIsSlowed = false;
 	}
+}
+
+void ASplitSecondGameMode::SpawnTutorial()
+{
+
+
+	if (TutorialClass)
+	{
+		CurrentArena = GetWorld()->SpawnActor<AArena>(TutorialClass);
+		if (!ensure(CurrentArena != nullptr)) { return; }
+		CurrentArena->OnArenaFinished.BindUFunction(this, TEXT("ReturnToMainMenu"));
+		CurrentArena->SpawnActors();
+
+		if (ArenaMusicReference == nullptr)
+		{
+			if (!ensure(ArenaMusic != nullptr)) { return; }
+			ArenaMusicReference = UGameplayStatics::SpawnSound2D(GetWorld(), ArenaMusic);
+		}
+	}
+	
+}
+
+void ASplitSecondGameMode::ReturnToMainMenu()
+{
+	if (!ensure(SplitSecondPlayerController != nullptr)) { return; }
+	SplitSecondPlayerController->ClientTravel(FString("/Game/Maps/MainMenu"), ETravelType::TRAVEL_Absolute, false);
 }
 
 void ASplitSecondGameMode::SpawnNextArena()

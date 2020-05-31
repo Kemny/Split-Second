@@ -134,7 +134,7 @@ void AArena::SpawnActors()
 				CreatedWidget->OnConditionFufilled.BindUFunction(this, TEXT("SetupKillBoss"));
 			case Tutorial:
 				CreatedWidget->ShowPopupMessage(FKey("F"), FText::FromString("Learn game\n\npress f to start"));
-				CreatedWidget->OnConditionFufilled.BindUFunction(this, TEXT("SetupObjective"));
+				CreatedWidget->OnConditionFufilled.BindUFunction(this, TEXT("SetupTutorial"));
 			default:
 				break;
 			}
@@ -167,6 +167,14 @@ void AArena::SetupFlag()
 	SpawnedFlagTarget->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 
 	UE_LOG(LogTemp, Log, TEXT("Capture The Flag Setup Finished"));
+}
+void AArena::SetupTutorial()
+{
+	if (auto Spawned = GetWorld()->SpawnActor<ATargetLocation>(LocationTargetScene->GetComponentLocation(), FRotator(0)))
+	{
+		Spawned->OnTargetLocationCollision.BindUFunction(this, FName("FinishObjective"));
+		Spawned->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
+	}
 }
 void AArena::TryDeliverFlag()
 {

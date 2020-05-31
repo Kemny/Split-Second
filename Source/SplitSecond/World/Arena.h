@@ -89,6 +89,7 @@ private:
 	UFUNCTION() void SetupObjective();
 	UFUNCTION() void SetupKillAll();
 	UFUNCTION() void SetupKillBoss();
+	UFUNCTION() void SetupTutorial();
 
 	void SpawnEnemies(int32 NumberToSpawn, TArray<UEnemySpawnLocation*> SpawnLocations);
 

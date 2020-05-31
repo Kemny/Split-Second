@@ -58,6 +58,9 @@ public:
 	UFUNCTION() void OnPlayerDeath();
 	UFUNCTION() void OnConfirmedPlayerDeath();
 
+	UFUNCTION(BlueprintCallable)
+	void SpawnTutorial();
+
 	UPROPERTY(EditDefaultsOnly, Category = "Game Scaling") float EnemyDamageScaler = 2;
 	UPROPERTY(EditDefaultsOnly, Category = "Game Scaling") float EnemyHealthScaler = 2;
 	UPROPERTY(EditDefaultsOnly, Category = "Game Scaling") float BossDamageScaler = 1.5;
@@ -81,6 +84,7 @@ private:
 	TSubclassOf<class ASuper_Gun> ShotgunClass;
 	TSubclassOf<class ASuper_Gun> BowClass;
 	TSubclassOf<class UPlayerUI> PlayerUIClass;
+	TSubclassOf<class AArena> TutorialClass;
 	TSubclassOf<class UTransitionScreen> TransitionScreenClass;
 	TSubclassOf<class UUpgradeSelection> UpgradeSelectionClass;
 
@@ -89,6 +93,7 @@ private:
 	class UAudioComponent* BossMusicReference = nullptr;
 
 	UFUNCTION() void PlayerSlowGame();
+	UFUNCTION() void ReturnToMainMenu();
 
 	float CurrentSlowValue;
 	bool bGameIsSlowed = false;
