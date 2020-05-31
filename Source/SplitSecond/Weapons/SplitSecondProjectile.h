@@ -41,6 +41,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "FX")
 	class UNiagaraSystem* DefaultCollisionParticle;
 
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* BulletImpactSound;
+
 public:
 	void SetDamage(float NewDamage) { Damage = NewDamage; }
 

@@ -173,6 +173,7 @@ void AArena::TryDeliverFlag()
 		FinishObjective();
 		if (SpawnedFlagTarget)
 		{
+			SpawnedFlagTarget->PlayFinishSound();
 			SpawnedFlagTarget->Destroy();
 		}
 	}

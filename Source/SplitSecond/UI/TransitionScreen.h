@@ -27,6 +27,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	UTextBlock* txt_ArenaNum;
 
+	UPROPERTY(BlueprintReadWrite)
+	bool WinAnimation = false;
+
 public:
 	FTransitionScreenDelegate OnTransitionFinished;
 

@@ -176,8 +176,11 @@ void APlayerCharacter::ResetDash()
 
 void APlayerCharacter::OnTakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser)
 {
+
     if (!ensure(PlayerUI != nullptr)) { return; }
     if (!ensure(PlayerState != nullptr)) { return; }
+
+    if (PlayerState->CurrentStats.Health <= 0) return;
 
     if (!ensure(PlayerHitSound != nullptr)) { return; }
     UGameplayStatics::PlaySound2D(GetWorld(), PlayerHitSound);

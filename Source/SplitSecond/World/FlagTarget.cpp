@@ -8,6 +8,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
+#include "Kismet/GameplayStatics.h"
 
 AFlagTarget::AFlagTarget()
 {
@@ -37,6 +38,9 @@ AFlagTarget::AFlagTarget()
 	ConstructorHelpers::FObjectFinder<UMaterialInterface> BP_Mat2(TEXT("/Game/Materials/MI_TransparentBorderBorder"));
 	if (BP_Mat2.Object) Mesh->SetMaterial(1, BP_Mat2.Object);
 
+	ConstructorHelpers::FObjectFinder<USoundBase> BP_CollisionSound(TEXT("/Game/Audio/2D/delivertablet_Cue"));
+	if (BP_CollisionSound.Object) CollisionSound = BP_CollisionSound.Object;
+
 
 	RotatingMovement = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("Rotating Movement"));
 }
@@ -47,4 +51,9 @@ void AFlagTarget::OnCollision(UPrimitiveComponent* OverlappedComponent, AActor* 
 	{
 		OnFlagTargetCollision.ExecuteIfBound();
 	}
+}
+void AFlagTarget::PlayFinishSound()
+{
+	if (!ensure(CollisionSound != nullptr)) { return; }
+	UGameplayStatics::PlaySound2D(GetWorld(), CollisionSound);
 }

@@ -54,6 +54,9 @@ void ASplitSecondProjectile::OnBulletOverlap(class UPrimitiveComponent* Overlapp
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DefaultCollisionParticle, GetActorLocation(), GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
 	}
 
+	if (!ensure(BulletImpactSound != nullptr)) { return; }
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), BulletImpactSound, GetActorLocation());
+
 	Destroy();
 }
 void ASplitSecondProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -62,6 +65,9 @@ void ASplitSecondProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherAc
 	if (OtherActor->IsA<ASplitSecondProjectile>()) return;
 
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), DefaultCollisionParticle, GetActorLocation(), GetActorRotation(), FVector(1), true, true, ENCPoolMethod::AutoRelease);
+
+	if (!ensure(BulletImpactSound != nullptr)) { return; }
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), BulletImpactSound, GetActorLocation());
 
 	Destroy();
 }

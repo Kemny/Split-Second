@@ -39,9 +39,10 @@ void APlayerProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, 
 
 	// Called to apply damage to hit actor
 	UGameplayStatics::ApplyDamage(OtherActor, Damage, UGameplayStatics::GetPlayerController(GetWorld(), 0), this, UDamageType::StaticClass());
-
+	
+	if (!ensure(BulletImpactSound != nullptr)) { return; }
+	USoundBase* SoundToPlay = BulletImpactSound;
 	UNiagaraSystem* SytemToSpawn = DefaultCollisionParticle;
-	USoundBase* SoundToPlay = nullptr;
 
 	SetExplosive(SytemToSpawn, SoundToPlay);
 
@@ -73,8 +74,9 @@ void APlayerProjectile::OnBulletOverlap(class UPrimitiveComponent* OverlappedCom
 	// Called to apply damage to hit actor
 	UGameplayStatics::ApplyDamage(OtherActor, Damage, UGameplayStatics::GetPlayerController(GetWorld(), 0), this, UDamageType::StaticClass());
 
+	if (!ensure(BulletImpactSound != nullptr)) { return; }
+	USoundBase* SoundToPlay = BulletImpactSound;
 	UNiagaraSystem* SytemToSpawn = DefaultCollisionParticle;
-	USoundBase* SoundToPlay = nullptr;
 
 	SetExplosive(SytemToSpawn, SoundToPlay);
 

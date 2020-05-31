@@ -8,6 +8,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
+#include "Kismet/GameplayStatics.h"
 
 AFlag::AFlag()
 {
@@ -35,6 +36,9 @@ AFlag::AFlag()
 	ConstructorHelpers::FObjectFinder<UMaterialInterface> BP_Mat3(TEXT("/Game/Materials/Screen"));
 	if (BP_Mat3.Object) Mesh->SetMaterial(2, BP_Mat3.Object);
 
+	ConstructorHelpers::FObjectFinder<USoundBase> BP_CollisionSound(TEXT("/Game/Audio/2D/picktablet_Cue"));
+	if (BP_CollisionSound.Object) CollisionSound = BP_CollisionSound.Object;
+
 	RotatingMovement = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("Rotating Movement"));
 }
 
@@ -42,6 +46,9 @@ void AFlag::OnCollision(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 {
 	if (OtherActor == GetWorld()->GetFirstPlayerController()->GetPawn())
 	{
+		if (!ensure(CollisionSound != nullptr)) { return; }
+		UGameplayStatics::PlaySound2D(GetWorld(), CollisionSound);
+
 		OnFlagCollision.ExecuteIfBound();
 		DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		Destroy();

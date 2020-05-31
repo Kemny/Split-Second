@@ -16,6 +16,8 @@ void UTransitionScreen::PlayWinAnimation(int32 ArenaNum)
 	AnimEvent.BindUFunction(this, TEXT("HandleAnimationFinished"));
 	BindToAnimationFinished(ResultAnimation, AnimEvent);
 
+	WinAnimation = true;
+
 	PlayAnimation(ResultAnimation);
 }
 void UTransitionScreen::PlayFailAnimation(int32 ArenaNum)
@@ -30,6 +32,8 @@ void UTransitionScreen::PlayFailAnimation(int32 ArenaNum)
 	FWidgetAnimationDynamicEvent AnimEvent;
 	AnimEvent.BindUFunction(this, TEXT("HandleAnimationFinished"));
 	BindToAnimationFinished(ResultAnimation, AnimEvent);
+
+	WinAnimation = false;
 
 	PlayAnimation(ResultAnimation);
 }
