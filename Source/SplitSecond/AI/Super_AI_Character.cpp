@@ -184,6 +184,7 @@ void ASuper_AI_Character::SpawnGun()
 
 void ASuper_AI_Character::Highlight(EHighlightType HighlightType)
 {
+    if (bIsSpawning) return;
     if (bIsSlowed) HighlightType = EHighlightType::Slow;
 
     float HealthPercentage = Health / MaxHealth;
@@ -209,7 +210,9 @@ void ASuper_AI_Character::Highlight(EHighlightType HighlightType)
 
 void ASuper_AI_Character::GetSlowed(float SlowTime, float SlowAmmount)
 {
+    if (bIsSpawning) return;
     if (!GetMesh()) return;
+
     bIsSlowed = true;
 
     float HealthPercentage = Health / MaxHealth;
