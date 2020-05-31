@@ -1,6 +1,5 @@
 # Split-Second
 
-Game made by:
 ## Lukas Krchov
  - Gameplay Programmer
  - Visual Director
